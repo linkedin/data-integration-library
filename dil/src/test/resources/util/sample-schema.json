@@ -1,0 +1,18 @@
+[
+  {
+    "columnName": "an",
+    "isNullable": false,
+    "dataType": {
+      "type": "array",
+      "name": "an",
+      "items": "string"
+    }
+  },
+  {
+    "columnName": "data",
+    "isNullable": false,
+    "dataType": {
+      "type": "string"
+    }
+  }
+]

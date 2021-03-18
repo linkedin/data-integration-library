@@ -1,0 +1,21 @@
+// Copyright 2021 LinkedIn Corporation. All rights reserved.
+// Licensed under the BSD-2 Clause license.
+// See LICENSE in the project root for license information.
+
+repositories {
+  mavenCentral()
+}
+
+subprojects {
+  repositories {
+    mavenCentral()
+    maven {
+      url "https://repository.cloudera.com/artifactory/cloudera-repos/"
+    }
+    maven {
+      url "http://conjars.org/repo"
+    }
+  }
+
+  project.buildDir = new File(project.rootProject.buildDir, project.name)
+}

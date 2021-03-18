@@ -1,0 +1,25 @@
+// Copyright 2021 LinkedIn Corporation. All rights reserved.
+// Licensed under the BSD-2 Clause license.
+// See LICENSE in the project root for license information.
+
+repositories {
+  mavenCentral()
+  maven {
+    url "https://plugins.gradle.org/m2/"
+  }
+  maven {
+    url "http://packages.confluent.io/maven/"
+  }
+  maven {
+    url "https://linkedin.bintray.com/maven"
+  }
+  jcenter()
+}
+
+try {
+  subprojects {
+    project.repositories.addAll(rootProject.repositories)
+  }
+} catch (Throwable t) {
+  //nothing
+}

@@ -1,0 +1,92 @@
+// Copyright 2021 LinkedIn Corporation. All rights reserved.
+// Licensed under the BSD-2 Clause license.
+// See LICENSE in the project root for license information.
+
+subprojects {
+  plugins.withType(JavaPlugin) {
+    plugins.apply('findbugs')
+    plugins.apply('checkstyle')
+
+    test {
+      if (project.hasProperty("printTestOutput")) {
+        testLogging.showStandardStreams = true
+      }
+      useTestNG () {
+        excludeGroups 'ignore', 'performance'
+        if (project.hasProperty('skipTestGroup')) {
+          excludeGroups skipTestGroup
+        }
+        if (project.hasProperty('runTestGroups')) {
+          includeGroups project.runTestGroups
+        }
+      }
+      testLogging {
+        events "started","skipped","passed","failed"
+        exceptionFormat "full"
+      }
+      // Some tests require MySQL we can either download an embedded Wix image or use a pre-installed version
+      if (rootProject.hasProperty('usePreinstalledMysql') && Boolean.parseBoolean(rootProject.usePreinstalledMysql)) {
+        systemProperty 'gobblin.metastore.testing.embeddedMysqlEnabled', 'false'
+      }
+    }
+
+    findbugs {
+      toolVersion = findBugsVersion
+      ignoreFailures = false
+      effort = "max"
+      sourceSets = [sourceSets.main] // Only analyze src/java/main, not src/java/test/
+      // The exclude filter file must be under "ligradle/findbugs/" for internal compatibility with ligradle FindBugs
+      excludeFilter = file(rootProject.projectDir.path + "/quality/findbugsExclude.xml")
+    }
+    checkstyle {
+      toolVersion = '7.6.1'
+      configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+    }
+  }
+
+  tasks.withType(FindBugs) {
+    // Only one findbugs report can be enabled at a time.
+    // There are 3 kinds of reports in gobblin.
+    // 1. xml - when withFindBugsXmlReport is set
+    // 2. xml:withMessages - For Li internal builds
+    // 3. html - otherwise
+    if (project.hasProperty("withFindBugsXmlReport") && reports.find { it.name == "xml:withMessages"} == null) {
+      reports {
+        html.enabled = false
+        xml.enabled = true
+      }
+    }
+    else if (reports.find { it.name == "xml:withMessages"} == null) {
+      reports {
+        html.enabled = true
+        xml.enabled = false
+      }
+    }
+  }
+
+  tasks.withType(Test) {
+
+    // a collection to track failedTests
+    ext.failedTests = []
+
+    afterTest { descriptor, result ->
+      if (result.resultType == TestResult.ResultType.FAILURE) {
+        String failedTest = "${descriptor.className}::${descriptor.name}"
+        logger.debug("Adding " + failedTest + " to failedTests...")
+        failedTests << [failedTest]
+      }
+    }
+
+    afterSuite { suite, result ->
+      if (!suite.parent) { // will match the outermost suite
+        // logs each failed test
+        if (!failedTests.empty) {
+          logger.lifecycle("Failed tests:")
+          failedTests.each { failedTest ->
+            logger.lifecycle("${failedTest}")
+          }
+        }
+      }
+    }
+  }
+}
