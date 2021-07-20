@@ -6,7 +6,6 @@ name: Build and Run Tests
 
 on:
   push:
-    # Publish only on `master`
     branches:
       - master
   pull_request:
@@ -26,7 +25,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      # Stores external dependencies, can be further improved with Gradle 6.1
       - name: Cache Gradle Dependencies
         uses: actions/cache@v2
         with:
@@ -38,7 +36,7 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
       - name: Build repository
         run: |
-          ./gradlew --no-daemon clean build -x test -x javadoc -x findbugsMain -x findbugsTest -x checkstyleMain -x checkstyleJmh -x checkstyleTest -Dorg.gradle.parallel=true
+          ./gradlew --no-daemon clean build -x test -x javadoc -x findbugsMain -x findbugsTest -x checkstyleMain -x checkstyleTest -Dorg.gradle.parallel=true
 
   test_coverage:
     runs-on: ubuntu-latest
@@ -62,7 +60,7 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
       - name: Generate code coverage
         run: |
-          ./gradlew -PskipTestGroup=disabledOnCI -Dorg.gradle.parallel=false -DjacocoBuild=1 $GOBBLIN_GRADLE_OPTS jacocoTestCoverage
+          ./gradlew -PskipTestGroup=disabledOnCI -Dorg.gradle.parallel=false -DjacocoBuild=1 $DIL_GRADLE_OPTS jacocoTestCoverage
 
   static_checks:
     name: Run static checks
@@ -87,12 +85,12 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
       - name: Run CheckStyle and FindBugs
         run: |
-          ./gradlew --no-daemon -x javadoc findbugsMain checkstyleMain checkstyleTest checkstyleJmh
+          ./gradlew --no-daemon -x javadoc findbugsMain checkstyleMain checkstyleTest
 
   run_tests:
     timeout-minutes: 60
     env:
-      GOBBLIN_GRADLE_OPTS: "--no-daemon -Dgobblin.metastore.testing.embeddedMysqlEnabled=false -PusePreinstalledMysql=true"
+      DIL_GRADLE_OPTS: "--no-daemon -Dgobblin.metastore.testing.embeddedMysqlEnabled=false -PusePreinstalledMysql=true"
     strategy:
       matrix:
         test-group: ["Core Tests", "Service Tests", "Module Tests", "Other Tests"]
@@ -140,7 +138,7 @@ jobs:
           n=0
           until [ "$n" -ge 3 ]
           do
-            ./gradlew -PskipTestGroup=disabledOnCI $GOBBLIN_GRADLE_OPTS $TASKS -Dorg.gradle.parallel=false && break
+            ./gradlew -PskipTestGroup=disabledOnCI $DIL_GRADLE_OPTS $TASKS -Dorg.gradle.parallel=false && break
             n=$((n+1))
             if [[ $n -lt 3 ]]; then
               echo "Tests failed, retry attempt number $n"

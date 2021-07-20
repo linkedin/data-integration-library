@@ -21,7 +21,7 @@ export java_version=$(java -version 2>&1 | grep 'openjdk version' | sed -e 's/op
 
 echo "Using Java version:${java_version}"
 
-export GOBBLIN_GRADLE_OPTS="-Dorg.gradle.daemon=false -Dgobblin.metastore.testing.embeddedMysqlEnabled=false -PusePreinstalledMysql=true -PjdkVersion=${java_version}"
+export DIL_GRADLE_OPTS="-Dorg.gradle.daemon=false -PusePreinstalledMysql=true -PjdkVersion=${java_version}"
 
 TEST_SCRIPT=${script_dir}/test-${RUN_TEST_GROUP}.sh
 if [ -x $TEST_SCRIPT ] ; then
