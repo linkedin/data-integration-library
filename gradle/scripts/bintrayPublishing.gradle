@@ -7,9 +7,9 @@ import org.gradle.api.internal.java.JavaLibrary
 ext.pomAttributes = {
   packaging = 'jar'
   // optionally artifactId can be defined here
-  name = 'Apache Gobblin (incubating)'
-  description = 'A distributed data integration framework for streaming and batch data ecosystems.'
-  url = 'https://gobblin.apache.org/'
+  name = 'Data Integration Library'
+  description = 'A library components for configuration driven data integration'
+  url = 'https://github.com/linkedin/data-integration-library'
 
   scm {
     url = 'https://git-wip-us.apache.org/repos/asf?p=incubator-gobblin.git;a=tree'

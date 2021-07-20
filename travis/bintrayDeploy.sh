@@ -2,11 +2,6 @@
 # Licensed under the BSD-2 Clause license.
 # See LICENSE in the project root for license information.
 
-#
-# Test script used by Travis to test the
-# hadoop1 or hadoop2 versions of gobblin.
-#
-
 #!/bin/bash
 set -e
 
