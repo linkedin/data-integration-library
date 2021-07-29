@@ -1,42 +1,59 @@
+.classpath*
+.project*
+.settings
+.DS_Store
+*.tar.gz
 
+# Intellij related
+**/.idea
+**/*.iml
+**/*.iws
+**/*.ipr
+.shelf/
+.ideaDataSources/
 
-# Compiled class file
-*.class
+# VS Code related
+.vscode
 
-# Log file
-*.log
+**/.classpath
+**/.project
+**/.settings
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+**/*.swp
+**/*.swo
+**/*.log
 
-# IntelliJ
-*.iml
-*.ipr
-*.iws
-.idea
-
-# LinkedIn / Gradle
-.cache
+**/build/
 .gradle
+**/.gradle
+gradle.properties.release
+test-output
+**/test-output
+dist
+target
+tmp
+out
+**/out
+output
+/eclipse_build
+.project
+.classpath
+out/
+*/bin/
+**/mainGeneratedDataTemplate
+**/mainGeneratedRest
+**/main/snapshot
+**.tar.gz
+*~
+metastore_db/
 
-# Explicitly include gradle wrapper jar as part of gradlew migration.  Please check go/gradlew for more information.
-!gradle/wrapper/gradle-wrapper.jar
+# generated nodeJs files
+node_modules/
+package-lock.json
 
-# Excluding gradlew.bat by default as part of gradlew migration.
-# Users are free to remove this line and include the batch file if they wish.
-# Please check go/gradlew for more references.
-gradlew.bat
+*.out
 
-# Ignore .idea/ as it stores IJ metadata for native IDE import.
-.idea/
+# generated java files
+**/gen-java/
 
-
-
-
-# Added by mp-maker
-build
-/*/config
-.shelf
-*.iml
-*.ipr
-*.iws
+temp/
