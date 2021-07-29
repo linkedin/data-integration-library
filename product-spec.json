@@ -1,0 +1,54 @@
+{
+  "name": "data-integration-library",
+  "group": "com.linkedin.@spec.name@",
+  "version": "0.0.*",
+  "scmUrl": "None",
+  "comment": "",
+  "description": "Closed source data integration library",
+  "build": {
+    "commands": {
+      "build": "./gradlew -Prelease=true build",
+      "snapshot": "./gradlew localRelease",
+      "test": "echo 'testing done by build command'"
+    },
+    "toolchains": {
+      "gradle": {
+        "plugins": {
+          "ligradle-jvm": {
+            "libraries": [
+              "product-plugins"
+            ],
+            "version": "5.*"
+          }
+        }
+      }
+    },
+    "type": "gradle",
+    "versions": {
+      "java": "1.8.0_121"
+    }
+  },
+  "runtime": {},
+  "review": {},
+  "topology": {
+    "applications": {}
+  },
+  "archive": {
+    "artifacts": {},
+    "databases": {},
+    "images": {},
+    "repo_name": "TOOLS"
+  },
+  "dependencyResolution": {},
+  "external": {
+    "junitJupiterApi": "org.junit.jupiter:junit-jupiter-api:5.5.1",
+    "junitJupiterEngine": "org.junit.jupiter:junit-jupiter-engine:5.5.1",
+    "junitJupiterParams": "org.junit.jupiter:junit-jupiter-params:5.5.1",
+    "assertj": "org.assertj:assertj-core:3.11.1"
+  },
+  "product": {},
+  "trunkDev": {
+    "autoRevert": false
+  },
+  "extSCM": {}
+}
