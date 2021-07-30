@@ -106,7 +106,7 @@ subprojects{
       repository {
         repoKey = 'dil'
         username = project.hasProperty('artifactoryUser') ? project.property('artifactoryUser') : System.getenv('ARTIFACTORY_USER')
-        password = project.hasProperty('artifactoryApiKey') ? project.property('artifactoryApiKey') : System.getenv('ARTIFACTORY_API_KEY')
+        password = project.hasProperty('artifactoryKey') ? project.property('artifactoryKey') : System.getenv('ARTIFACTORY_KEY')
       }
       defaults {
         publications ('mavenJava')
