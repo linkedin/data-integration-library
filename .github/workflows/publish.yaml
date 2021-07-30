@@ -34,11 +34,11 @@ jobs:
           # Only rebuild cache if build.gradle is changed
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
-      - name: Build repository
+      - name: Publish repository
         env:
           ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
           ARTIFACTORY_KEY: ${{ secrets.ARTIFACTORY_KEY }}
-        run: ./gradlew --stacktrace --debug artifactoryPublish
+        run: echo "$ARTIFACTORY_USER" && echo "$ARTIFACTORY_KEY"
 
 
 
