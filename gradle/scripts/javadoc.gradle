@@ -57,33 +57,11 @@ subprojects {
 
 subprojects {
   plugins.withType(JavaPlugin) {
-    if (isDefaultEnvironment) {
-      task javadocJar(type: Jar) {
-        from javadoc
-        classifier = 'javadoc'
-      }
-      artifacts { archives javadocJar }
+    task javadocJar(type: Jar) {
+      from javadoc
+      classifier = 'javadoc'
     }
-
-    // Add standard javadoc repositories so we can reference classes in them using @link
-    tasks.javadoc.options.links "http://typesafehub.github.io/config/latest/api/",
-        "https://docs.oracle.com/javase/7/docs/api/",
-        "http://google.github.io/guava/releases/15.0/api/docs/",
-        "http://hadoop.apache.org/docs/r${rootProject.ext.hadoopVersion}/api/",
-        "https://hive.apache.org/javadocs/r${rootProject.ext.hiveVersion}/api/",
-        "http://avro.apache.org/docs/${avroVersion}/api/java/",
-        "https://dropwizard.github.io/metrics/${dropwizardMetricsVersion}/apidocs/"
-  }
-}
-
-gradle.projectsEvaluated {
-  subprojects {
-    plugins.withType(JavaPlugin) {
-      getAllDependentProjects(project).each {
-        tasks.javadoc.options.linksOffline "http://linkedin.github.io/gobblin/javadoc/${javadocVersion}/${it.name}/",
-            "${rootProject.buildDir}/${it.name}/docs/javadoc/"
-      }
-    }
+    artifacts { archives javadocJar }
   }
 }
 

@@ -40,7 +40,7 @@ subprojects {
     }
     checkstyle {
       toolVersion = '7.6.1'
-      configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+      configFile = rootProject.file('gradle/checkstyle/checkstyle.xml')
     }
   }
 
