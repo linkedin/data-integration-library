@@ -38,7 +38,7 @@ jobs:
         env:
           ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
           ARTIFACTORY_KEY: ${{ secrets.ARTIFACTORY_KEY }}
-        run: echo "$ARTIFACTORY_USER" && echo "$ARTIFACTORY_KEY"
+        run: ./gradlew artifactoryPublish -PartifactoryUser=$ARTIFACTORY_USER -PartifactoryApiKey=$ARTIFACTORY_API_KEY
 
 
 
