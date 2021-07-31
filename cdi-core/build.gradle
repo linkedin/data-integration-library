@@ -97,11 +97,11 @@ shadowJar {
   exclude 'org/slf4j/**'
   exclude 'javax/ws/rs/**'
 
-  relocate('com.squareup', 'dil.shaded.com.squareup')
-  relocate('retrofit', 'dil.shaded.retrofit')
-  relocate('okhttp3', 'dil.shaded.okhttp3')
-  relocate('okio', 'dil.shaded.okio')
-  relocate('org.testng', 'dil.shaded.org.testng')
+  relocate('com.squareup', 'cdi.shaded.com.squareup')
+  relocate('retrofit', 'cdi.shaded.retrofit')
+  relocate('okhttp3', 'cdi.shaded.okhttp3')
+  relocate('okio', 'cdi.shaded.okio')
+  relocate('org.testng', 'cdi.shaded.org.testng')
   mergeServiceFiles()
 }
 

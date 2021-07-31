@@ -2,4 +2,4 @@
 // Licensed under the BSD-2 Clause license.
 // See LICENSE in the project root for license information.
 
-include 'dil-core'
+include 'cdi-core'
