@@ -31,7 +31,7 @@ if (!project.hasProperty('disableShipkit')) {
 }
 
 allprojects { p ->
-  group = "com.linkedin.dil"
+  group = "com.linkedin.cdi"
 }
 
 if (!project.hasProperty('disableShipkit')) {
