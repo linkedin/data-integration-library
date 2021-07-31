@@ -43,7 +43,7 @@ artifacts {
 def pomConfig = {
   licenses {
     license {
-      name = 'The Apache License, Version 2.0'
+      name = 'BSD 2-CLAUSE LICENSE'
       url = 'https://github.com/linkedin/data-integration-library/blob/master/LICENSE'
       distribution = 'repo'
     }
