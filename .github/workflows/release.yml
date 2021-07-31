@@ -1,4 +1,4 @@
-name: Create GitHub & Artifactory Release
+name: Release and Publish
 on:
   push:
     branches:
