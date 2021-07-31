@@ -1,4 +1,6 @@
 # Data Integration Library 
+[![Build Status](https://github.com/linkedin/data-integration-library/actions/workflows/build-and-test.yml/badge.svg?branch=master)](https://github.com/linkedin/data-integration-library/actions?query=workflow%3A%22Build+and+Run+Tests%22+branch%3Amaster+event%3Apush)
+[![Release Status](https://github.com/linkedin/data-integration-library/actions/workflows/release.yml/badge.svg?branch=master)](https://github.com/linkedin/data-integration-library/actions?query=workflow%3A%22Release+and+Publish%22+branch%3Amaster+event%3Apush)
 
 LinkedIn Data Integration Library (DIL) is a collection of generic data integration components that can be mix-and-matched to form powerful ready-to-use connectors, which can then be used by data integration frameworks like [Apache Gobblin](https://gobblin.apache.org) or event processing frameworks like [Apache Kafka](https://kafka.apache.org/) to ingress or egress data between cloud services or APIs.    
 
@@ -22,10 +24,10 @@ If building the distribution with tests turned on:
 
 # Instructions to build the distribution
 1. Extract the archive file to your local directory.
-2. Skip tests and build the distribution: 
-Run `./gradlew build -x findbugsMain -x test -x rat -x checkstyleMain` 
-The distribution will be created in build/distribution directory.
-(or)
-3. Run tests and build the distribution (requires Maven): 
-Run `./gradlew build` 
-The distribution will be created in build/distribution directory.
+2. Set JAVA_HOME
+3. Build
+* Skip tests and build the distribution
+> `./gradlew build -x findbugsMain -x test -x rat -x checkstyleMain` 
+
+* Tests and build the distribution (requires Maven): 
+> `./gradlew build` 
