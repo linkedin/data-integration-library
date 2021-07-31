@@ -34,9 +34,6 @@ apply from: 'gradle/scripts/dependencyDefinitions.gradle'
 apply from: 'gradle/scripts/configureSubprojects.gradle'
 apply from: 'gradle/scripts/jacoco-coveralls-support.gradle'
 apply from: 'gradle/scripts/testSetup.gradle'
-apply from: 'gradle/scripts/sourcesJar.gradle'
-apply from: 'gradle/scripts/javadoc.gradle'
-apply from: 'gradle/scripts/artifactoryPublishing.gradle'
 apply from: "gradle/release.gradle"
 
 allprojects {

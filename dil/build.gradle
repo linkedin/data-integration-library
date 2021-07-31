@@ -13,6 +13,8 @@ jacocoTestReport {
   }
 }
 
+apply from: "$rootDir/gradle/java-publishing.gradle"
+
 dependencies {
   compile externalDependency.'gson'
   compile externalDependency.'gobblin-core'
