@@ -3,13 +3,14 @@
 // See LICENSE in the project root for license information.
 
 buildscript {
-  ext.avroVersion='1.8.1'
-  ext.awsVersion='2.10.15'
+  ext.avroVersion = '1.8.1'
+  ext.awsVersion = '2.10.15'
   ext.findBugsVersion = '3.0.0'
-  ext.gobblinVersion='0.15.0-dev-9467'
-  ext.hadoopVersion='2.3.0'
-  ext.hiveVersion='1.0.1'
+  ext.gobblinVersion = '0.15.0-dev-9467'
+  ext.hadoopVersion = '2.3.0'
+  ext.hiveVersion = '1.0.1'
   ext.javaVersion = JavaVersion.VERSION_1_8
+  ext.junitJupiterVersion = '5.6.1'
   ext.log4jVersion = '1.2.17'
   ext.pegasusVersion = '28.3.7'
   ext.slf4jVersion = '1.7.21'
@@ -24,6 +25,8 @@ buildscript {
     classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0"
     classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:latest.release'
     classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
+    classpath "org.shipkit:shipkit-auto-version:latest.release"
+    classpath "org.shipkit:shipkit-changelog:latest.release"
   }
 }
 
@@ -33,8 +36,8 @@ apply from: 'gradle/scripts/jacoco-coveralls-support.gradle'
 apply from: 'gradle/scripts/testSetup.gradle'
 apply from: 'gradle/scripts/sourcesJar.gradle'
 apply from: 'gradle/scripts/javadoc.gradle'
-
 apply from: 'gradle/scripts/artifactoryPublishing.gradle'
+apply from: "gradle/release.gradle"
 
 allprojects {
   apply plugin: 'idea'
@@ -49,6 +52,45 @@ subprojects {
     testCompileOnly externalDependency.lombok
     annotationProcessor externalDependency.lombok
     testAnnotationProcessor externalDependency.lombok
+  }
+  project.buildDir = new File(project.rootProject.buildDir, project.name)
+}
+
+subprojects { sp ->
+  apply plugin: 'maven'
+
+  plugins.withType(JavaPlugin) {
+    dependencies {
+      testCompile externalDependency.testng
+    }
+
+    tasks.withType(Test) {
+      useTestNG()
+    }
+
+    checkstyle {
+      configDirectory = file("${project.rootDir}/gradle/checkstyle")
+      sourceSets = [ getProject().sourceSets.main, getProject().sourceSets.test ]
+      toolVersion = "8.35"
+      maxWarnings = 0
+      ignoreFailures = false
+    }
+  }
+
+  afterEvaluate {
+    if (project.plugins.hasPlugin('java')) {
+      sourceCompatibility = 1.8
+      targetCompatibility = 1.8
+    }
+  }
+
+  afterEvaluate {
+    if (project.plugins.hasPlugin('pegasus')) {
+      dependencies {
+        dataTemplateCompile spec.product.pegasus.data
+        restClientCompile spec.product.pegasus.restliClient
+      }
+    }
   }
 }
 
