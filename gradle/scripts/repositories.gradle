@@ -11,7 +11,7 @@ repositories {
     url "http://packages.confluent.io/maven/"
   }
   maven {
-    url "https://linkedin.bintray.com/maven"
+    url "https://linkedin.jfrog.io/artifactory/open-source/"
   }
   jcenter()
 }

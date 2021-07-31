@@ -13,6 +13,8 @@ jacocoTestReport {
   }
 }
 
+apply from: "$rootDir/gradle/java-publishing.gradle"
+
 dependencies {
   compile externalDependency.'gson'
   compile externalDependency.'gobblin-core'
@@ -33,6 +35,7 @@ dependencies {
   compile externalDependency.'commonsLang3'
   compile externalDependency.'testng'
   compile externalDependency.'okhttp'
+  compile externalDependency.'jhyde'
 
   runtime externalDependency.'gobblin-azkaban'
   runtime externalDependency.'gobblin-kafka-08'
@@ -40,7 +43,7 @@ dependencies {
   runtime externalDependency.'gobblin-metrics'
   runtime externalDependency.'gobblin-data-management'
   runtime externalDependency.'gobblin-sql'
-  runtime externalDependency.gson
+  runtime externalDependency.'gson'
   runtime externalDependency.'jodaTime'
 
   testCompile externalDependency.'jmockit'
@@ -73,6 +76,7 @@ configurations {
   all*.exclude group: 'org.apache.hive'
   all*.exclude group: 'ch.qos.logback'
   all*.exclude group: 'com.ibm.icu', module: 'icu4j'
+  all*.exclude group: 'org.pentaho'
 }
 
 shadowJar {
@@ -93,11 +97,11 @@ shadowJar {
   exclude 'org/slf4j/**'
   exclude 'javax/ws/rs/**'
 
-  relocate('com.squareup', 'gobblin.shaded.com.squareup')
-  relocate('retrofit', 'gobblin.shaded.retrofit')
-  relocate('okhttp3', 'gobblin.shaded.okhttp3')
-  relocate('okio', 'gobblin.shaded.okio')
-  relocate('org.testng', 'gobblin.shaded.org.testng')
+  relocate('com.squareup', 'dil.shaded.com.squareup')
+  relocate('retrofit', 'dil.shaded.retrofit')
+  relocate('okhttp3', 'dil.shaded.okhttp3')
+  relocate('okio', 'dil.shaded.okio')
+  relocate('org.testng', 'dil.shaded.org.testng')
   mergeServiceFiles()
 }
 
