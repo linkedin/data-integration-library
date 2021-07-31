@@ -10,7 +10,7 @@
   </module>
 
   <module name="SuppressionFilter">
-    <property name="file" value="config/checkstyle/suppressions.xml"/>
+    <property name="file" value="gradle/checkstyle/suppressions.xml"/>
     <property name="optional" value="true"/>
   </module>
 </module>

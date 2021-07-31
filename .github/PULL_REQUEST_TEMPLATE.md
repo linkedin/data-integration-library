@@ -1,12 +1,9 @@
-Dear Gobblin maintainers,
+Dear DIL maintainers,
 
 Please accept this PR. I understand that it will not be reviewed until I have checked off all the steps below!
 
-
 ### JIRA
-- [ ] My PR addresses the following [Gobblin JIRA](https://issues.apache.org/jira/browse/GOBBLIN/) issues and references them in the PR title. For example, "[GOBBLIN-XXX] My Gobblin PR"
-    - https://issues.apache.org/jira/browse/GOBBLIN-XXX
-
+- [ ] My PR addresses the following [JIRA](https://jira01.corp.linkedin.com:8443/issues) issues and references them in the PR title. 
 
 ### Description
 - [ ] Here are some details about my PR, including screenshots (if applicable):
