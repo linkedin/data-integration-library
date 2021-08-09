@@ -52,7 +52,10 @@ public interface StaticConstants {
   String KEY_WORD_UNITS = "units";
   String KEY_WORD_UNKNOWN = "unknown";
   String KEY_WORD_VALUES = "values";
-
+  String KEY_WORD_THRESHOLD = "threshold";
+  String KEY_WORD_CRITERIA = "criteria";
+  String KEY_WORD_FAIL = "fail";
+  String KEY_WORD_SUCCESS = "success";
+  String KEY_WORD_ERROR_COLUMN = "errorColumn";
   Gson GSON = new Gson();
-
 }

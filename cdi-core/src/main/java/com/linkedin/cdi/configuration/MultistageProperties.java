@@ -497,6 +497,24 @@ public enum MultistageProperties {
    * path and fields, etc.
    */
   MSTAGE_PAYLOAD_PROPERTY("ms.payload.property", JsonArray.class),
+  /**
+   * This property is required for inflowValidation with simple count comparison rule
+   * The rule is accepted as a JsonObject with following Keys
+   * 1. "threshold" - represents the percentage of accepted failure records to mark job as passed
+   * 2. "criteria" - this value can be "fail" or "success" , fail represents that input record only has failed records
+   * 3. "errorColumn" - this value is optional and is required when we require to filter the failure records based on a specific column
+   * if the input record has only success records then set this as "success"
+   * Ex: ms.validation.attributes={"threshold": "10", "criteria" : "fail"}
+   */
+  MSTAGE_VALIDATION_ATTRIBUTES("ms.validation.attributes", JsonObject.class) {
+    @Override
+    public <T> T getDefaultValue() {
+      JsonObject attributesJson = new JsonObject();
+      attributesJson.addProperty(StaticConstants.KEY_WORD_THRESHOLD, 0);
+      attributesJson.addProperty(StaticConstants.KEY_WORD_CRITERIA, StaticConstants.KEY_WORD_FAIL);
+      return (T) attributesJson;
+    }
+  },
   MSTAGE_RETENTION("ms.retention", JsonObject.class) {
     @Override
     public <T> T getDefaultValue() {
