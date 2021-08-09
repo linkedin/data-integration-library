@@ -38,6 +38,7 @@ public class AvroExtractorKeys extends ExtractorKeys {
   private long currentPageNumber = 0;
   private Schema avroOutputSchema = null;
   private Boolean isValidOutputSchema = true;
+  private GenericRecord sampleData = null;
 
   public void incrCurrentPageNumber() {
     currentPageNumber++;

@@ -5,6 +5,7 @@
 package com.linkedin.cdi.extractor;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
 import com.google.gson.JsonArray;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +96,7 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
       avroSchema = fromJsonSchema(schemaArray);
     } else {
       avroSchema = processInputStream(0) ? avroExtractorKeys.getAvroOutputSchema()
-          : fromJsonSchema(createMinimumSchema());
+          : createMinimumAvroSchema();
     }
     Assert.assertNotNull(avroSchema);
     return addDerivedFieldsToSchema(avroSchema);
@@ -133,14 +134,12 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
       return null;
     }
 
-    DataFileStream<GenericRecord> avroRecordIterator = avroExtractorKeys.getAvroRecordIterator();
-
     if (hasNext()) {
       avroExtractorKeys.incrProcessedCount();
       // update work unit status along the way, since we are using iterators
       workUnitStatus.setPageStart(avroExtractorKeys.getProcessedCount());
       workUnitStatus.setPageNumber(avroExtractorKeys.getCurrentPageNumber());
-      GenericRecord row = avroRecordIterator.next();
+      GenericRecord row = extractDataField(getNext());
       AvroSchemaBasedFilter avroSchemaBasedFilter = (AvroSchemaBasedFilter) rowFilter;
       if (avroSchemaBasedFilter != null) {
         row = avroSchemaBasedFilter.filter(row);
@@ -162,6 +161,8 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
    * @return true if Successful
    */
   @Override
+  // Suppressing un-checked casting warning when casting GenericData.Array<GenericRecord>
+  // The casting is thoroughly checked by the isArrayOfRecord method, but it does not get rid of the warning
   protected boolean processInputStream(long starting) {
     if (!super.processInputStream(starting)) {
       return false;
@@ -171,10 +172,13 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
     try {
       avroRecordIterator = new DataFileStream<>(workUnitStatus.getBuffer(),
           new GenericDatumReader<>());
+
       avroExtractorKeys.setAvroRecordIterator(avroRecordIterator);
-      // store the original schema for further processing
+      // save one record to infer the avro schema from data
       if (hasNext() && avroExtractorKeys.getAvroOutputSchema() == null) {
-        avroExtractorKeys.setAvroOutputSchema(avroRecordIterator.getSchema());
+        GenericRecord sampleData = avroRecordIterator.next();
+        avroExtractorKeys.setSampleData(AvroSchemaUtils.deepCopy(sampleData.getSchema(), sampleData));
+        avroExtractorKeys.setAvroOutputSchema(getAvroSchemaFromData(sampleData));
       }
       if (jobKeys.hasOutputSchema()) {
         List<String> schemaColumns = new ArrayList<>(new JsonIntermediateSchema(jobKeys.getOutputSchema())
@@ -212,12 +216,37 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
   }
 
   /**
-   * Helper function that indicates if there are any records left to read
+   * Helper function that checks if there are sample data or more records in the iterator
    * @return true if there are more records and false otherwise
    */
   protected boolean hasNext() {
     DataFileStream<GenericRecord> avroRecordIterator = avroExtractorKeys.getAvroRecordIterator();
+    return avroExtractorKeys.getSampleData() != null || hasNext(avroRecordIterator);
+  }
+
+  /**
+   * Helper function that indicates if there are any records left to read in the iterator
+   * @return true if there are more records and false otherwise
+   */
+  private boolean hasNext(DataFileStream<GenericRecord> avroRecordIterator) {
     return avroRecordIterator != null && avroRecordIterator.hasNext();
+  }
+
+  /**
+   * Helper function to get the next record either from sample data or the iterator
+   * Should only calls this after {@link #hasNext()}
+   * @return next avro record
+   */
+  private GenericRecord getNext() {
+    GenericRecord sampleData = avroExtractorKeys.getSampleData();
+
+    if (sampleData != null) {
+      avroExtractorKeys.setSampleData(null);
+      return sampleData;
+    } else {
+      DataFileStream<GenericRecord> avroRecordExtractor = avroExtractorKeys.getAvroRecordIterator();
+      return avroRecordExtractor.hasNext() ? avroRecordExtractor.next() : null;
+    }
   }
 
   /**
@@ -344,9 +373,112 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
    * Utility method to convert JsonArray schema to avro schema
    * @param schema of JsonArray type
    * @return avro schema
-   * @throws UnsupportedDateTypeException
+   * @throws UnsupportedDateTypeException unsupported type exception
    */
   private Schema fromJsonSchema(JsonArray schema) throws UnsupportedDateTypeException {
     return AvroSchemaUtils.fromJsonSchema(schema, state);
+  }
+
+  /**
+   * get the avro schema of the data
+   * @param sampleData a single record
+   * @return avro schema
+   */
+  private Schema getAvroSchemaFromData(GenericRecord sampleData) {
+    Schema sampleDataSchema = sampleData.getSchema();
+    String dataFieldPath = jobKeys.getDataField();
+    if (StringUtils.isBlank(dataFieldPath)) {
+      return sampleDataSchema;
+    }
+    return createDataFieldRecordSchema(sampleData, dataFieldPath);
+  }
+
+  /**
+   * Extract the data field from the current row
+   * @param row the original data
+   * @return a GenericRecord containing the data field
+   */
+  private GenericRecord extractDataField(GenericRecord row) {
+    String dataFieldPath = jobKeys.getDataField();
+    if (StringUtils.isBlank(dataFieldPath)) {
+      return row;
+    }
+    // if the data field is not present, the schema will be null and the work unit will fail
+    Schema dataFieldRecordSchema = createDataFieldRecordSchema(row, dataFieldPath);
+    GenericRecord dataFieldRecord = new GenericData.Record(dataFieldRecordSchema);
+    // the value should be present here otherwise the work unit would've have failed
+    Object dataFieldValue = AvroUtils.getFieldValue(row, dataFieldPath).get();
+    dataFieldRecord.put(extractDataFieldName(dataFieldPath), dataFieldValue);
+    return dataFieldRecord;
+  }
+
+  /**
+   * create the schema of the record that wraps the data field
+   * @param data original record
+   * @param dataFieldPath path to data field
+   * @return avro schema of the wrapping record
+   */
+  private Schema createDataFieldRecordSchema(GenericRecord data, String dataFieldPath) {
+    Schema rowSchema = data.getSchema();
+    Optional<Object> fieldValue = AvroUtils.getFieldValue(data, dataFieldPath);
+    Schema dataFieldSchema;
+    if (fieldValue.isPresent()) {
+      Object dataFieldValue = fieldValue.get();
+      if (isArrayOfRecord(dataFieldValue)) {
+        dataFieldSchema = ((GenericData.Array<GenericRecord>) dataFieldValue).getSchema();
+      } else {
+        // no need for isPresent check here since the value already exists
+        dataFieldSchema = AvroUtils.getFieldSchema(rowSchema, dataFieldPath).get();
+      }
+      String dataFieldName = extractDataFieldName(dataFieldPath);
+      Schema schema = Schema.createRecord(rowSchema.getName(), rowSchema.getDoc(),
+          rowSchema.getNamespace(), false);
+      List<Schema.Field> schemaFields = new ArrayList<>();
+      schemaFields.add(new Schema.Field(dataFieldName, dataFieldSchema, dataFieldSchema.getDoc(), null));
+      schema.setFields(schemaFields);
+      return schema;
+    } else {
+      failWorkUnit("Terminate the ingestion because the data.field cannot be found");
+      return null;
+    }
+  }
+
+  /**
+   * Use the last value in path as the name of the field. For example, for field1.nestedField1
+   * this will return nestedField1.
+   * @param dataFieldPath path to the data field
+   * @return name of the data field
+   */
+  private String extractDataFieldName(String dataFieldPath) {
+    String[] pathArray = dataFieldPath.split("\\.");
+    return pathArray[pathArray.length - 1];
+  }
+
+  /**
+   * Check if the object is of type GenericData.Array<GenericRecord>
+   * Also allowing UNION, as the inner records' type could be UNION
+   * @param payload an object
+   * @return true if the type is correct and false otherwise
+   */
+  private boolean isArrayOfRecord(Object payload) {
+    if (payload instanceof GenericData.Array<?>) {
+      Schema.Type arrayElementType = ((GenericData.Array<?>) payload).getSchema().getElementType().getType();
+      return arrayElementType == RECORD || arrayElementType == UNION;
+    }
+    return false;
+  }
+
+  /**
+   * Create a minimum avro schema
+   * @return avro schema
+   */
+  private Schema createMinimumAvroSchema() {
+    Schema schema;
+    try {
+      schema = fromJsonSchema(createMinimumSchema());
+    } catch (UnsupportedDateTypeException e) {
+      throw new IllegalStateException("Should not get here since the minimum schema only contains supported types");
+    }
+    return schema;
   }
 }
