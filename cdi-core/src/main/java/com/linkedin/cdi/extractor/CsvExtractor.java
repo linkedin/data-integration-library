@@ -81,8 +81,17 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
         MultistageProperties.MSTAGE_CSV_COLUMN_HEADER.validateNonblank(state) ? MultistageProperties.MSTAGE_CSV_COLUMN_HEADER.getProp(
             state) : false);
     csvExtractorKeys.setRowsToSkip(MultistageProperties.MSTAGE_CSV_SKIP_LINES.getValidNonblankWithDefault(state));
-    if (csvExtractorKeys.getColumnHeader() && csvExtractorKeys.getRowsToSkip() == 0) {
-      csvExtractorKeys.setRowsToSkip(1);
+    if (csvExtractorKeys.getColumnHeader()) {
+      // only set the columnHeaderIndex if ms.csv.column.header is true
+      csvExtractorKeys.setColumnHeaderIndex(
+          MultistageProperties.MSTAGE_CSV_COLUMN_HEADER_INDEX.getValidNonblankWithDefault(state));
+      // if no explicit number of lines to skip is set, skip all lines up to the header by default
+      if (csvExtractorKeys.getRowsToSkip() == 0) {
+        csvExtractorKeys.setRowsToSkip(csvExtractorKeys.getColumnHeaderIndex() + 1);
+      } else if (csvExtractorKeys.getRowsToSkip() <= csvExtractorKeys.getColumnHeaderIndex()) {
+        failWorkUnit(String.format("Header index out of bound: index is %d but the number of skipped lines is %d",
+            csvExtractorKeys.getColumnHeaderIndex(), csvExtractorKeys.getRowsToSkip()));
+      }
     }
     csvExtractorKeys.setSeparator(
         CsvUtils.unescape(MultistageProperties.MSTAGE_CSV_SEPARATOR.getValidNonblankWithDefault(state)));
@@ -403,8 +412,8 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
     int linesRead = 0;
     while (readerIterator.hasNext() && linesRead < csvExtractorKeys.getRowsToSkip()) {
       String[] line = getNextLineWithCleansing(readerIterator);
-      if (linesRead == 0 && csvExtractorKeys.getColumnHeader()) {
-        // if header is present, the first row will be used as header
+      // save the column header
+      if (linesRead == csvExtractorKeys.getColumnHeaderIndex() && csvExtractorKeys.getColumnHeader()) {
         csvExtractorKeys.setHeaderRow(line);
         // check if header has all columns in schema
         if (jobKeys.hasOutputSchema()) {
@@ -413,8 +422,8 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
           List<String> headerRow = Arrays.asList(csvExtractorKeys.getHeaderRow());
           csvExtractorKeys.setIsValidOutputSchema(SchemaUtils.isValidOutputSchema(schemaColumns, headerRow));
         }
-        linesRead++;
       }
+      linesRead++;
     }
   }
 

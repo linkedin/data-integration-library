@@ -648,20 +648,87 @@ public class CsvExtractorTest {
     Assert.assertEquals(res[4], "123.456");
   }
 
+  private void testSkipRowAndSaveHeaderHelper(CsvExtractor csvExtractor, List<String[]> rows, int expectedLinesRemaining)
+      throws Exception {
+    Iterator<String[]> rowIterator = rows.iterator();
+    Whitebox.invokeMethod(csvExtractor, "skipRowAndSaveHeader", rowIterator);
+    int linesRemaining = 0;
+    while (rowIterator.hasNext()) {
+      linesRemaining ++;
+      rowIterator.next();
+    }
+    Assert.assertEquals(linesRemaining, expectedLinesRemaining);
+  }
+
   @Test
   public void testSkipRowAndSaveHeader() throws Exception {
     initExtractor(state);
     String[] someData = new String[]{"some_date"};
     String[] moreData = new String[]{"more_data"};
-    List<String[]> rows = ImmutableList.of(someData, moreData);
     CsvExtractorKeys csvExtractorKeys = new CsvExtractorKeys();
     CsvExtractorKeys spy = spy(csvExtractorKeys);
     csvExtractor.setCsvExtractorKeys(spy);
+    // Three lines of data, skipping two, so there should be one left
+    List<String[]> rows = ImmutableList.of(someData, moreData, moreData);
     when(spy.getRowsToSkip()).thenReturn(2);
     when(spy.getColumnHeader()).thenReturn(false);
-    Whitebox.invokeMethod(csvExtractor, "skipRowAndSaveHeader", rows.iterator());
+    testSkipRowAndSaveHeaderHelper(csvExtractor, rows, 1);
     verify(spy, atMost(0)).setHeaderRow(someData);
     verify(spy, atMost(0)).setHeaderRow(moreData);
+
+    rows = ImmutableList.of(someData, someData, moreData, moreData, moreData);
+    when(spy.getRowsToSkip()).thenReturn(3);
+    when(spy.getColumnHeaderIndex()).thenReturn(2);
+    when(spy.getColumnHeader()).thenReturn(true);
+    testSkipRowAndSaveHeaderHelper(csvExtractor, rows, 2);
+
+    rows = ImmutableList.of(someData, someData, moreData, someData, moreData);
+    when(spy.getRowsToSkip()).thenReturn(4);
+    when(spy.getColumnHeaderIndex()).thenReturn(2);
+    when(spy.getColumnHeader()).thenReturn(true);
+    testSkipRowAndSaveHeaderHelper(csvExtractor, rows, 1);
+  }
+
+  private void testExtractCSVWithSkipLinesHelper(String filepath, boolean hasHeader, int headerIndex,
+      int explicitRowsToSkip, int expectedRecordLength, int expectedProcessedCount) throws RetriableAuthenticationException {
+    InputStream inputStream = getClass().getResourceAsStream(filepath);
+    WorkUnitStatus status = WorkUnitStatus.builder().buffer(inputStream).build();
+
+    when(sourceState.getProp("ms.output.schema", "" )).thenReturn("");
+    when(state.getProp("ms.csv.column.header", StringUtils.EMPTY)).thenReturn(String.valueOf(hasHeader));
+    when(state.getPropAsBoolean("ms.csv.column.header")).thenReturn(hasHeader);
+    if (explicitRowsToSkip > 0) {
+      when(state.getPropAsInt("ms.csv.skip.lines", 0)).thenReturn(explicitRowsToSkip);
+    }
+    when(state.getPropAsInt("ms.csv.column.header.index", 0)).thenReturn(headerIndex);
+    when(MultistageProperties.MSTAGE_CSV_SEPARATOR.getValidNonblankWithDefault(state)).thenReturn("u002c");
+
+    realHttpSource.getWorkunits(sourceState);
+    CsvExtractor extractor = new CsvExtractor(state, realHttpSource.getHttpSourceKeys());
+    when(multistageConnection.executeFirst(extractor.workUnitStatus)).thenReturn(status);
+    extractor.setConnection(multistageConnection);
+
+    extractor.readRecord(null);
+    while (extractor.hasNext()) {
+      String[] record = extractor.readRecord(null);
+      Assert.assertNotNull(record);
+      Assert.assertEquals(record.length, expectedRecordLength);
+    }
+    Assert.assertEquals(expectedProcessedCount, extractor.getCsvExtractorKeys().getProcessedCount());
+  }
+
+  @Test
+  public void testExtractCSVWithSkipLines() throws RetriableAuthenticationException {
+    testExtractCSVWithSkipLinesHelper("/csv/ids_multiple_header_lines.csv",
+        true, 2, 0,2, 10);
+
+    testExtractCSVWithSkipLinesHelper("/csv/ids_multiple_header_lines.csv",
+        true, 1, 3, 2, 10);
+
+    // the work unit should fail in reality, but in unit test records are still processed
+    // there should be an error log saying header index out of bound
+    testExtractCSVWithSkipLinesHelper("/csv/ids_multiple_header_lines.csv",
+        true, 3, 3, 2, 10);
   }
 
   @Test
