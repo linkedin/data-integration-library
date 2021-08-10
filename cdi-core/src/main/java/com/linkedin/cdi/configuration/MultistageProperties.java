@@ -169,6 +169,18 @@ public enum MultistageProperties {
     }
   },
   /**
+   * By default, CsvExtractor tries to infer the true type of fields when inferring schema
+   * However, in some cases, the inference is not accurate, and users may prefer to keep all fields as strings.
+   * In this case ms.csv.default.field.type = string
+   * Supported types: string | int | long | double | boolean | float
+   */
+  MSTAGE_CSV_DEFAULT_FIELD_TYPE("ms.csv.default.field.type", String.class)  {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) StringUtils.EMPTY;
+    }
+  },
+  /**
    * if csv.column.header is true, csv.skip.lines will be 1 by default, if more than 1
    * row to be skipped, then set this parameter explicitly.
    *

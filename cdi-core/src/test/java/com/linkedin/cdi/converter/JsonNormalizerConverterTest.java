@@ -6,6 +6,7 @@ package com.linkedin.cdi.converter;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import org.apache.gobblin.configuration.WorkUnitState;
 import org.testng.Assert;
@@ -23,8 +24,8 @@ public class JsonNormalizerConverterTest {
       + "{\"columnName\":\"normalized\",\"isNullable\":\"false\",\"dataType\":{\"type\":\"string\"}}]";
   String sourceSchemaWithNullableFields = "[{\"columnName\":\"toBeNormalized0\",\"isNullable\":\"true\",\"dataType\":{\"type\":\"string\"}},"
       + "{\"columnName\":\"asIs\",\"isNullable\":\"false\",\"dataType\":{\"type\":\"string\"}},"
-      + "{\"columnName\":\"toBeNormalized1\",\"isNullable\":\"false\",\"dataType\":{\"type\":\"string\"}},"
-      + "{\"columnName\":\"toBeNormalized2\",\"isNullable\":\"false\",\"dataType\":{\"type\":\"string\"}}]";
+      + "{\"columnName\":\"toBeNormalized1\",\"isNullable\":\"true\",\"dataType\":{\"type\":\"string\"}},"
+      + "{\"columnName\":\"toBeNormalized2\",\"isNullable\":\"true\",\"dataType\":{\"type\":\"string\"}}]";
   String targetSchemaWithNullableFields = "[{\"columnName\":\"asIs\",\"isNullable\":\"false\",\"dataType\":{\"type\":\"string\"}}, "
       + "{\"columnName\":\"nullable\",\"isNullable\":\"true\",\"dataType\":{\"type\":\"string\"}},"
       + "{\"columnName\":\"normalized\",\"isNullable\":\"false\",\"dataType\":{\"type\":\"map\", \"values\": \"string\"}}]";
@@ -58,7 +59,6 @@ public class JsonNormalizerConverterTest {
     underTest.convertRecord(outputSchema, record, state);
     Iterable<JsonObject> recordIterable = underTest.convertRecord(outputSchema, record, state);
     JsonObject jsonObject = recordIterable.iterator().next();
-    Assert.assertEquals(jsonObject.getAsJsonArray("normalized").size(), 2);
     // There's 1 record in the buffer before before passing eof
     underTest.convertRecord(outputSchema, record,state);
     JsonObject eof = new JsonObject();
@@ -87,13 +87,15 @@ public class JsonNormalizerConverterTest {
     // There's 1 record in the buffer before before passing eof
     JsonObject recordWithNullableField = new JsonObject();
     recordWithNullableField.addProperty("asIs", "dummy");
-    recordWithNullableField.addProperty("toBeNormalized0", "dummy");
+    recordWithNullableField.add("toBeNormalized0", JsonNull.INSTANCE);
+    // map type should not include this null value
+    recordWithNullableField.addProperty("toBeNormalized0", (String) null);
     recordWithNullableField.addProperty("toBeNormalized1", "dummy");
     recordWithNullableField.addProperty("toBeNormalized2", "dummy");
     recordIterable = underTest.convertRecord(outputSchema, recordWithNullableField, state);
     jsonObject = recordIterable.iterator().next();
     Assert.assertEquals(jsonObject.entrySet().size(), 2);
-    Assert.assertEquals(jsonObject.getAsJsonObject("normalized").entrySet().size(), 3);
+    Assert.assertEquals(jsonObject.getAsJsonObject("normalized").entrySet().size(), 2);
     JsonObject eof = new JsonObject();
     eof.addProperty("EOF", "EOF");
     // When there are no records in the buffer calling before eof

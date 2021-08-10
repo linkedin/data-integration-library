@@ -282,4 +282,21 @@ public interface JsonUtils {
   static JsonArray filter(final String searchKey, final String value, final JsonArray objArray) {
     return filter(searchKey, value, objArray, null);
   }
+
+  /**
+   * Filter out any null values in a JsonObject
+   * @param input JsonObject with nulls
+   * @return the filtered jsonObject
+   */
+  static JsonObject filterNull(final JsonObject input) {
+    JsonObject output = new JsonObject();
+    for (Map.Entry<String, JsonElement> entry : input.entrySet()) {
+      String key = entry.getKey();
+      JsonElement value = entry.getValue();
+      if (!value.isJsonNull()) {
+        output.add(key, value);
+      }
+    }
+    return output;
+  }
 }

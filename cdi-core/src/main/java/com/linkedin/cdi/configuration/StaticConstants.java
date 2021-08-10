@@ -60,5 +60,9 @@ public interface StaticConstants {
   String KEY_WORD_FAIL = "fail";
   String KEY_WORD_SUCCESS = "success";
   String KEY_WORD_ERROR_COLUMN = "errorColumn";
+  String KEY_WORD_INT = "int";
+  String KEY_WORD_LONG = "long";
+  String KEY_WORD_DOUBLE = "double";
+  String KEY_WORD_FLOAT = "float";
   Gson GSON = new Gson();
 }
