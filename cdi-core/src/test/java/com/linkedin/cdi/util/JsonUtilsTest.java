@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.util;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -58,5 +59,15 @@ public class JsonUtilsTest {
 
     a.addProperty("name2", "value1");
     Assert.assertEquals(JsonUtils.replace(a, b).toString(), "{\"name1\":\"newValue1\",\"name2\":\"value1\"}");
+  }
+
+  @Test
+  public void testHas() {
+    Gson gson = new Gson();
+    JsonObject a = gson.fromJson("{\"name1\": \"value1\", \"result\": {\"name2\": \"value2\"}}", JsonObject.class);
+    Assert.assertTrue(JsonUtils.has(a, "name1"));
+    Assert.assertTrue(JsonUtils.has(a, "result.name2"));
+    Assert.assertFalse(JsonUtils.has(a, "name2"));
+    Assert.assertFalse(JsonUtils.has(a, "name3"));
   }
 }

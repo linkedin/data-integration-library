@@ -408,16 +408,16 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
         || VariableUtils.PATTERN.matcher(source).matches());
   }
 
-  protected String generateDerivedFieldValue(Map<String, String> derivedFieldDef,
+  protected String generateDerivedFieldValue(String name, Map<String, String> derivedFieldDef,
       final String inputValue, boolean isStrValueFromSource) {
-    String strValue = StringUtils.EMPTY;
+    String strValue = inputValue;
     long longValue = Long.MIN_VALUE;
     String source = derivedFieldDef.getOrDefault("source", StringUtils.EMPTY);
     String type = derivedFieldDef.get("type");
     String format = derivedFieldDef.getOrDefault("format", StringUtils.EMPTY);
     DateTimeZone timeZone = DateTimeZone.forID(timezone.isEmpty() ? DEFAULT_TIMEZONE : timezone);
 
-    // get the base value from various sources
+    // get the base value from date times or variables
     if (source.equalsIgnoreCase(CURRENT_DATE)) {
       longValue = DateTime.now().getMillis();
     } else if (source.matches(PXD)) {
@@ -435,7 +435,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
         if (longValue != Long.MIN_VALUE) {
           strValue = String.valueOf(longValue);
         } else if (!format.equals(StringUtils.EMPTY)) {
-          strValue = deriveEpoc(format, inputValue);
+          strValue = deriveEpoc(format, strValue);
         } else {
           // Otherwise, the strValue should be a LONG string derived from a dynamic variable source
           Assert.assertNotNull(LongValidator.getInstance().validate(strValue));
@@ -443,7 +443,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
         break;
       case "regexp":
         Pattern pattern = Pattern.compile(!format.equals(StringUtils.EMPTY) ? format : "(.*)");
-        Matcher matcher = pattern.matcher(inputValue);
+        Matcher matcher = pattern.matcher(strValue);
         if (matcher.find()) {
           strValue = matcher.group(1);
         } else {
@@ -452,12 +452,17 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
         }
         break;
       case "boolean":
-        if (!StringUtils.isEmpty(inputValue)) {
-          strValue = inputValue;
+        if (StringUtils.isEmpty(strValue)) {
+          log.error("Input value of a boolean derived field should not be empty!");
         }
         break;
       default:
         break;
+    }
+
+    if (StringUtils.isEmpty(strValue)) {
+      failWorkUnit(String.format("Could not extract the value for the derived field %s from %s",
+          name, StringUtils.join(derivedFieldDef)));
     }
     return strValue;
   }

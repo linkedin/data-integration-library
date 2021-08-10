@@ -159,6 +159,16 @@ public interface JsonUtils {
   }
 
   /**
+   * Check if a JsonElement is available in a JsonObject given a JsonPath
+   * @param row the record
+   * @param jsonPath the JsonPath (string) how to get the data element
+   * @return true if present, false otherwise
+   */
+  static boolean has(JsonObject row, String jsonPath) {
+    return !get(jsonPath, row).isJsonNull();
+  }
+
+  /**
    * Get a JsonElement from a JsonObject based on the given JsonPath
    *
    * @param nested the record contains the data element
