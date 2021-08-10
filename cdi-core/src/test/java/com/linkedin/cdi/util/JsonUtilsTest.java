@@ -5,6 +5,7 @@
 package com.linkedin.cdi.util;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -69,5 +70,13 @@ public class JsonUtilsTest {
     Assert.assertTrue(JsonUtils.has(a, "result.name2"));
     Assert.assertFalse(JsonUtils.has(a, "name2"));
     Assert.assertFalse(JsonUtils.has(a, "name3"));
+  }
+
+  @Test
+  public void testFilter() {
+    Gson gson = new Gson();
+    JsonArray sample = gson.fromJson("[{\"name1\": \"value1\", \"result\": {\"name2\": \"value2\"}}]", JsonArray.class);
+    Assert.assertTrue(JsonUtils.filter("name1", "value1", sample).size() == 1);
+    Assert.assertTrue(JsonUtils.filter("name1", "noneexist", sample).size() == 0);
   }
 }
