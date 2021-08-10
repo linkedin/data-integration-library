@@ -169,6 +169,18 @@ public enum MultistageProperties {
     }
   },
   /**
+   * By default, CsvExtractor tries to infer the true type of fields when inferring schema
+   * However, in some cases, the inference is not accurate, and users may prefer to keep all fields as strings.
+   * In this case ms.csv.default.field.type = string
+   * Supported types: string | int | long | double | boolean | float
+   */
+  MSTAGE_CSV_DEFAULT_FIELD_TYPE("ms.csv.default.field.type", String.class)  {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) StringUtils.EMPTY;
+    }
+  },
+  /**
    * if csv.column.header is true, csv.skip.lines will be 1 by default, if more than 1
    * row to be skipped, then set this parameter explicitly.
    *
@@ -764,6 +776,27 @@ public enum MultistageProperties {
    */
   MSTAGE_WATERMARK("ms.watermark", JsonArray.class),
   MSTAGE_WATERMARK_GROUPS("ms.watermark.groups", JsonArray.class),
+  /**
+   * Minimum records to be present in order for the work unit to be successful,
+   * below the minimum value, the work unit will be failed.
+   */
+  MSTAGE_WORK_UNIT_MIN_RECORDS("ms.work.unit.min.records", Long.class) {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) Long.valueOf(0);
+    }
+  },
+  /**
+   * Minimum number of work units to be present in order for the job to proceed,
+   * below the minimum value, the job will be failed. This parameter shold be used
+   * only when there is a unit watermark.
+   */
+  MSTAGE_WORK_UNIT_MIN_UNITS("ms.work.unit.min.units", Long.class) {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) Long.valueOf(0);
+    }
+  },
   MSTAGE_WORK_UNIT_PARALLELISM_MAX("ms.work.unit.parallelism.max", Integer.class) {
     @Override
     public boolean validateNonblank(State state) {
@@ -830,6 +863,16 @@ public enum MultistageProperties {
       return (T) Long.valueOf(500L);
     }
   },
+  MSTAGE_AUDIT_ENABLED("ms.audit.enabled", Boolean.class) {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) Boolean.FALSE;
+    }
+  },
+  MSTAGE_KAFKA_BROKERS("ms.kafka.brokers", String.class),
+  MSTAGE_KAFKA_SCHEMA_REGISTRY_URL("ms.kafka.schema.registry.url", String.class),
+  MSTAGE_KAFKA_CLIENT_ID("ms.kafka.clientId", String.class),
+  MSTAGE_KAFKA_TOPIC_NAME("ms.kafka.audit.topic.name", String.class),
   // Properties defined in Gobblin, redefine here to leverage the new features like validation
   CONVERTER_CLASSES("converter.classes", String.class),
   DATASET_URN_KEY("dataset.urn", String.class),

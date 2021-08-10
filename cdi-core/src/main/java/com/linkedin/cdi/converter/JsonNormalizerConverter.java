@@ -141,7 +141,10 @@ public class JsonNormalizerConverter extends Converter<JsonArray, JsonArray, Jso
 
     String columnType = JsonUtils.get(KEY_WORD_COLUMN_NAME,
         normalizedField, KEY_WORD_DATA_TYPE_TYPE, targetSchema).getAsString();
-    if (columnType.equalsIgnoreCase(KEY_WORD_MAP) || columnType.equalsIgnoreCase(KEY_WORD_RECORD)) {
+    // filter out null values for map type
+    if (columnType.equalsIgnoreCase(KEY_WORD_MAP)) {
+      newRecord.add(normalizedField, JsonUtils.filterNull(normalized.get(0).getAsJsonObject()));
+    } else if (columnType.equalsIgnoreCase(KEY_WORD_RECORD)) {
       newRecord.add(normalizedField, normalized.get(0));
     } else {
       newRecord.add(normalizedField, normalized);

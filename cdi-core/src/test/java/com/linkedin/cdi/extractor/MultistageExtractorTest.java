@@ -36,6 +36,8 @@ import com.linkedin.cdi.source.MultistageSource;
 import com.linkedin.cdi.util.ParameterTypes;
 import com.linkedin.cdi.util.WorkUnitStatus;
 import org.apache.gobblin.runtime.JobState;
+import org.apache.gobblin.source.extractor.WatermarkInterval;
+import org.apache.gobblin.source.extractor.extract.LongWatermark;
 import org.apache.gobblin.source.workunit.WorkUnit;
 import org.joda.time.DateTime;
 import org.mockito.Mockito;
@@ -215,7 +217,9 @@ public class MultistageExtractorTest extends PowerMockTestCase {
 
   @Test
   public void testClose() {
+    WorkUnit dummyWU = WorkUnit.create(null, new WatermarkInterval(new LongWatermark(-1L), new LongWatermark(-1L)));
     when(state.getWorkingState()).thenReturn(WorkUnitState.WorkingState.CANCELLED);
+    when(state.getWorkunit()).thenReturn(dummyWU);
     multistageExtractor.close();
   }
 
