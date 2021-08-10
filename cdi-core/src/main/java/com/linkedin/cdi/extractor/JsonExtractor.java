@@ -295,7 +295,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
       }
     }
 
-    return generateDerivedFieldValue(derivedFieldDef, inputValue, isInputValueFromSource);
+    return generateDerivedFieldValue(name, derivedFieldDef, inputValue, isInputValueFromSource);
   }
 
   /**
@@ -440,8 +440,10 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
             return jsonExtractorKeys.getTotalCount();
           } else if (payload.isJsonArray()) {
             return jsonExtractorKeys.getTotalCount() + payload.getAsJsonArray().size();
+          } else if (payload.isJsonObject()) {
+            return jsonExtractorKeys.getTotalCount() + 1;
           } else {
-            throw new RuntimeException("Payload is not a JsonArray, only array payload is supported");
+            throw new RuntimeException("Unsupported payload type: only JsonArray or JsonObject is supported");
           }
         } else {
           // no total count field and no data field
@@ -557,7 +559,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
     JsonObject pushDowns = new JsonObject();
     for (Map.Entry<String, Map<String, String>> entry : derivedFields.entrySet()) {
       String source = entry.getValue().get("source");
-      if (data.has(source)) {
+      if (JsonUtils.has(data, source)) {
         pushDowns.addProperty(entry.getKey(), data.get(source).getAsString());
         log.info("Identified push down value: {}", pushDowns);
       }

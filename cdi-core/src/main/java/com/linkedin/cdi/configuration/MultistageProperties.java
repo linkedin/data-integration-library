@@ -117,6 +117,13 @@ public enum MultistageProperties {
    * this value is in milliseconds.
    */
   MSTAGE_CALL_INTERVAL("ms.call.interval.millis", Long.class),
+  MSTAGE_CONVERTER_CSV_MAX_FAILURES("ms.converter.csv.max.failures", Long.class),
+  MSTAGE_CONVERTER_KEEP_NULL_STRINGS("ms.converter.keep.null.strings", Boolean.class) {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) Boolean.FALSE;
+    }
+  },
   MSTAGE_CSV_COLUMN_HEADER("ms.csv.column.header", Boolean.class),
   /**
    * a comma-separated string, where each value is either an integer or a range

@@ -35,6 +35,8 @@ import com.linkedin.cdi.util.WorkUnitStatus;
 import org.apache.gobblin.runtime.JobState;
 import org.apache.gobblin.source.workunit.WorkUnit;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.mockito.Mockito;
 import org.powermock.reflect.Whitebox;
 import org.testng.Assert;
@@ -317,6 +319,7 @@ public class JsonExtractorTest {
     Assert.assertEquals(actual.entrySet().size(), 2);
     Assert.assertTrue(actual.has("formula"));
     Assert.assertEquals(actual.get("start_time").toString(), "\"1592809200000\"");
+
     // negative regex case
     derivedFields = ImmutableMap.of("formula",
         ImmutableMap.of("type", "regexp", "source", "uri", "format", "/syncs/([0-9]+)$"));
@@ -331,6 +334,7 @@ public class JsonExtractorTest {
     Assert.assertEquals(actual.get("start_time").toString(), "\"1592809200000\"");
     Assert.assertEquals(actual.get("formula").toString(), "\"no match\"");
     Assert.assertEquals(actual.get("uri").toString(), "\"invalid_uri\"");
+
     // positive regex case
     derivedFields = ImmutableMap.of("formula",
         ImmutableMap.of("type", "regexp", "source", "uri", "format", "/syncs/([0-9]+)$"));
@@ -356,16 +360,31 @@ public class JsonExtractorTest {
     Assert.assertTrue(actual.has("formula"));
     Assert.assertEquals(actual.get("formula").toString(), "true");
 
+    // Testing derived fields from push downs that are two levels deep
+    derivedFields = ImmutableMap.of("formula",
+        ImmutableMap.of("type", "string", "source", "result.key1"));
+    when(jobKeys.getDerivedFields()).thenReturn(derivedFields);
+    pushDowns.addProperty("nested", "result.key1");
+    row.add("result", gson.fromJson("{\"key1\": \"value1\"}", JsonObject.class));
+    when(jsonExtractorKeys.getPushDowns()).thenReturn(pushDowns);
+    actual = Whitebox.invokeMethod(jsonExtractor, "addDerivedFields", row);
+    Assert.assertEquals(actual.entrySet().size(), 4);
+    Assert.assertTrue(actual.has("formula"));
+    Assert.assertEquals(actual.get("formula").toString(), "\"value1\"");
+
     // Testing derived fields from variable
     JsonObject parameters = new JsonObject();
-    parameters.addProperty("dateString", "2019-11-01 12:00:00");
+    parameters.addProperty("dateString", "2019-11-01");
+    parameters.addProperty("dateTimeString", "2019-11-01 12:00:00");
     parameters.addProperty("someInteger", 123456);
     parameters.addProperty("someNumber", 123.456);
     parameters.addProperty("someEpoc", 1601038688000L);
     jsonExtractor.currentParameters = parameters;
 
     derivedFields = ImmutableMap.of("dateString",
-        ImmutableMap.of("type", "string", "source", "{{dateString}}"),
+        ImmutableMap.of("type", "epoc", "source", "{{dateString}}", "format", "yyyy-MM-dd"),
+        "dateTimeString",
+        ImmutableMap.of("type", "string", "source", "{{dateTimeString}}"),
         "someInteger",
         ImmutableMap.of("type", "integer", "source", "{{someInteger}}"),
         "someEpoc",
@@ -375,8 +394,11 @@ public class JsonExtractorTest {
     when(jobKeys.getDerivedFields()).thenReturn(derivedFields);
     pushDowns.addProperty("non-formula", "testValue");
     actual = Whitebox.invokeMethod(jsonExtractor, "addDerivedFields", row);
-    Assert.assertEquals(actual.entrySet().size(), 7);
-    Assert.assertEquals(actual.get("dateString").toString(), "\"2019-11-01 12:00:00\"");
+    Assert.assertEquals(actual.entrySet().size(), 9);
+    DateTimeFormatter datetimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+    DateTime dateTime = datetimeFormatter.parseDateTime("2019-11-01");
+    Assert.assertEquals(actual.get("dateString").toString(), String.valueOf(dateTime.getMillis()));
+    Assert.assertEquals(actual.get("dateTimeString").toString(), "\"2019-11-01 12:00:00\"");
     Assert.assertEquals(actual.get("someInteger").toString(), "123456");
     Assert.assertEquals(actual.get("someNumber").toString(), "123.456");
     Assert.assertEquals(actual.get("start_time").toString(), "\"1592809200000\"");
@@ -440,13 +462,24 @@ public class JsonExtractorTest {
   }
 
   /**
-   * Test getTotalCountValue with non-JsonArray payload
+   * Test getTotalCountValue with jsonObject data field
+   */
+  @Test
+  public void testGetTotalCountValueWithJsonObjectDataField() throws Exception {
+    when(source.getJobKeys().getTotalCountField()).thenReturn("");
+    when(source.getJobKeys().getDataField()).thenReturn("items");
+    JsonObject data = gson.fromJson("{\"records\":{\"totalRecords\":2},\"items\":{\"callId\":\"001\"}}", JsonObject.class);
+    Assert.assertEquals(Whitebox.invokeMethod(jsonExtractor, "getTotalCountValue", data), Long.valueOf(1));
+  }
+
+  /**
+   * Test getTotalCountValue with invalid data field
    * Expect: RuntimeException
    */
   @Test(expectedExceptions = RuntimeException.class)
-  public void testGetTotalCountValueWithJsonObjectPayload() throws Exception {
+  public void testGetTotalCountValueWithInvalidDataField() throws Exception {
     when(source.getJobKeys().getTotalCountField()).thenReturn("");
-    when(source.getJobKeys().getDataField()).thenReturn("items");
+    when(source.getJobKeys().getDataField()).thenReturn("items.callId");
     JsonObject data = gson.fromJson("{\"records\":{\"totalRecords\":2},\"items\":{\"callId\":\"001\"}}", JsonObject.class);
     Assert.assertEquals(Whitebox.invokeMethod(jsonExtractor, "getTotalCountValue", data), Long.valueOf(0));
   }

@@ -23,6 +23,7 @@ public interface StaticConstants {
   String KEY_WORD_RANGE_FROM = "from";
   String KEY_WORD_HTTP_OK = "ok";
   String KEY_WORD_INTEGER = "integer";
+  String KEY_WORD_IS_NULLABLE = "isNullable";
   String KEY_WORD_ITEMS = "items";
   String KEY_WORD_MAP = "map";
   String KEY_WORD_NAME = "name";
