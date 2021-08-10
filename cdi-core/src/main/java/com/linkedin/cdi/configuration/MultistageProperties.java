@@ -842,6 +842,16 @@ public enum MultistageProperties {
       return (T) Long.valueOf(500L);
     }
   },
+  MSTAGE_AUDIT_ENABLED("ms.audit.enabled", Boolean.class) {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) Boolean.FALSE;
+    }
+  },
+  MSTAGE_KAFKA_BROKERS("ms.kafka.brokers", String.class),
+  MSTAGE_KAFKA_SCHEMA_REGISTRY_URL("ms.kafka.schema.registry.url", String.class),
+  MSTAGE_KAFKA_CLIENT_ID("ms.kafka.clientId", String.class),
+  MSTAGE_KAFKA_TOPIC_NAME("ms.kafka.audit.topic.name", String.class),
   // Properties defined in Gobblin, redefine here to leverage the new features like validation
   CONVERTER_CLASSES("converter.classes", String.class),
   DATASET_URN_KEY("dataset.urn", String.class),

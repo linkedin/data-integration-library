@@ -64,5 +64,8 @@ public interface StaticConstants {
   String KEY_WORD_LONG = "long";
   String KEY_WORD_DOUBLE = "double";
   String KEY_WORD_FLOAT = "float";
+  String KEY_WORD_JSON = "json";
+  String KEY_WORD_CSV = "csv";
+  String KEY_WORD_AVRO = "avro";
   Gson GSON = new Gson();
 }
