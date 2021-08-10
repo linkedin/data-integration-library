@@ -23,7 +23,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.gobblin.configuration.State;
 import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
-import com.linkedin.cdi.factory.HttpClientFactory;
+import com.linkedin.cdi.factory.ConnectionClientFactory;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.HttpKeys;
 import com.linkedin.cdi.keys.JobKeys;
@@ -79,9 +79,9 @@ public class HttpConnection extends MultistageConnection {
     if (httpClient == null) {
       try {
         Class<?> factoryClass = Class.forName(
-            MultistageProperties.MSTAGE_HTTP_CLIENT_FACTORY.getValidNonblankWithDefault(state));
-        HttpClientFactory factory = (HttpClientFactory) factoryClass.newInstance();
-        httpClient = factory.get(state);
+            MultistageProperties.MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
+        ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.newInstance();
+        httpClient = factory.getHttpClient(state);
       } catch (Exception e) {
         log.error("Error creating HttpClient: {}", e.getMessage());
       }

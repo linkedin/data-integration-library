@@ -11,6 +11,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.linkedin.cdi.factory.ConnectionClientFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
 import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.factory.SchemaReaderFactory;
 import com.linkedin.cdi.factory.reader.SchemaReader;
 import com.linkedin.cdi.util.DateTimeUtils;
 import com.linkedin.cdi.util.HdfsReader;
@@ -557,7 +557,10 @@ public class JobKeys {
     try {
       // Schema Reader could be plugged in before the initialization on JobKeys
       if (schemaReader == null) {
-        schemaReader = SchemaReaderFactory.create(state);
+        Class<?> factoryClass = Class.forName(
+            MultistageProperties.MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
+        ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.newInstance();
+        schemaReader = factory.getSchemaReader(state);
       }
       return schemaReader.read(state, urn).getAsJsonArray();
     } catch (Exception e) {
