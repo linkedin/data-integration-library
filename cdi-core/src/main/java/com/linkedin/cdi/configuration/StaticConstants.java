@@ -19,6 +19,7 @@ public interface StaticConstants {
   String KEY_WORD_DATA_TYPE = "dataType";
   String KEY_WORD_DATA_TYPE_TYPE = "dataType.type";
   String KEY_WORD_EOF = "EOF";
+  String KEY_WORD_EPOC = "epoc";
   String KEY_WORD_FIELDS = "fields";
   String KEY_WORD_RANGE_FROM = "from";
   String KEY_WORD_HTTP_OK = "ok";
@@ -38,6 +39,7 @@ public interface StaticConstants {
   String KEY_WORD_PROPERTIES = "properties";
   String KEY_WORD_RANGE = "range";
   String KEY_WORD_RECORD = "record";
+  String KEY_WORD_REGEXP = "regexp";
   String KEY_WORD_RETRY = "retry";
   String KEY_WORD_RETRY_COUNT = "retryCount";
   String KEY_WORD_RETRY_DELAY_IN_SEC = "delayInSec";

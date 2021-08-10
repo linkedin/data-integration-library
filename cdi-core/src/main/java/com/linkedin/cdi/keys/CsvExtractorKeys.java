@@ -39,7 +39,6 @@ public class CsvExtractorKeys extends ExtractorKeys {
       MultistageProperties.MSTAGE_CSV_ESCAPE_CHARACTER);
 
   private Iterator<String[]> csvIterator = null;
-  private long processedCount = 0;
   private long currentPageNumber = 0;
   private Boolean columnHeader = false;
   private int columnHeaderIndex = 0;
@@ -58,9 +57,6 @@ public class CsvExtractorKeys extends ExtractorKeys {
 
   public void incrCurrentPageNumber() {
     currentPageNumber++;
-  }
-  public void incrProcessedCount() {
-    processedCount++;
   }
 
   @Override

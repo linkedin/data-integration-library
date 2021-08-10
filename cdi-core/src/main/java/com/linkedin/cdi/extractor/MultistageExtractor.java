@@ -75,7 +75,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   protected final static String PXD = "P\\d+D";
   protected final static String CONTENT_TYPE_KEY = "Content-Type";
   protected final static List<String> SUPPORTED_DERIVED_FIELD_TYPES =
-      Arrays.asList("epoc", "string", "integer", "number");
+      Arrays.asList(KEY_WORD_EPOC, KEY_WORD_STRING, KEY_WORD_REGEXP, KEY_WORD_BOOLEAN, KEY_WORD_INTEGER, KEY_WORD_NUMBER);
   protected static final String COMMA_STR = ",";
   protected final static String DEFAULT_TIMEZONE = "America/Los_Angeles";
 
@@ -138,13 +138,19 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   @Nullable
   @Override
   public D readRecord(D reuse) {
+    if (extractorKeys.getProcessedCount() % (100 * 1000) == 0) {
+      log.debug("Processed {} records", extractorKeys.getProcessedCount());
+    }
     return null;
   }
 
   @Override
   public void close() {
+    log.info("Closing the work unit: {}", this.extractorKeys.getSignature());
     if (state.getWorkingState().equals(WorkUnitState.WorkingState.SUCCESSFUL)) {
       state.setActualHighWatermark(state.getWorkunit().getExpectedHighWatermark(LongWatermark.class));
+    } else {
+      state.setActualHighWatermark(new LongWatermark(-1L));
     }
     if (connection != null) {
       connection.closeAll(StringUtils.EMPTY);

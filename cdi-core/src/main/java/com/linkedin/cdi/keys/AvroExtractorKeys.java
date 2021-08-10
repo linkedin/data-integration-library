@@ -32,7 +32,6 @@ public class AvroExtractorKeys extends ExtractorKeys {
       MultistageProperties.MSTAGE_TOTAL_COUNT_FIELD);
 
   private DataFileStream<GenericRecord> avroRecordIterator = null;
-  private long processedCount;
   private long totalCount;
   // TODO: move this to ExtractorKeys if pagination is needed
   private long currentPageNumber = 0;
@@ -43,9 +42,6 @@ public class AvroExtractorKeys extends ExtractorKeys {
   public void incrCurrentPageNumber() {
     currentPageNumber++;
   }
-  public void incrProcessedCount() {
-    processedCount++;
-  }
 
 
 
@@ -55,7 +51,6 @@ public class AvroExtractorKeys extends ExtractorKeys {
     log.debug("These are values of JsonExtractor regarding to Work Unit: {}",
         workUnit == null ? "testing" : workUnit.getProp(MultistageProperties.DATASET_URN_KEY.toString()));
     log.debug("Total rows expected or processed: {}", totalCount);
-    log.debug("Total rows processed: {}", processedCount);
   }
 
   @Override

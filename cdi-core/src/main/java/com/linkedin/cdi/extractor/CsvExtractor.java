@@ -35,6 +35,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.WorkUnitState;
 import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.filter.CsvSchemaBasedFilter;
@@ -155,6 +156,8 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
   @Nullable
   @Override
   public String[] readRecord(String[] reuse) {
+    super.readRecord(reuse);
+
     if (csvExtractorKeys.getCsvIterator() == null && !processInputStream(0)) {
       return null;
     }
@@ -236,17 +239,20 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
             MultistageProperties.MSTAGE_SOURCE_DATA_CHARACTER_SET.getValidNonblankWithDefault(state)))).withCSVParser(parser)
             .build();
         Iterator<String[]> readerIterator = reader.iterator();
+
+        // header row can be in the front of informational rows or after them
+        skipRowAndSaveHeader(readerIterator);
+
         // convert some sample data to json to infer the schema
         if (!jobKeys.hasOutputSchema() && starting == 0) {
           // initialize a reader without skipping lines since header might be used
           JsonArray inferredSchema = inferSchemaWithSample(readerIterator);
           extractorKeys.setInferredSchema(inferredSchema);
+
           // build the columnToIndexMap for derived fields based on the inferred schema
           if (jobKeys.getDerivedFields().entrySet().size() != 0) {
             buildColumnToIndexMap(inferredSchema);
           }
-        } else {
-          skipRowAndSaveHeader(readerIterator);
         }
         csvExtractorKeys.setCsvIterator(readerIterator);
       } catch (Exception e) {
@@ -343,34 +349,18 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
    * @param derivedFieldDef map {type: type1, source: source1, format: format1}
    * @return String value of the derived field
    */
-  private String processDerivedFieldSource(String[] row, Map<String, String> derivedFieldDef) {
-    String source = derivedFieldDef.get("source");
-    String strValue = "";
-    DateTimeZone timeZone = DateTimeZone.forID(timezone.isEmpty() ? DEFAULT_TIMEZONE : timezone);
+  private String processDerivedFieldSource(String[] row, String name, Map<String, String> derivedFieldDef) {
+    String source = derivedFieldDef.getOrDefault("source", StringUtils.EMPTY);
+    String inputValue = derivedFieldDef.getOrDefault("value", StringUtils.EMPTY);
+    boolean isInputValueFromSource = false;
 
-    // get the base value from various sources
-    if (source.equalsIgnoreCase("currentdate")) {
-      strValue = String.valueOf(DateTime.now().getMillis());
-    } else if (source.matches("P\\d+D")) {
-      Period period = Period.parse(source);
-      strValue =
-          String.valueOf(DateTime.now().withZone(timeZone).minus(period).dayOfMonth().roundFloorCopy().getMillis());
-    } else if (csvExtractorKeys.getColumnToIndexMap().containsKey(source)) {
+    if (csvExtractorKeys.getColumnToIndexMap().containsKey(source)) {
       int sourceIndex = csvExtractorKeys.getColumnToIndexMap().get(source);
-      strValue = row[sourceIndex];
-    } else if (VariableUtils.PATTERN.matcher(source).matches()) {
-      strValue = replaceVariable(source);
-    } else {
-      failWorkUnit("Unsupported source for derived fields: " + source);
+      inputValue = row[sourceIndex];
+      isInputValueFromSource = true;
     }
 
-    // further processing required for specific types
-    String type = derivedFieldDef.get("type");
-    if (type.equals("epoc") && !(source.equalsIgnoreCase(CURRENT_DATE) || source.matches(PXD))
-        && derivedFieldDef.containsKey("format")) {
-      strValue = deriveEpoc(derivedFieldDef.get("format"), strValue);
-    }
-    return strValue;
+    return generateDerivedFieldValue(name, derivedFieldDef, inputValue, isInputValueFromSource);
   }
 
   /**
@@ -391,8 +381,9 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
 
     int index = originalLength;
     for (Map.Entry<String, Map<String, String>> derivedField : derivedFields) {
+      String name = derivedField.getKey();
       Map<String, String> derivedFieldDef = derivedField.getValue();
-      String strValue = processDerivedFieldSource(row, derivedFieldDef);
+      String strValue = processDerivedFieldSource(row, name, derivedFieldDef);
       String type = derivedFieldDef.get("type");
       if (SUPPORTED_DERIVED_FIELD_TYPES.contains(type)) {
         row[index] = strValue;
@@ -431,7 +422,6 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
    * Perform limited cleansing so that data can be processed by converters
    *
    * @param input the input data to be cleansed
-   * @return the cleansed data
    */
   private void limitedCleanse(String[] input) {
     for (int i = 0; i < input.length; i++) {
@@ -458,7 +448,6 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
    * @return inferred schema
    */
   private JsonArray inferSchemaWithSample(Iterator<String[]> readerIterator) {
-    skipRowAndSaveHeader(readerIterator);
     String[] header = csvExtractorKeys.getHeaderRow();
     JsonArray sample = new JsonArray();
     int linesRead = 0;
