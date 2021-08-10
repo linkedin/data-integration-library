@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.factory;
 
+import com.jcraft.jsch.JSch;
 import com.linkedin.cdi.factory.reader.SchemaReader;
 import com.linkedin.cdi.util.EncryptionUtils;
 import java.sql.Connection;
@@ -62,6 +63,19 @@ public class DefaultConnectionClientFactory implements ConnectionClientFactory {
   }
 
   /**
+<<<<<<< HEAD
+=======
+   * Initiate a Secure Channel for SFTP Connection
+   * @param state the state of execution environment
+   * @return a SFTP secure channel
+   */
+  public JSch getSecureChannel(State state) {
+    // TODO implement the default SFTP secure channel
+    return null;
+  }
+
+  /**
+>>>>>>> 569c190... Consolidate factor classes
    * Initiate a SchemaReader
    * @param state the state of execution environment
    * @return a SchemaReader
