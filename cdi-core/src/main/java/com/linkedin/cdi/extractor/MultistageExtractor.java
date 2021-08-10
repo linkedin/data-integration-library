@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.extractor;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -156,8 +157,15 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
           jobKeys.getMinWorkUnitRecords()));
     }
 
+    Preconditions.checkNotNull(state.getWorkunit(), MSG_WORK_UNIT_ALWAYS);
+    Preconditions.checkNotNull(state.getWorkunit().getLowWatermark(), MSG_LOW_WATER_MARK_ALWAYS);
     if (state.getWorkingState().equals(WorkUnitState.WorkingState.SUCCESSFUL)) {
       state.setActualHighWatermark(state.getWorkunit().getExpectedHighWatermark(LongWatermark.class));
+    } else if (state.getActualHighWatermark() == null) {
+      // Set the actual high watermark to low watermark explicitly,
+      // replacing the implicit behavior in state.getActualHighWatermark(LongWatermark.class)
+      // avoiding different returns from the two versions of getActualHighWatermark()
+      state.setActualHighWatermark(state.getWorkunit().getLowWatermark(LongWatermark.class));
     }
 
     if (connection != null) {

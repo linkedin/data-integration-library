@@ -312,15 +312,13 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
         // grace period logic, which is controlled by cut off time
         if (unitCutoffTime == -1L
             || dtPartition.getRight() >= Longs.max(unitCutoffTime, cutoffTime)) {
-          // prune the date range only if it is not partitioned
+          // prune the date range only if the unit is not in first execution
           // note the nominal date range low boundary had been saved in signature
-          ImmutablePair<Long, Long> dtPartitionModified = dtPartition;
-          if (datetimePartitions.size() == 1 && dtPartition.left < cutoffTime) {
-            dtPartitionModified = new ImmutablePair<>(cutoffTime, dtPartition.right);
-          }
-          log.debug("dtPartitionModified: {}", dtPartitionModified);
+          ImmutablePair<Long, Long> dtPartitionModified = unitCutoffTime == -1L
+              ? dtPartition : previousHighWatermarks.get(wuSignature).equals(dtPartition.left)
+              ? dtPartition : new ImmutablePair<>(Long.max(unitCutoffTime, dtPartition.left), dtPartition.right);
 
-          log.info("Generating Work Unit: {}, watermark: {}", wuSignature, dtPartitionModified);
+          log.info(String.format(MSG_WORK_UNIT_INFO, wuSignature, dtPartitionModified));
           WorkUnit workUnit = WorkUnit.create(extract,
               new WatermarkInterval(
                   new LongWatermark(dtPartitionModified.getLeft()),
