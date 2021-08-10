@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.gobblin.configuration.SourceState;
@@ -44,6 +45,8 @@ import static org.mockito.Mockito.*;
 
 public class MultistageSourceTest {
   private final static DateTimeFormatter JODA_DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ");
+  private final static DateTimeZone PST_TIMEZONE = DateTimeZone.forTimeZone(TimeZone.getTimeZone("PST"));
+  private final static DateTimeFormatter DTF_PST_TIMEZONE = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss").withZone(PST_TIMEZONE);
   private Gson gson;
   private MultistageSource source;
 
@@ -715,4 +718,38 @@ public class MultistageSourceTest {
     Assert.assertNotNull(source.generateWorkUnits(new ArrayList<>(), new HashMap<>()));
   }
 
+  @Test
+  public void testAvoidWatermarkGoingBeyondLeftBoundary() {
+    // state and source: define 2 day grace period
+    SourceState state = new SourceState();
+    state.setProp("ms.grace.period.days", "2");
+    MultistageSource<?, ?> source = new MultistageSource<>();
+    source.setSourceState(state);
+    source.jobKeys.initialize(state);
+
+    // watermark definition: define from and to date watermark
+    String jsonDef = "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"2021-06-18\", \"to\": \"2021-06-19\"}}]";
+    Gson gson = new Gson();
+    JsonArray defArray = gson.fromJson(jsonDef, JsonArray.class);
+    WatermarkDefinition watermarkDefinition = new WatermarkDefinition(defArray.get(0).getAsJsonObject(),
+        false, WorkUnitPartitionTypes.DAILY);
+    List<WatermarkDefinition> definitions = ImmutableList.of(watermarkDefinition);
+
+    // previous highwatermarks: simulate state-store entry
+    Map<String, Long> previousHighWatermarks = Mockito.mock(HashMap.class);
+    when(previousHighWatermarks.containsKey(any())).thenReturn(true);
+    when(previousHighWatermarks.get(any())).thenReturn(
+        DTF_PST_TIMEZONE.parseDateTime("2021-06-19T00:00:00").getMillis());
+
+    // expected workunits
+    WorkUnit expectedWorkUnit = WorkUnit.create(null,
+        new WatermarkInterval(
+            new LongWatermark(DTF_PST_TIMEZONE.parseDateTime("2021-06-18T00:00:00").getMillis()),
+            new LongWatermark(DTF_PST_TIMEZONE.parseDateTime("2021-06-19T00:00:00").getMillis())));
+
+    List<WorkUnit> actualWorkUnits = source.generateWorkUnits(definitions, previousHighWatermarks);
+    Assert.assertEquals(actualWorkUnits.size(), 1);
+    Assert.assertEquals(actualWorkUnits.get(0).getLowWatermark(), expectedWorkUnit.getLowWatermark());
+    Assert.assertEquals(actualWorkUnits.get(0).getExpectedHighWatermark(), expectedWorkUnit.getExpectedHighWatermark());
+  }
 }
