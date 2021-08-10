@@ -7,11 +7,11 @@ package com.linkedin.cdi.configuration;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.factory.DefaultConnectionClientFactory;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.factory.DefaultS3ClientFactory;
 
 
 /**
@@ -357,13 +357,13 @@ public enum MultistageProperties {
     }
   },
   /**
-   * http.client.factory define an indirect way to specify the type of HttpClient to use.
-   * default = {@link com.linkedin.cdi.factory.ApacheHttpClientFactory}
+   * Define an indirect way to specify the type of connection clients
+   * default = {@link DefaultConnectionClientFactory}
    */
-  MSTAGE_HTTP_CLIENT_FACTORY("ms.http.client.factory", String.class) {
+  MSTAGE_CONNECTION_CLIENT_FACTORY("ms.connection.client.factory", String.class) {
     @Override
     public <T> T getDefaultValue() {
-      return (T) "com.linkedin.cdi.factory.ApacheHttpClientFactory";
+      return (T) "com.linkedin.cdi.factory.DefaultConnectionClientFactory";
     }
   },
   /**
@@ -412,17 +412,6 @@ public enum MultistageProperties {
    * Currently, we don't allow exceptions being made to revert errors by using reason code.
    */
   MSTAGE_HTTP_STATUS_REASONS("ms.http.status.reasons", JsonObject.class),
-  /**
-   * jdbc.client.factory define an indirect way to specify the type of JDBC Client to use.
-   * default = {@link com.linkedin.cdi.factory.DefaultJdbcClientFactory}
-   */
-  MSTAGE_JDBC_CLIENT_FACTORY("ms.jdbc.client.factory", String.class) {
-    @Override
-    public <T> T getDefaultValue() {
-      return (T) "com.linkedin.cdi.factory.DefaultJdbcClientFactory";
-    }
-  },
-
   MSTAGE_JDBC_SCHEMA_REFACTOR("ms.jdbc.schema.refactor", String.class) {
     @Override
     public <T> T getDefaultValue() {
@@ -548,16 +537,6 @@ public enum MultistageProperties {
       retention.addProperty("publish.dir", "P731D"); // keep 2 years published data
       retention.addProperty("log", "P30D");
       return (T) retention;
-    }
-  },
-  /**
-   * s3.client.factory define an indirect way to specify the type of S3 Client to use.
-   * default = {@link DefaultS3ClientFactory}
-   */
-  MSTAGE_S3_CLIENT_FACTORY("ms.s3.client.factory", String.class) {
-    @Override
-    public <T> T getDefaultValue() {
-      return (T) "com.linkedin.cdi.factory.DefaultS3ClientFactory";
     }
   },
   /**

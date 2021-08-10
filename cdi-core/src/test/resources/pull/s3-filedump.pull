@@ -2,7 +2,7 @@ source.class=com.linkedin.cdi.source.S3SourceV2
 #ms.extract.preprocessors=com.linkedin.cdi.preprocessor.GunzipProcessor
 ms.extractor.class=com.linkedin.cdi.extractor.FileDumpExtractor
 converter.classes=org.apache.gobblin.converter.csv.CsvToJsonConverterV2,org.apache.gobblin.converter.avro.JsonIntermediateToAvroConverter
-ms.http.client.factory=com.linkedin.cdi.factory.ApacheHttpClientFactory
+ms.http.client.factory=com.linkedin.cdi.factory.DefaultConnectionClientFactory
 
 extract.namespace=com.linkedin.test
 extract.table.name=test

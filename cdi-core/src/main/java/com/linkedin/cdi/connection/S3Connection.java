@@ -5,6 +5,7 @@
 package com.linkedin.cdi.connection;
 
 import com.google.common.collect.Lists;
+import com.linkedin.cdi.factory.ConnectionClientFactory;
 import java.net.URI;
 import java.time.Duration;
 import java.util.List;
@@ -16,7 +17,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.State;
 import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
-import com.linkedin.cdi.factory.S3ClientFactory;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.keys.S3Keys;
@@ -135,8 +135,8 @@ public class S3Connection extends MultistageConnection {
   synchronized S3Client getS3HttpClient(State state) {
     if (s3Client == null) {
       try {
-        Class<?> factoryClass = Class.forName(MultistageProperties.MSTAGE_S3_CLIENT_FACTORY.getValidNonblankWithDefault(state));
-        S3ClientFactory factory = (S3ClientFactory) factoryClass.newInstance();
+        Class<?> factoryClass = Class.forName(MultistageProperties.MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
+        ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.newInstance();
 
         Integer connectionTimeout = s3SourceV2Keys.getConnectionTimeout();
         AttributeMap config = connectionTimeout == null ? GLOBAL_HTTP_DEFAULTS
@@ -147,7 +147,7 @@ public class S3Connection extends MultistageConnection {
         s3Client = S3Client.builder()
             .region(this.s3SourceV2Keys.getRegion())
             .endpointOverride(URI.create(s3SourceV2Keys.getEndpoint()))
-            .httpClient(factory.getHttpClient(state, config))
+            .httpClient(factory.getS3Client(state, config))
             .credentialsProvider(getCredentialsProvider(state))
             .build();
       } catch (Exception e) {
