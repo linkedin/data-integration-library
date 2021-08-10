@@ -6,6 +6,7 @@ package com.linkedin.cdi.extractor;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -383,7 +384,7 @@ public class CsvExtractorTest {
     // check if schema has been added
     JsonParser parser = new JsonParser();
     String schema = extractor.getSchema();
-    Assert.assertEquals(parser.parse(schema).getAsJsonArray().size(), 10);
+    Assert.assertEquals(parser.parse(schema).getAsJsonArray().size(), 9);
 
     int index = 0;
     long[] dates = new long[]{1586502000000L, 1586588400000L, 1586674800000L, 1586761200000L, 1586847600000L,
@@ -426,7 +427,7 @@ public class CsvExtractorTest {
     // check if schema has been added
     JsonParser parser = new JsonParser();
     String schema = extractor.getSchema();
-    Assert.assertEquals(parser.parse(schema).getAsJsonArray().size(), 10);
+    Assert.assertEquals(parser.parse(schema).getAsJsonArray().size(), 9);
 
     int index = 0;
     long[] dates = new long[]{1586502000000L, 1586588400000L, 1586674800000L, 1586761200000L, 1586847600000L,
@@ -730,5 +731,25 @@ public class CsvExtractorTest {
     when(state.getProp(MSTAGE_CSV_ESCAPE_CHARACTER.getConfig(), StringUtils.EMPTY)).thenReturn("u005C");
     when(state.getProp(MSTAGE_EXTRACT_PREPROCESSORS_PARAMETERS.getConfig(), new JsonObject().toString())).thenReturn(StringUtils.EMPTY);
     when(state.getProp(MSTAGE_EXTRACT_PREPROCESSORS.getConfig(), StringUtils.EMPTY)).thenReturn(StringUtils.EMPTY);
+  }
+
+  @Test
+  private void testSchemaWithDuplicates() {
+    initExtractor(state);
+    String schemaString = "[{\"columnName\":\"derived_delta\"," + "\"comment\":\"\","
+        + "\"isNullable\":\"true\"," + "\"dataType\":{\"type\":\"long\"}}]";
+    Map<String, Map<String, String>> derivedFields = ImmutableMap.of("derived_delta",
+        ImmutableMap.of("type", "non-epoc", "source", "start_time", "format", "yyyy-MM-dd"));
+    when(jobKeys.getDerivedFields()).thenReturn(derivedFields);
+    JsonArray schema = new Gson().fromJson(schemaString, JsonArray.class);
+    when(jobKeys.hasOutputSchema()).thenReturn(true);
+    when(jobKeys.getOutputSchema()).thenReturn(schema);
+    Assert.assertEquals(csvExtractor.getSchema(), schemaString);
+    Map<String, Map<String, String>> derivedFields1 = ImmutableMap.of("derived_field",
+        ImmutableMap.of("type", "non-epoc", "source", "start_time", "format", "yyyy-MM-dd"));
+    when(jobKeys.getDerivedFields()).thenReturn(derivedFields1);
+    String resultSchema = "[{\"columnName\":\"derived_delta\",\"comment\":\"\",\"isNullable\":\"true\","
+        + "\"dataType\":{\"type\":\"long\"}},{\"columnName\":\"derived_field\",\"dataType\":{\"type\":\"string\"}}]";
+    Assert.assertEquals(csvExtractor.getSchema(), resultSchema);
   }
 }

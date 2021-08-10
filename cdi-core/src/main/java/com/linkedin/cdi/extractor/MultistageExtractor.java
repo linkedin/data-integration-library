@@ -393,8 +393,8 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
         default:
           // by default take the source types
           JsonElement source = JsonUtils.get(entry.getValue().get(KEY_WORD_SOURCE), jobKeys.getOutputSchema());
-          dataType.addProperty(KEY_WORD_TYPE, source.isJsonNull() ? KEY_WORD_STRING
-              : source.getAsJsonObject().get(KEY_WORD_TYPE).getAsString());
+          dataType.addProperty(KEY_WORD_TYPE,
+              source.isJsonNull() ? KEY_WORD_STRING : source.getAsJsonObject().get(KEY_WORD_TYPE).getAsString());
           break;
       }
       column.add("dataType", dataType);
@@ -422,7 +422,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
       longValue = DateTime.now().getMillis();
     } else if (source.matches(PXD)) {
       Period period = Period.parse(source);
-      longValue  = DateTime.now().withZone(timeZone).minus(period).dayOfMonth().roundFloorCopy().getMillis();
+      longValue = DateTime.now().withZone(timeZone).minus(period).dayOfMonth().roundFloorCopy().getMillis();
     } else if (VariableUtils.PATTERN.matcher(source).matches()) {
       strValue = replaceVariable(source);
     } else if (!StringUtils.isEmpty(source) && !isStrValueFromSource) {
@@ -676,23 +676,21 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
 
     if (state.contains(ConfigurationKeys.EXTRACT_PRIMARY_KEY_FIELDS_KEY)) {
       String[] primaryKeys =
-          state.getProp(ConfigurationKeys.EXTRACT_PRIMARY_KEY_FIELDS_KEY,
-              StringUtils.EMPTY).split(COMMA_STR);
+          state.getProp(ConfigurationKeys.EXTRACT_PRIMARY_KEY_FIELDS_KEY, StringUtils.EMPTY).split(COMMA_STR);
       for (String key: primaryKeys) {
         if (!key.isEmpty()) {
-          elements.add(new SchemaBuilder(key, SchemaBuilder.PRIMITIVE, true, new ArrayList<>())
-              .setPrimitiveType(KEY_WORD_STRING));
+          elements.add(new SchemaBuilder(key, SchemaBuilder.PRIMITIVE, true, new ArrayList<>()).setPrimitiveType(
+              KEY_WORD_STRING));
         }
       }
     }
     if (state.contains(ConfigurationKeys.EXTRACT_DELTA_FIELDS_KEY)) {
       String[] deltaKeys =
-          state.getProp(ConfigurationKeys.EXTRACT_DELTA_FIELDS_KEY,
-              StringUtils.EMPTY).split(COMMA_STR);
+          state.getProp(ConfigurationKeys.EXTRACT_DELTA_FIELDS_KEY, StringUtils.EMPTY).split(COMMA_STR);
       for (String key: deltaKeys) {
         if (!key.isEmpty()) {
-          elements.add(new SchemaBuilder(key, SchemaBuilder.PRIMITIVE, true, new ArrayList<>())
-              .setPrimitiveType(KEY_WORD_TIMESTAMP));
+          elements.add(new SchemaBuilder(key, SchemaBuilder.PRIMITIVE, true, new ArrayList<>()).setPrimitiveType(
+              KEY_WORD_TIMESTAMP));
         }
       }
     }

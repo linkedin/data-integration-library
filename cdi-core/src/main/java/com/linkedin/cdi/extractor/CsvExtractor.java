@@ -11,7 +11,10 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.configuration.StaticConstants;
+import com.linkedin.cdi.util.JsonUtils;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -123,7 +126,8 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
     log.debug("Retrieving schema definition");
     JsonArray schemaArray = super.getOrInferSchema();
     Assert.assertNotNull(schemaArray);
-    if (jobKeys.getDerivedFields().size() > 0) {
+    if (jobKeys.getDerivedFields().size() > 0 && JsonUtils.get(StaticConstants.KEY_WORD_COLUMN_NAME,
+        jobKeys.getDerivedFields().keySet().iterator().next(), StaticConstants.KEY_WORD_COLUMN_NAME, schemaArray) == JsonNull.INSTANCE) {
       schemaArray.addAll(addDerivedFieldsToAltSchema());
     }
     return schemaArray.toString();
@@ -404,10 +408,10 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
         csvExtractorKeys.setHeaderRow(line);
         // check if header has all columns in schema
         if (jobKeys.hasOutputSchema()) {
-            List<String> schemaColumns = new ArrayList<>(new JsonIntermediateSchema(jobKeys.getOutputSchema())
-                .getColumns().keySet());
-            List<String> headerRow = Arrays.asList(csvExtractorKeys.getHeaderRow());
-            csvExtractorKeys.setIsValidOutputSchema(SchemaUtils.isValidOutputSchema(schemaColumns, headerRow));
+          List<String> schemaColumns =
+              new ArrayList<>(new JsonIntermediateSchema(jobKeys.getOutputSchema()).getColumns().keySet());
+          List<String> headerRow = Arrays.asList(csvExtractorKeys.getHeaderRow());
+          csvExtractorKeys.setIsValidOutputSchema(SchemaUtils.isValidOutputSchema(schemaColumns, headerRow));
         }
         linesRead++;
       }
@@ -464,11 +468,11 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
       sample.add(row);
       linesRead++;
     }
-    return SchemaBuilder.fromJsonData(sample).buildAltSchema(jobKeys.getDefaultFieldTypes(),
-        jobKeys.isEnableCleansing(),
-        jobKeys.getSchemaCleansingPattern(),
-        jobKeys.getSchemaCleansingReplacement(),
-        jobKeys.getSchemaCleansingNullable()).getAsJsonArray();
+    return SchemaBuilder.fromJsonData(sample)
+        .buildAltSchema(jobKeys.getDefaultFieldTypes(), jobKeys.isEnableCleansing(),
+            jobKeys.getSchemaCleansingPattern(), jobKeys.getSchemaCleansingReplacement(),
+            jobKeys.getSchemaCleansingNullable())
+        .getAsJsonArray();
   }
 
   /**
