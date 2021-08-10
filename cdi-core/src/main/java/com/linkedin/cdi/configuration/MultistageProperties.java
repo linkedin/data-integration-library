@@ -776,6 +776,27 @@ public enum MultistageProperties {
    */
   MSTAGE_WATERMARK("ms.watermark", JsonArray.class),
   MSTAGE_WATERMARK_GROUPS("ms.watermark.groups", JsonArray.class),
+  /**
+   * Minimum records to be present in order for the work unit to be successful,
+   * below the minimum value, the work unit will be failed.
+   */
+  MSTAGE_WORK_UNIT_MIN_RECORDS("ms.work.unit.min.records", Long.class) {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) Long.valueOf(0);
+    }
+  },
+  /**
+   * Minimum number of work units to be present in order for the job to proceed,
+   * below the minimum value, the job will be failed. This parameter shold be used
+   * only when there is a unit watermark.
+   */
+  MSTAGE_WORK_UNIT_MIN_UNITS("ms.work.unit.min.units", Long.class) {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) Long.valueOf(0);
+    }
+  },
   MSTAGE_WORK_UNIT_PARALLELISM_MAX("ms.work.unit.parallelism.max", Integer.class) {
     @Override
     public boolean validateNonblank(State state) {

@@ -105,6 +105,36 @@ public class MultistageSourceTest {
     Assert.assertEquals(wuList.size(), 3 * 30 * 24);
   }
 
+  @Test (expectedExceptions = RuntimeException.class)
+  public void testGetWorkUnitsMinimumUnits() {
+    SourceState state = new SourceState();
+    state.setProp("ms.watermark",
+        "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"2000-01-01\", \"to\": \"-\"}}]");
+    state.setProp("extract.table.type", "SNAPSHOT_ONLY");
+    state.setProp("extract.namespace", "test");
+    state.setProp("extract.table.name", "table1");
+    state.setProp("ms.work.unit.partition", "hourly");
+    state.setProp("ms.pagination", "{}");
+    state.setProp("ms.work.unit.min.units", "1");
+    MultistageSource source = new MultistageSource();
+    source.getWorkunits(state);
+  }
+
+  @Test (expectedExceptions = RuntimeException.class)
+  public void testGetWorkUnitsMinimumUnits2() {
+    SourceState state = new SourceState();
+    state.setProp("ms.watermark",
+        "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"2000-01-01\", \"to\": \"-\"}}, "
+            + "{\"name\": \"unitWatermark\",\"type\": \"unit\", \"units\": \"unit1\"}]");
+    state.setProp("extract.table.type", "SNAPSHOT_ONLY");
+    state.setProp("extract.namespace", "test");
+    state.setProp("extract.table.name", "table1");
+    state.setProp("ms.pagination", "{}");
+    state.setProp("ms.work.unit.min.units", "2");
+    MultistageSource source = new MultistageSource();
+    source.getWorkunits(state);
+  }
+
   @Test
   public void testGetWorkUnitsDefault(){
     SourceState state = new SourceState();

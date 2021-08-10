@@ -81,6 +81,8 @@ public class JobKeys {
       MultistageProperties.MSTAGE_SOURCE_URI,
       MultistageProperties.MSTAGE_TOTAL_COUNT_FIELD,
       MultistageProperties.MSTAGE_WAIT_TIMEOUT_SECONDS,
+      MultistageProperties.MSTAGE_WORK_UNIT_MIN_RECORDS,
+      MultistageProperties.MSTAGE_WORK_UNIT_MIN_UNITS,
       MultistageProperties.MSTAGE_WORK_UNIT_PACING_SECONDS,
       MultistageProperties.MSTAGE_WORK_UNIT_PARALLELISM_MAX,
       MultistageProperties.MSTAGE_WORK_UNIT_PARTIAL_PARTITION,
@@ -123,6 +125,8 @@ public class JobKeys {
   private String schemaCleansingPattern = "(\\s|\\$|@)";
   private String schemaCleansingReplacement = "_";
   private Boolean schemaCleansingNullable = false;
+  private long minWorkUnits = 0;
+  private long minWorkUnitRecords = 0;
 
   public void initialize(State state) {
     parsePaginationFields(state);
@@ -139,6 +143,8 @@ public class JobKeys {
     setDataField(MultistageProperties.MSTAGE_DATA_FIELD.getValidNonblankWithDefault(state));
     setCallInterval(MultistageProperties.MSTAGE_CALL_INTERVAL.getProp(state));
     setSessionTimeout(MultistageProperties.MSTAGE_WAIT_TIMEOUT_SECONDS.getMillis(state));
+    setMinWorkUnitRecords(MultistageProperties.MSTAGE_WORK_UNIT_MIN_RECORDS.getValidNonblankWithDefault(state));
+    setMinWorkUnits(MultistageProperties.MSTAGE_WORK_UNIT_MIN_UNITS.getValidNonblankWithDefault(state));
 
     setEnableCleansing(MultistageProperties.MSTAGE_ENABLE_CLEANSING.getValidNonblankWithDefault(state));
     JsonObject schemaCleansing = MultistageProperties.MSTAGE_SCHEMA_CLENSING.getValidNonblankWithDefault(state);

@@ -139,7 +139,9 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   @Override
   public D readRecord(D reuse) {
     if (extractorKeys.getProcessedCount() % (100 * 1000) == 0) {
-      log.debug("Processed {} records", extractorKeys.getProcessedCount());
+      log.debug(String.format(MSG_ROWS_PROCESSED,
+          extractorKeys.getProcessedCount(),
+          extractorKeys.getSignature()));
     }
     return null;
   }
@@ -147,11 +149,17 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   @Override
   public void close() {
     log.info("Closing the work unit: {}", this.extractorKeys.getSignature());
+
+    if (extractorKeys.getProcessedCount() < jobKeys.getMinWorkUnitRecords()) {
+      throw new RuntimeException(String.format(EXCEPTION_RECORD_MINIMUM,
+          jobKeys.getMinWorkUnitRecords(),
+          jobKeys.getMinWorkUnitRecords()));
+    }
+
     if (state.getWorkingState().equals(WorkUnitState.WorkingState.SUCCESSFUL)) {
       state.setActualHighWatermark(state.getWorkunit().getExpectedHighWatermark(LongWatermark.class));
-    } else {
-      state.setActualHighWatermark(new LongWatermark(-1L));
     }
+
     if (connection != null) {
       connection.closeAll(StringUtils.EMPTY);
     }
