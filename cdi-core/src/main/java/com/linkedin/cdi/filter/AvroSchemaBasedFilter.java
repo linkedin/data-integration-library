@@ -34,9 +34,6 @@ public class AvroSchemaBasedFilter extends MultistageSchemaBasedFilter<GenericRe
   public GenericRecord filter(GenericRecord input) {
     Schema outputSchema = AvroSchemaUtils.fromJsonSchema(schema.toJson(), state);
     GenericRecord filteredRow = new GenericData.Record(outputSchema);
-    if (avroExtractorKeys.getIsValidOutputSchema()) {
-      log.warn("Some columns from the schema are not present at source, padding with null value.");
-    }
     for (String fieldName : AvroSchemaUtils.getSchemaFieldNames(outputSchema)) {
       Optional<Object> fieldValue = AvroUtils.getFieldValue(input, fieldName);
       filteredRow.put(fieldName, fieldValue.isPresent() ? fieldValue.get() : null);

@@ -34,8 +34,8 @@ import com.linkedin.cdi.util.SchemaUtils;
 import org.apache.gobblin.util.AvroUtils;
 import org.testng.Assert;
 
+import static com.linkedin.cdi.configuration.StaticConstants.*;
 import static org.apache.avro.Schema.Type.*;
-
 
 /**
  * AvroExtractor reads Avro formatted files from HDFS locations.
@@ -129,6 +129,8 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
   @Nullable
   @Override
   public GenericRecord readRecord(GenericRecord reuse) {
+    super.readRecord(reuse);
+
     if (avroExtractorKeys.getAvroRecordIterator() == null
         && !processInputStream(0)) {
       return null;
@@ -168,6 +170,11 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
       return false;
     }
 
+    // returning false to end the work unit if the buffer is null
+    if (workUnitStatus.getBuffer() == null) {
+      return false;
+    }
+
     DataFileStream<GenericRecord> avroRecordIterator;
     try {
       avroRecordIterator = new DataFileStream<>(workUnitStatus.getBuffer(),
@@ -193,12 +200,10 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
     }
 
     // return false to stop the job under these situations
-    if (workUnitStatus.getBuffer() == null
-        || avroExtractorKeys.getAvroRecordIterator() == null) {
+    if (avroExtractorKeys.getAvroRecordIterator() == null) {
       return false;
     }
     avroExtractorKeys.incrCurrentPageNumber();
-
     avroExtractorKeys.logDebugAll(state.getWorkunit());
     workUnitStatus.logDebugAll();
     extractorKeys.logDebugAll(state.getWorkunit());
@@ -264,22 +269,22 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
     List<Schema.Field> fields = AvroUtils.deepCopySchemaFields(schema);
     for (Map.Entry<String, Map<String, String>> derivedField: derivedFields) {
       String name = derivedField.getKey();
-      String type = derivedField.getValue().get("type");
+      String type = derivedField.getValue().get(KEY_WORD_TYPE);
       switch (type) {
-        case "epoc":
+        case KEY_WORD_EPOC:
           fields.add(new Schema.Field(name, Schema.create(LONG), name, null));
           break;
-        case "string":
-        case "regexp":
+        case KEY_WORD_STRING:
+        case KEY_WORD_REGEXP:
           fields.add(new Schema.Field(name, Schema.create(STRING), name, null));
           break;
-        case "boolean":
+        case KEY_WORD_BOOLEAN:
           fields.add(new Schema.Field(name, Schema.create(BOOLEAN), name, null));
           break;
-        case "integer":
+        case KEY_WORD_INTEGER:
           fields.add(new Schema.Field(name, Schema.create(INT), name, null));
           break;
-        case "number":
+        case KEY_WORD_NUMBER:
           fields.add(new Schema.Field(name, Schema.create(DOUBLE), name, null));
           break;
         default:

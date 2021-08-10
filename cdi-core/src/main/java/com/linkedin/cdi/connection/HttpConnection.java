@@ -35,6 +35,8 @@ import org.apache.http.HeaderElement;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.util.EntityUtils;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
@@ -212,6 +214,7 @@ public class HttpConnection extends MultistageConnection {
     // trying to make a Http request, capture the client side error and
     // fail the task if any encoding exception or IO exception
     CloseableHttpResponse response;
+    HttpClientContext context = HttpClientContext.create();
     try {
       JsonObject payloads = new JsonObject();
       JsonObject queryParameters = new JsonObject();
@@ -222,8 +225,9 @@ public class HttpConnection extends MultistageConnection {
           queryParameters.add(entry.getKey(), entry.getValue());
         }
       }
-      response = (CloseableHttpResponse) httpClient.execute(
-          command.getHttpRequest(httpUriTemplate, queryParameters, headers, payloads));
+      HttpUriRequest request = command.getHttpRequest(httpUriTemplate, queryParameters, headers, payloads);
+      response = (CloseableHttpResponse) httpClient.execute(request, context);
+      log.debug(context.toString());
     } catch (Exception e) {
       throw new RuntimeException(e.getMessage(), e);
     }

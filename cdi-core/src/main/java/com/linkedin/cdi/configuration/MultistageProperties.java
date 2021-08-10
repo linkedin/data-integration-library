@@ -125,6 +125,12 @@ public enum MultistageProperties {
     }
   },
   MSTAGE_CSV_COLUMN_HEADER("ms.csv.column.header", Boolean.class),
+  MSTAGE_CSV_COLUMN_HEADER_INDEX("ms.csv.column.header.index", Integer.class) {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) Integer.valueOf(0);
+    }
+  },
   /**
    * a comma-separated string, where each value is either an integer or a range
    * representing the index of the field to include

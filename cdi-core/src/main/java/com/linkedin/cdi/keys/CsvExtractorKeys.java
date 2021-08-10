@@ -39,9 +39,9 @@ public class CsvExtractorKeys extends ExtractorKeys {
       MultistageProperties.MSTAGE_CSV_ESCAPE_CHARACTER);
 
   private Iterator<String[]> csvIterator = null;
-  private long processedCount = 0;
   private long currentPageNumber = 0;
   private Boolean columnHeader = false;
+  private int columnHeaderIndex = 0;
   private int rowsToSkip = 0;
   private String separator = MultistageProperties.MSTAGE_CSV_SEPARATOR.getDefaultValue();
   private String quoteCharacter = MultistageProperties.MSTAGE_CSV_QUOTE_CHARACTER.getDefaultValue();
@@ -57,9 +57,6 @@ public class CsvExtractorKeys extends ExtractorKeys {
 
   public void incrCurrentPageNumber() {
     currentPageNumber++;
-  }
-  public void incrProcessedCount() {
-    processedCount++;
   }
 
   @Override

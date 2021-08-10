@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.converter;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -64,7 +65,8 @@ public class JsonNormalizerConverter extends Converter<JsonArray, JsonArray, Jso
         normalizedField = columnName;
       }
     }
-    assert normalizedField != null;
+
+    Preconditions.checkNotNull(normalizedField, "Normalized field is NULL.");
     JsonObject dataType = JsonUtils.get(KEY_WORD_COLUMN_NAME,
         normalizedField, KEY_WORD_DATA_TYPE, targetSchema).getAsJsonObject();
     String trueType = JsonUtils.get(KEY_WORD_TYPE, dataType).getAsString();

@@ -9,14 +9,16 @@ import com.google.common.base.Splitter;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.linkedin.cdi.configuration.StaticConstants;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,7 +27,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.WorkUnitState;
 import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.filter.JsonSchemaBasedFilter;
@@ -37,6 +39,8 @@ import com.linkedin.cdi.util.JsonUtils;
 import com.linkedin.cdi.util.ParameterTypes;
 import com.linkedin.cdi.util.SchemaBuilder;
 import org.testng.Assert;
+
+import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
 /**
@@ -141,7 +145,8 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
     log.debug("Retrieving schema definition");
     JsonArray schemaArray = super.getOrInferSchema();
     Assert.assertNotNull(schemaArray);
-    if (jobKeys.getDerivedFields().size() > 0) {
+    if (jobKeys.getDerivedFields().size() > 0 && JsonUtils.get(StaticConstants.KEY_WORD_COLUMN_NAME,
+        jobKeys.getDerivedFields().keySet().iterator().next(), StaticConstants.KEY_WORD_COLUMN_NAME, schemaArray) == JsonNull.INSTANCE) {
       schemaArray.addAll(addDerivedFieldsToAltSchema());
     }
     return schemaArray;
@@ -150,6 +155,8 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
   @Nullable
   @Override
   public JsonObject readRecord(JsonObject reuse) {
+    super.readRecord(reuse);
+
     if (jsonExtractorKeys.getJsonElementIterator() == null && !processInputStream(0)) {
       return null;
     }
@@ -193,7 +200,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
     // if Content-Type is provided, but not application/json, the response can have
     // useful error information
     JsonObject expectedContentType = MultistageProperties.MSTAGE_HTTP_RESPONSE_TYPE.getValidNonblankWithDefault(state);
-    HashSet<String> expectedContentTypeSet = new LinkedHashSet<>(Arrays.asList("application/json"));
+    HashSet<String> expectedContentTypeSet = new LinkedHashSet<>(Collections.singletonList("application/json"));
     if (expectedContentType.has(CONTENT_TYPE_KEY)) {
       for (Map.Entry<String, JsonElement> entry: expectedContentType.entrySet()) {
         expectedContentTypeSet.add(entry.getValue().getAsString());
@@ -311,22 +318,22 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
       String strValue = processDerivedFieldSource(row, name, derivedFieldDef);
       String type = derivedField.getValue().get("type");
       switch (type) {
-        case "epoc":
+        case KEY_WORD_EPOC:
           if (strValue.length() > 0) {
             row.addProperty(name, Long.parseLong(strValue));
           }
           break;
-        case "string":
-        case "regexp":
+        case KEY_WORD_STRING:
+        case KEY_WORD_REGEXP:
           row.addProperty(name, strValue);
           break;
-        case "boolean":
+        case KEY_WORD_BOOLEAN:
           row.addProperty(name, Boolean.parseBoolean(strValue));
           break;
-        case "integer":
+        case KEY_WORD_INTEGER:
           row.addProperty(name, Integer.parseInt(strValue));
           break;
-        case "number":
+        case KEY_WORD_NUMBER:
           row.addProperty(name, Double.parseDouble(strValue));
           break;
         default:

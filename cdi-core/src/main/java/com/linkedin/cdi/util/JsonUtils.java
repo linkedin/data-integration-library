@@ -13,6 +13,7 @@ import com.google.gson.JsonObject;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 import org.testng.Assert;
 
 
@@ -238,5 +239,47 @@ public interface JsonUtils {
     } catch (Exception e) {
       return JsonNull.INSTANCE;
     }
+  }
+
+  /**
+   * From an array of JsonObjects, filter by searching by key-value pair, and
+   * once the JsonObject is found, it returns the element located by the JsonPath,
+   * specified by returnKey, or the whole record if no returnKey is specified
+   *
+   * This function doesn't deepCopy the returned elements to avoid allocating extra
+   * spaces.
+   *
+   * @param searchKey key name to search in order to identify the JsonObject
+   * @param value value to match in order to identify the JsonObject
+   * @param objArray the array of JsonObjects
+   * @param returnKey the Json path to identify the return value
+   * @return the filtered elements within the array
+   */
+  static JsonArray filter(final String searchKey, final String value, final JsonArray objArray, final String returnKey) {
+    JsonArray output = new JsonArray();
+    for (JsonElement element: objArray) {
+      if (element.isJsonObject()
+          && element.getAsJsonObject().has(searchKey)
+          && element.getAsJsonObject().get(searchKey).getAsString().equalsIgnoreCase(value)) {
+        if (StringUtils.isEmpty(returnKey)) {
+          output.add(element);
+        } else {
+          output.add(get(returnKey, element.getAsJsonObject()));
+        }
+      }
+    }
+    return output;
+  }
+
+  /**
+   * From an array of JsonObjects, filter by searching by key-value pair.
+   *
+   * @param searchKey key name to search in order to identify the JsonObject
+   * @param value value to match in order to identify the JsonObject
+   * @param objArray the array of JsonObjects
+   * @return the filtered elements within the array
+   */
+  static JsonArray filter(final String searchKey, final String value, final JsonArray objArray) {
+    return filter(searchKey, value, objArray, null);
   }
 }

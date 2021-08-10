@@ -48,6 +48,11 @@ public class ExtractorKeys {
   private JsonObject dynamicParameters = new JsonObject();
   private Boolean explictEof;
   private JsonArray payloads = new JsonArray();
+  private long processedCount = 0;
+
+  public void incrProcessedCount() {
+    processedCount++;
+  }
 
   public void logDebugAll(WorkUnit workUnit) {
     log.debug("These are values in MultistageExtractor regarding to Work Unit: {}",
@@ -61,6 +66,7 @@ public class ExtractorKeys {
       log.info("Avro-flavor schema: {}", inferredSchema.toString());
     }
     log.debug("Session Status: {}", sessionKeyValue);
+    log.debug("Total rows processed: {}", processedCount);
   }
 
   public void logUsage(State state) {
