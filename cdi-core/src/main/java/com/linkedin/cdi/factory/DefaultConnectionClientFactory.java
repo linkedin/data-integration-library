@@ -33,6 +33,7 @@ public class DefaultConnectionClientFactory implements ConnectionClientFactory {
    * @param state the State of execution environment
    * @return an HTTP client object
    */
+  @Override
   public HttpClient getHttpClient(State state) {
     return HttpClientBuilder.create().build();
   }
@@ -43,6 +44,7 @@ public class DefaultConnectionClientFactory implements ConnectionClientFactory {
    * @param config S3 parameters
    * @return an S3 HTTP client object
    */
+  @Override
   public SdkHttpClient getS3Client(State state, AttributeMap config) {
     return ApacheHttpClient.builder()
         .connectionTimeout(config.get(CONNECTION_TIMEOUT))
@@ -56,6 +58,7 @@ public class DefaultConnectionClientFactory implements ConnectionClientFactory {
    * @param state source or work unit state that can provide the encryption master key location
    * @return a JDBC connection
    */
+  @Override
   public Connection getJdbcConnection(String jdbcUrl, String userId, String cryptedPassword, State state) {
     try {
       return DriverManager.getConnection(
@@ -73,6 +76,7 @@ public class DefaultConnectionClientFactory implements ConnectionClientFactory {
    * @param state the state of execution environment
    * @return a SFTP channel client
    */
+  @Override
   public SftpClient getSftpChannelClient(State state) {
     return new SftpChannelClient(state);
   }
@@ -82,6 +86,7 @@ public class DefaultConnectionClientFactory implements ConnectionClientFactory {
    * @param state the state of execution environment
    * @return a SchemaReader
    */
+  @Override
   public SchemaReader getSchemaReader(State state) {
     // There is no default schema reader currently
     return null;
