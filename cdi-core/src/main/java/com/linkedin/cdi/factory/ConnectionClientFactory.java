@@ -4,8 +4,10 @@
 
 package com.linkedin.cdi.factory;
 
-import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
 import com.linkedin.cdi.factory.reader.SchemaReader;
+import com.linkedin.cdi.factory.sftp.SftpChannelClient;
+import com.linkedin.cdi.factory.sftp.SftpClient;
 import java.sql.Connection;
 import org.apache.gobblin.configuration.State;
 import org.apache.http.client.HttpClient;
@@ -19,7 +21,7 @@ import software.amazon.awssdk.utils.AttributeMap;
 public interface ConnectionClientFactory {
   /**
    * Initiate an HTTP client
-   * @param state the State of exeuction environment
+   * @param state the State of execution environment
    * @return an HTTP client object
    */
   HttpClient getHttpClient(State state);
@@ -43,16 +45,13 @@ public interface ConnectionClientFactory {
   Connection getJdbcConnection(String jdbcUrl, String userId, String cryptedPassword, State state);
 
   /**
-<<<<<<< HEAD
-=======
-   * Initiate a Secure Channel for SFTP Connection
+   * Initiate a Secure Channel client for SFTP Connection
    * @param state the state of execution environment
-   * @return a SFTP secure channel
+   * @return a SFTP channel client
    */
-  JSch getSecureChannel(State state);
+  SftpClient getSftpChannelClient(State state);
 
   /**
->>>>>>> 569c190... Consolidate factor classes
    * Initiate a SchemaReader
    * @param state the state of execution environment
    * @return a SchemaReader

@@ -4,14 +4,17 @@
 
 package com.linkedin.cdi.factory;
 
-import com.jcraft.jsch.JSch;
 import com.linkedin.cdi.factory.reader.SchemaReader;
+import com.linkedin.cdi.factory.sftp.SftpChannelClient;
+import com.linkedin.cdi.factory.sftp.SftpClient;
 import com.linkedin.cdi.util.EncryptionUtils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import org.apache.gobblin.configuration.State;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.utils.AttributeMap;
@@ -23,9 +26,11 @@ import static software.amazon.awssdk.http.SdkHttpConfigurationOption.*;
  * This is the default implementation
  */
 public class DefaultConnectionClientFactory implements ConnectionClientFactory {
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultConnectionClientFactory.class);
+
   /**
    * Initiate an HTTP client
-   * @param state the State of exeuction environment
+   * @param state the State of execution environment
    * @return an HTTP client object
    */
   public HttpClient getHttpClient(State state) {
@@ -58,24 +63,21 @@ public class DefaultConnectionClientFactory implements ConnectionClientFactory {
           EncryptionUtils.decryptGobblin(userId, state),
           EncryptionUtils.decryptGobblin(cryptedPassword, state));
     } catch (Exception e) {
+      LOG.error("Error creating JDBC connection", e);
       throw new RuntimeException(e);
     }
   }
 
   /**
-<<<<<<< HEAD
-=======
-   * Initiate a Secure Channel for SFTP Connection
+   * Initiate a Secure Channel client for SFTP Connection
    * @param state the state of execution environment
-   * @return a SFTP secure channel
+   * @return a SFTP channel client
    */
-  public JSch getSecureChannel(State state) {
-    // TODO implement the default SFTP secure channel
-    return null;
+  public SftpClient getSftpChannelClient(State state) {
+    return new SftpChannelClient(state);
   }
 
   /**
->>>>>>> 569c190... Consolidate factor classes
    * Initiate a SchemaReader
    * @param state the state of execution environment
    * @return a SchemaReader
