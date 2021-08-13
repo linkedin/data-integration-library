@@ -54,6 +54,8 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
 import org.testng.Assert;
 
+import static com.linkedin.cdi.configuration.StaticConstants.*;
+
 
 /**
  * CSV Extractor extracts CSV formatted data from an InputStream passed from a Source.
@@ -100,6 +102,8 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
         CsvUtils.unescape(MultistageProperties.MSTAGE_CSV_QUOTE_CHARACTER.getValidNonblankWithDefault(state)));
     csvExtractorKeys.setEscapeCharacter(
         CsvUtils.unescape(MultistageProperties.MSTAGE_CSV_ESCAPE_CHARACTER.getValidNonblankWithDefault(state)));
+    csvExtractorKeys.setDefaultFieldType(
+        MultistageProperties.MSTAGE_CSV_DEFAULT_FIELD_TYPE.getValidNonblankWithDefault(state).toString().toLowerCase());
     csvExtractorKeys.setSampleRows(new ArrayDeque<>());
 
     // check if user has defined the output schema
@@ -476,20 +480,25 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
   /**
    * Helper function for creating sample json data for schema inference
    * Type conversion is required as all data will be parsed as string otherwise
+   * Users can specify the default type for all fields using ms.csv.default.field.type or
+   * specify the default for a specific field using ms.default.data.type.
    * @param key name of the column
    * @param data original data from a column
    * @param row json form of the row
    */
   private void addParsedCSVData(String key, String data, JsonObject row) {
-    if (Ints.tryParse(data) != null) {
+    String defaultFieldType = csvExtractorKeys.getDefaultFieldType();
+    if (defaultFieldType.equals(KEY_WORD_STRING)) {
+      row.addProperty(key, data);
+    } else if (defaultFieldType.equals(KEY_WORD_INT) || Ints.tryParse(data) != null) {
       row.addProperty(key, Integer.valueOf(data));
-    } else if (Longs.tryParse(data) != null) {
+    } else if (defaultFieldType.equals(KEY_WORD_LONG) || Longs.tryParse(data) != null) {
       row.addProperty(key, Long.valueOf(data));
-    } else if (Doubles.tryParse(data) != null) {
+    } else if (defaultFieldType.equals(KEY_WORD_DOUBLE) || Doubles.tryParse(data) != null) {
       row.addProperty(key, Double.valueOf(data));
-    } else if (data.toLowerCase().matches("(true|false)")) {
+    } else if (defaultFieldType.equals(KEY_WORD_BOOLEAN) || data.toLowerCase().matches("(true|false)")) {
       row.addProperty(key, Boolean.valueOf(data));
-    } else if (Floats.tryParse(data) != null) {
+    } else if (defaultFieldType.equals(KEY_WORD_FLOAT) || Floats.tryParse(data) != null) {
       row.addProperty(key, Float.valueOf(data));
     } else {
       row.addProperty(key, data);

@@ -17,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
 import com.linkedin.cdi.configuration.MultistageProperties;
 import org.apache.gobblin.source.workunit.WorkUnit;
@@ -54,6 +55,7 @@ public class CsvExtractorKeys extends ExtractorKeys {
   private String[] headerRow;
   private Set<Integer> columnProjection = new HashSet<>();
   private Boolean isValidOutputSchema = true;
+  private String defaultFieldType = StringUtils.EMPTY;
 
   public void incrCurrentPageNumber() {
     currentPageNumber++;

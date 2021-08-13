@@ -143,6 +143,14 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
 
     // generated work units based on watermarks defined and previous high watermarks
     List<WorkUnit> wuList = generateWorkUnits(definedWatermarks, previousHighWatermarks);
+
+    // abort (fail) the job when the number of work units is below require threshold
+    if (wuList.size() < jobKeys.getMinWorkUnits()) {
+      throw new RuntimeException(String.format(EXCEPTION_WORK_UNIT_MINIMUM,
+          jobKeys.getMinWorkUnits(),
+          jobKeys.getMinWorkUnits()));
+    }
+
     if (authentications != null && authentications.size() == 1) {
       for (WorkUnit wu : wuList) {
         wu.setProp(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.toString(),
@@ -234,6 +242,13 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
     }
     // Set default unit watermark
     if (unitWatermark == null) {
+      // abort (fail) the job when at least some work units are expected
+      if (jobKeys.getMinWorkUnits() > 0) {
+        throw new RuntimeException(String.format(EXCEPTION_WORK_UNIT_MINIMUM,
+            jobKeys.getMinWorkUnits(),
+            jobKeys.getMinWorkUnits()));
+      }
+
       JsonArray unitArray = new JsonArray();
       unitArray.add(new JsonObject());
       unitWatermark = new WatermarkDefinition("unit", unitArray);
@@ -297,15 +312,13 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
         // grace period logic, which is controlled by cut off time
         if (unitCutoffTime == -1L
             || dtPartition.getRight() >= Longs.max(unitCutoffTime, cutoffTime)) {
-          // prune the date range only if it is not partitioned
+          // prune the date range only if the unit is not in first execution
           // note the nominal date range low boundary had been saved in signature
-          ImmutablePair<Long, Long> dtPartitionModified = dtPartition;
-          if (datetimePartitions.size() == 1 && dtPartition.left < cutoffTime) {
-            dtPartitionModified = new ImmutablePair<>(cutoffTime, dtPartition.right);
-          }
-          log.debug("dtPartitionModified: {}", dtPartitionModified);
+          ImmutablePair<Long, Long> dtPartitionModified = unitCutoffTime == -1L
+              ? dtPartition : previousHighWatermarks.get(wuSignature).equals(dtPartition.left)
+              ? dtPartition : new ImmutablePair<>(Long.max(unitCutoffTime, dtPartition.left), dtPartition.right);
 
-          log.info("Generating Work Unit: {}, watermark: {}", wuSignature, dtPartitionModified);
+          log.info(String.format(MSG_WORK_UNIT_INFO, wuSignature, dtPartitionModified));
           WorkUnit workUnit = WorkUnit.create(extract,
               new WatermarkInterval(
                   new LongWatermark(dtPartitionModified.getLeft()),

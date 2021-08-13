@@ -776,17 +776,48 @@ public class CsvExtractorTest {
     initExtractor(state);
     Method method = CsvExtractor.class.getDeclaredMethod("addParsedCSVData", String.class, String.class, JsonObject.class);
     method.setAccessible(true);
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("");
+    method.invoke(csvExtractor, "key1", "true", schema);
+    Assert.assertEquals(schema.get("key1").getAsBoolean(), true);
+
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("");
+    method.invoke(csvExtractor, "key2", "false", schema);
+    Assert.assertEquals(schema.get("key2").getAsBoolean(), false);
+
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("");
+    method.invoke(csvExtractor, "key3", "1.234F", schema);
+    Assert.assertEquals(schema.get("key3").getAsFloat(), 1.234F);
+
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("");
+    method.invoke(csvExtractor, "key4", "something else", schema);
+    Assert.assertEquals(schema.get("key4").getAsString(), "something else");
+
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("string");
+    method.invoke(csvExtractor, "key5", "123", schema);
+    Assert.assertEquals(schema.get("key5").getAsString(), "123");
+
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("int");
+    method.invoke(csvExtractor, "key5", "123", schema);
+    Assert.assertEquals(schema.get("key5").getAsInt(), 123);
+
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("boolean");
     method.invoke(csvExtractor, "key1", "true", schema);
     Assert.assertEquals(schema.get("key1").getAsBoolean(), true);
 
     method.invoke(csvExtractor, "key2", "false", schema);
     Assert.assertEquals(schema.get("key2").getAsBoolean(), false);
 
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("float");
     method.invoke(csvExtractor, "key3", "1.234F", schema);
     Assert.assertEquals(schema.get("key3").getAsFloat(), 1.234F);
 
-    method.invoke(csvExtractor, "key4", "something else", schema);
-    Assert.assertEquals(schema.get("key4").getAsString(), "something else");
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("long");
+    method.invoke(csvExtractor, "key5", "9993939399", schema);
+    Assert.assertEquals(schema.get("key5").getAsLong(), 9993939399L);
+
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("double");
+    method.invoke(csvExtractor, "key5", "1.234D", schema);
+    Assert.assertEquals(schema.get("key5").getAsDouble(), 1.234D);
   }
 
   private void initExtractor(WorkUnitState state) {

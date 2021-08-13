@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.extractor;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -139,7 +140,9 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   @Override
   public D readRecord(D reuse) {
     if (extractorKeys.getProcessedCount() % (100 * 1000) == 0) {
-      log.debug("Processed {} records", extractorKeys.getProcessedCount());
+      log.debug(String.format(MSG_ROWS_PROCESSED,
+          extractorKeys.getProcessedCount(),
+          extractorKeys.getSignature()));
     }
     return null;
   }
@@ -147,11 +150,24 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   @Override
   public void close() {
     log.info("Closing the work unit: {}", this.extractorKeys.getSignature());
+
+    if (extractorKeys.getProcessedCount() < jobKeys.getMinWorkUnitRecords()) {
+      throw new RuntimeException(String.format(EXCEPTION_RECORD_MINIMUM,
+          jobKeys.getMinWorkUnitRecords(),
+          jobKeys.getMinWorkUnitRecords()));
+    }
+
+    Preconditions.checkNotNull(state.getWorkunit(), MSG_WORK_UNIT_ALWAYS);
+    Preconditions.checkNotNull(state.getWorkunit().getLowWatermark(), MSG_LOW_WATER_MARK_ALWAYS);
     if (state.getWorkingState().equals(WorkUnitState.WorkingState.SUCCESSFUL)) {
       state.setActualHighWatermark(state.getWorkunit().getExpectedHighWatermark(LongWatermark.class));
-    } else {
-      state.setActualHighWatermark(new LongWatermark(-1L));
+    } else if (state.getActualHighWatermark() == null) {
+      // Set the actual high watermark to low watermark explicitly,
+      // replacing the implicit behavior in state.getActualHighWatermark(LongWatermark.class)
+      // avoiding different returns from the two versions of getActualHighWatermark()
+      state.setActualHighWatermark(state.getWorkunit().getLowWatermark(LongWatermark.class));
     }
+
     if (connection != null) {
       connection.closeAll(StringUtils.EMPTY);
     }
