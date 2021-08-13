@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.factory;
 
+import com.linkedin.cdi.factory.reader.JsonFileReader;
 import com.linkedin.cdi.factory.reader.SchemaReader;
 import com.linkedin.cdi.factory.sftp.SftpChannelClient;
 import com.linkedin.cdi.factory.sftp.SftpClient;
@@ -88,7 +89,6 @@ public class DefaultConnectionClientFactory implements ConnectionClientFactory {
    */
   @Override
   public SchemaReader getSchemaReader(State state) {
-    // There is no default schema reader currently
-    return null;
+    return new JsonFileReader();
   }
 }

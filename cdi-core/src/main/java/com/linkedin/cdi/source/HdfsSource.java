@@ -4,6 +4,9 @@
 
 package com.linkedin.cdi.source;
 
+import com.linkedin.cdi.connection.HdfsConnection;
+import com.linkedin.cdi.extractor.MultistageExtractor;
+import com.linkedin.cdi.keys.HdfsKeys;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -11,9 +14,6 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.configuration.WorkUnitState;
-import com.linkedin.cdi.connection.HdfsConnection;
-import com.linkedin.cdi.extractor.MultistageExtractor;
-import com.linkedin.cdi.keys.HdfsKeys;
 import org.apache.gobblin.source.extractor.Extractor;
 
 
