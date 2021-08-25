@@ -17,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
 import com.linkedin.cdi.configuration.MultistageProperties;
 import org.apache.gobblin.source.workunit.WorkUnit;
@@ -39,9 +40,9 @@ public class CsvExtractorKeys extends ExtractorKeys {
       MultistageProperties.MSTAGE_CSV_ESCAPE_CHARACTER);
 
   private Iterator<String[]> csvIterator = null;
-  private long processedCount = 0;
   private long currentPageNumber = 0;
   private Boolean columnHeader = false;
+  private int columnHeaderIndex = 0;
   private int rowsToSkip = 0;
   private String separator = MultistageProperties.MSTAGE_CSV_SEPARATOR.getDefaultValue();
   private String quoteCharacter = MultistageProperties.MSTAGE_CSV_QUOTE_CHARACTER.getDefaultValue();
@@ -54,12 +55,10 @@ public class CsvExtractorKeys extends ExtractorKeys {
   private String[] headerRow;
   private Set<Integer> columnProjection = new HashSet<>();
   private Boolean isValidOutputSchema = true;
+  private String defaultFieldType = StringUtils.EMPTY;
 
   public void incrCurrentPageNumber() {
     currentPageNumber++;
-  }
-  public void incrProcessedCount() {
-    processedCount++;
   }
 
   @Override

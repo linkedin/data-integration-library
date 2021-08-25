@@ -11,6 +11,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.linkedin.cdi.factory.ConnectionClientFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
 import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.factory.SchemaReaderFactory;
 import com.linkedin.cdi.factory.reader.SchemaReader;
 import com.linkedin.cdi.util.DateTimeUtils;
 import com.linkedin.cdi.util.HdfsReader;
@@ -81,6 +81,8 @@ public class JobKeys {
       MultistageProperties.MSTAGE_SOURCE_URI,
       MultistageProperties.MSTAGE_TOTAL_COUNT_FIELD,
       MultistageProperties.MSTAGE_WAIT_TIMEOUT_SECONDS,
+      MultistageProperties.MSTAGE_WORK_UNIT_MIN_RECORDS,
+      MultistageProperties.MSTAGE_WORK_UNIT_MIN_UNITS,
       MultistageProperties.MSTAGE_WORK_UNIT_PACING_SECONDS,
       MultistageProperties.MSTAGE_WORK_UNIT_PARALLELISM_MAX,
       MultistageProperties.MSTAGE_WORK_UNIT_PARTIAL_PARTITION,
@@ -123,6 +125,8 @@ public class JobKeys {
   private String schemaCleansingPattern = "(\\s|\\$|@)";
   private String schemaCleansingReplacement = "_";
   private Boolean schemaCleansingNullable = false;
+  private long minWorkUnits = 0;
+  private long minWorkUnitRecords = 0;
 
   public void initialize(State state) {
     parsePaginationFields(state);
@@ -139,6 +143,8 @@ public class JobKeys {
     setDataField(MultistageProperties.MSTAGE_DATA_FIELD.getValidNonblankWithDefault(state));
     setCallInterval(MultistageProperties.MSTAGE_CALL_INTERVAL.getProp(state));
     setSessionTimeout(MultistageProperties.MSTAGE_WAIT_TIMEOUT_SECONDS.getMillis(state));
+    setMinWorkUnitRecords(MultistageProperties.MSTAGE_WORK_UNIT_MIN_RECORDS.getValidNonblankWithDefault(state));
+    setMinWorkUnits(MultistageProperties.MSTAGE_WORK_UNIT_MIN_UNITS.getValidNonblankWithDefault(state));
 
     setEnableCleansing(MultistageProperties.MSTAGE_ENABLE_CLEANSING.getValidNonblankWithDefault(state));
     JsonObject schemaCleansing = MultistageProperties.MSTAGE_SCHEMA_CLENSING.getValidNonblankWithDefault(state);
@@ -551,7 +557,10 @@ public class JobKeys {
     try {
       // Schema Reader could be plugged in before the initialization on JobKeys
       if (schemaReader == null) {
-        schemaReader = SchemaReaderFactory.create(state);
+        Class<?> factoryClass = Class.forName(
+            MultistageProperties.MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
+        ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.newInstance();
+        schemaReader = factory.getSchemaReader(state);
       }
       return schemaReader.read(state, urn).getAsJsonArray();
     } catch (Exception e) {

@@ -371,8 +371,8 @@ public class HttpSourceTest extends PowerMockTestCase {
     secondaryInput = allKeys.get(MSTAGE_SECONDARY_INPUT.getConfig()).getAsJsonArray();
     when(state.getProp(MSTAGE_SECONDARY_INPUT.getConfig(), new JsonArray().toString())).thenReturn(secondaryInput.toString());
 
-    httpClientFactory = allKeys.get(MSTAGE_HTTP_CLIENT_FACTORY.getConfig()).getAsString();
-    when(state.getProp(MSTAGE_HTTP_CLIENT_FACTORY.getConfig(), StringUtils.EMPTY)).thenReturn(httpClientFactory);
+    httpClientFactory = allKeys.get(MSTAGE_CONNECTION_CLIENT_FACTORY.getConfig()).getAsString();
+    when(state.getProp(MSTAGE_CONNECTION_CLIENT_FACTORY.getConfig(), StringUtils.EMPTY)).thenReturn(httpClientFactory);
 
     httpRequestHeaders = allKeys.get(MSTAGE_HTTP_REQUEST_HEADERS.getConfig()).getAsJsonObject();
     when(state.getProp(MSTAGE_HTTP_REQUEST_HEADERS.getConfig(), new JsonObject().toString())).thenReturn(httpRequestHeaders.toString());

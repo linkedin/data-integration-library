@@ -79,7 +79,7 @@ public class MultistageSource2Test extends PowerMockTestCase {
     when(state.getPropAsBoolean(MSTAGE_WORK_UNIT_PARTIAL_PARTITION.getConfig())).thenReturn(allKeys.get(MSTAGE_WORK_UNIT_PARTIAL_PARTITION.getConfig()).getAsBoolean());
     when(state.getProp(MSTAGE_WATERMARK.getConfig(), new JsonArray().toString())).thenReturn(allKeys.get(MSTAGE_WATERMARK.getConfig()).getAsJsonArray().toString());
     when(state.getProp(MSTAGE_SECONDARY_INPUT.getConfig(), new JsonArray().toString())).thenReturn(allKeys.get(MSTAGE_SECONDARY_INPUT.getConfig()).getAsJsonArray().toString());
-    when(state.getProp(MSTAGE_HTTP_CLIENT_FACTORY.getConfig(), StringUtils.EMPTY)).thenReturn(allKeys.get(MSTAGE_HTTP_CLIENT_FACTORY.getConfig()).getAsString());
+    when(state.getProp(MSTAGE_CONNECTION_CLIENT_FACTORY.getConfig(), StringUtils.EMPTY)).thenReturn(allKeys.get(MSTAGE_CONNECTION_CLIENT_FACTORY.getConfig()).getAsString());
     when(state.getProp(MSTAGE_HTTP_REQUEST_HEADERS.getConfig(), new JsonObject().toString())).thenReturn(allKeys.get(MSTAGE_HTTP_REQUEST_HEADERS.getConfig()).getAsJsonObject().toString());
     when(state.getProp(MSTAGE_SOURCE_URI.getConfig(), StringUtils.EMPTY)).thenReturn(allKeys.get(MSTAGE_SOURCE_URI.getConfig()).getAsString());
     when(state.getProp(MSTAGE_HTTP_REQUEST_METHOD.getConfig(), StringUtils.EMPTY)).thenReturn(allKeys.get(MSTAGE_HTTP_REQUEST_METHOD.getConfig()).getAsString());

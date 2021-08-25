@@ -6,6 +6,7 @@ package com.linkedin.cdi.extractor;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -383,7 +384,7 @@ public class CsvExtractorTest {
     // check if schema has been added
     JsonParser parser = new JsonParser();
     String schema = extractor.getSchema();
-    Assert.assertEquals(parser.parse(schema).getAsJsonArray().size(), 10);
+    Assert.assertEquals(parser.parse(schema).getAsJsonArray().size(), 9);
 
     int index = 0;
     long[] dates = new long[]{1586502000000L, 1586588400000L, 1586674800000L, 1586761200000L, 1586847600000L,
@@ -426,7 +427,7 @@ public class CsvExtractorTest {
     // check if schema has been added
     JsonParser parser = new JsonParser();
     String schema = extractor.getSchema();
-    Assert.assertEquals(parser.parse(schema).getAsJsonArray().size(), 10);
+    Assert.assertEquals(parser.parse(schema).getAsJsonArray().size(), 9);
 
     int index = 0;
     long[] dates = new long[]{1586502000000L, 1586588400000L, 1586674800000L, 1586761200000L, 1586847600000L,
@@ -647,20 +648,87 @@ public class CsvExtractorTest {
     Assert.assertEquals(res[4], "123.456");
   }
 
+  private void testSkipRowAndSaveHeaderHelper(CsvExtractor csvExtractor, List<String[]> rows, int expectedLinesRemaining)
+      throws Exception {
+    Iterator<String[]> rowIterator = rows.iterator();
+    Whitebox.invokeMethod(csvExtractor, "skipRowAndSaveHeader", rowIterator);
+    int linesRemaining = 0;
+    while (rowIterator.hasNext()) {
+      linesRemaining ++;
+      rowIterator.next();
+    }
+    Assert.assertEquals(linesRemaining, expectedLinesRemaining);
+  }
+
   @Test
   public void testSkipRowAndSaveHeader() throws Exception {
     initExtractor(state);
     String[] someData = new String[]{"some_date"};
     String[] moreData = new String[]{"more_data"};
-    List<String[]> rows = ImmutableList.of(someData, moreData);
     CsvExtractorKeys csvExtractorKeys = new CsvExtractorKeys();
     CsvExtractorKeys spy = spy(csvExtractorKeys);
     csvExtractor.setCsvExtractorKeys(spy);
+    // Three lines of data, skipping two, so there should be one left
+    List<String[]> rows = ImmutableList.of(someData, moreData, moreData);
     when(spy.getRowsToSkip()).thenReturn(2);
     when(spy.getColumnHeader()).thenReturn(false);
-    Whitebox.invokeMethod(csvExtractor, "skipRowAndSaveHeader", rows.iterator());
+    testSkipRowAndSaveHeaderHelper(csvExtractor, rows, 1);
     verify(spy, atMost(0)).setHeaderRow(someData);
     verify(spy, atMost(0)).setHeaderRow(moreData);
+
+    rows = ImmutableList.of(someData, someData, moreData, moreData, moreData);
+    when(spy.getRowsToSkip()).thenReturn(3);
+    when(spy.getColumnHeaderIndex()).thenReturn(2);
+    when(spy.getColumnHeader()).thenReturn(true);
+    testSkipRowAndSaveHeaderHelper(csvExtractor, rows, 2);
+
+    rows = ImmutableList.of(someData, someData, moreData, someData, moreData);
+    when(spy.getRowsToSkip()).thenReturn(4);
+    when(spy.getColumnHeaderIndex()).thenReturn(2);
+    when(spy.getColumnHeader()).thenReturn(true);
+    testSkipRowAndSaveHeaderHelper(csvExtractor, rows, 1);
+  }
+
+  private void testExtractCSVWithSkipLinesHelper(String filepath, boolean hasHeader, int headerIndex,
+      int explicitRowsToSkip, int expectedRecordLength, int expectedProcessedCount) throws RetriableAuthenticationException {
+    InputStream inputStream = getClass().getResourceAsStream(filepath);
+    WorkUnitStatus status = WorkUnitStatus.builder().buffer(inputStream).build();
+
+    when(sourceState.getProp("ms.output.schema", "" )).thenReturn("");
+    when(state.getProp("ms.csv.column.header", StringUtils.EMPTY)).thenReturn(String.valueOf(hasHeader));
+    when(state.getPropAsBoolean("ms.csv.column.header")).thenReturn(hasHeader);
+    if (explicitRowsToSkip > 0) {
+      when(state.getPropAsInt("ms.csv.skip.lines", 0)).thenReturn(explicitRowsToSkip);
+    }
+    when(state.getPropAsInt("ms.csv.column.header.index", 0)).thenReturn(headerIndex);
+    when(MultistageProperties.MSTAGE_CSV_SEPARATOR.getValidNonblankWithDefault(state)).thenReturn("u002c");
+
+    realHttpSource.getWorkunits(sourceState);
+    CsvExtractor extractor = new CsvExtractor(state, realHttpSource.getHttpSourceKeys());
+    when(multistageConnection.executeFirst(extractor.workUnitStatus)).thenReturn(status);
+    extractor.setConnection(multistageConnection);
+
+    extractor.readRecord(null);
+    while (extractor.hasNext()) {
+      String[] record = extractor.readRecord(null);
+      Assert.assertNotNull(record);
+      Assert.assertEquals(record.length, expectedRecordLength);
+    }
+    Assert.assertEquals(expectedProcessedCount, extractor.getCsvExtractorKeys().getProcessedCount());
+  }
+
+  @Test
+  public void testExtractCSVWithSkipLines() throws RetriableAuthenticationException {
+    testExtractCSVWithSkipLinesHelper("/csv/ids_multiple_header_lines.csv",
+        true, 2, 0,2, 10);
+
+    testExtractCSVWithSkipLinesHelper("/csv/ids_multiple_header_lines.csv",
+        true, 1, 3, 2, 10);
+
+    // the work unit should fail in reality, but in unit test records are still processed
+    // there should be an error log saying header index out of bound
+    testExtractCSVWithSkipLinesHelper("/csv/ids_multiple_header_lines.csv",
+        true, 3, 3, 2, 10);
   }
 
   @Test
@@ -708,17 +776,48 @@ public class CsvExtractorTest {
     initExtractor(state);
     Method method = CsvExtractor.class.getDeclaredMethod("addParsedCSVData", String.class, String.class, JsonObject.class);
     method.setAccessible(true);
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("");
+    method.invoke(csvExtractor, "key1", "true", schema);
+    Assert.assertEquals(schema.get("key1").getAsBoolean(), true);
+
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("");
+    method.invoke(csvExtractor, "key2", "false", schema);
+    Assert.assertEquals(schema.get("key2").getAsBoolean(), false);
+
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("");
+    method.invoke(csvExtractor, "key3", "1.234F", schema);
+    Assert.assertEquals(schema.get("key3").getAsFloat(), 1.234F);
+
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("");
+    method.invoke(csvExtractor, "key4", "something else", schema);
+    Assert.assertEquals(schema.get("key4").getAsString(), "something else");
+
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("string");
+    method.invoke(csvExtractor, "key5", "123", schema);
+    Assert.assertEquals(schema.get("key5").getAsString(), "123");
+
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("int");
+    method.invoke(csvExtractor, "key5", "123", schema);
+    Assert.assertEquals(schema.get("key5").getAsInt(), 123);
+
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("boolean");
     method.invoke(csvExtractor, "key1", "true", schema);
     Assert.assertEquals(schema.get("key1").getAsBoolean(), true);
 
     method.invoke(csvExtractor, "key2", "false", schema);
     Assert.assertEquals(schema.get("key2").getAsBoolean(), false);
 
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("float");
     method.invoke(csvExtractor, "key3", "1.234F", schema);
     Assert.assertEquals(schema.get("key3").getAsFloat(), 1.234F);
 
-    method.invoke(csvExtractor, "key4", "something else", schema);
-    Assert.assertEquals(schema.get("key4").getAsString(), "something else");
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("long");
+    method.invoke(csvExtractor, "key5", "9993939399", schema);
+    Assert.assertEquals(schema.get("key5").getAsLong(), 9993939399L);
+
+    when(csvExtractorKeys.getDefaultFieldType()).thenReturn("double");
+    method.invoke(csvExtractor, "key5", "1.234D", schema);
+    Assert.assertEquals(schema.get("key5").getAsDouble(), 1.234D);
   }
 
   private void initExtractor(WorkUnitState state) {
@@ -730,5 +829,25 @@ public class CsvExtractorTest {
     when(state.getProp(MSTAGE_CSV_ESCAPE_CHARACTER.getConfig(), StringUtils.EMPTY)).thenReturn("u005C");
     when(state.getProp(MSTAGE_EXTRACT_PREPROCESSORS_PARAMETERS.getConfig(), new JsonObject().toString())).thenReturn(StringUtils.EMPTY);
     when(state.getProp(MSTAGE_EXTRACT_PREPROCESSORS.getConfig(), StringUtils.EMPTY)).thenReturn(StringUtils.EMPTY);
+  }
+
+  @Test
+  private void testSchemaWithDuplicates() {
+    initExtractor(state);
+    String schemaString = "[{\"columnName\":\"derived_delta\"," + "\"comment\":\"\","
+        + "\"isNullable\":\"true\"," + "\"dataType\":{\"type\":\"long\"}}]";
+    Map<String, Map<String, String>> derivedFields = ImmutableMap.of("derived_delta",
+        ImmutableMap.of("type", "non-epoc", "source", "start_time", "format", "yyyy-MM-dd"));
+    when(jobKeys.getDerivedFields()).thenReturn(derivedFields);
+    JsonArray schema = new Gson().fromJson(schemaString, JsonArray.class);
+    when(jobKeys.hasOutputSchema()).thenReturn(true);
+    when(jobKeys.getOutputSchema()).thenReturn(schema);
+    Assert.assertEquals(csvExtractor.getSchema(), schemaString);
+    Map<String, Map<String, String>> derivedFields1 = ImmutableMap.of("derived_field",
+        ImmutableMap.of("type", "non-epoc", "source", "start_time", "format", "yyyy-MM-dd"));
+    when(jobKeys.getDerivedFields()).thenReturn(derivedFields1);
+    String resultSchema = "[{\"columnName\":\"derived_delta\",\"comment\":\"\",\"isNullable\":\"true\","
+        + "\"dataType\":{\"type\":\"long\"}},{\"columnName\":\"derived_field\",\"dataType\":{\"type\":\"string\"}}]";
+    Assert.assertEquals(csvExtractor.getSchema(), resultSchema);
   }
 }
