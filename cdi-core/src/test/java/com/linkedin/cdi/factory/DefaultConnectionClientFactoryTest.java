@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 
 
 @PrepareForTest({HttpClientBuilder.class})
-public class ApacheHttpClientFactoryTest extends PowerMockTestCase {
+public class DefaultConnectionClientFactoryTest extends PowerMockTestCase {
   @Mock
   private HttpClientBuilder httpClientBuilder;
 
@@ -30,10 +30,10 @@ public class ApacheHttpClientFactoryTest extends PowerMockTestCase {
    */
   @Test
   public void testGet() {
-    ApacheHttpClientFactory factory = new ApacheHttpClientFactory();
+    DefaultConnectionClientFactory factory = new DefaultConnectionClientFactory();
     PowerMockito.mockStatic(HttpClientBuilder.class);
     PowerMockito.when(HttpClientBuilder.create()).thenReturn(httpClientBuilder);
     when(httpClientBuilder.build()).thenReturn(closeableHttpClient);
-    Assert.assertEquals(factory.get(new State()), closeableHttpClient);
+    Assert.assertEquals(factory.getHttpClient(new State()), closeableHttpClient);
   }
 }

@@ -6,6 +6,7 @@ package com.linkedin.cdi.connection;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.factory.ConnectionClientFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
@@ -26,7 +27,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.gobblin.configuration.State;
 import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
-import com.linkedin.cdi.factory.JdbcClientFactory;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JdbcKeys;
 import com.linkedin.cdi.keys.JobKeys;
@@ -101,10 +101,10 @@ public class JdbcConnection extends MultistageConnection {
    */
   private synchronized Connection getJdbcConnection(State state) {
     try {
-      Class<?> factoryClass = Class.forName(MultistageProperties.MSTAGE_JDBC_CLIENT_FACTORY.getValidNonblankWithDefault(state));
-      JdbcClientFactory factory = (JdbcClientFactory) factoryClass.newInstance();
+      Class<?> factoryClass = Class.forName(MultistageProperties.MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
+      ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.newInstance();
 
-      return factory.getConnection(
+      return factory.getJdbcConnection(
           jdbcSourceKeys.getSourceUri(),
           MultistageProperties.SOURCE_CONN_USERNAME.getValidNonblankWithDefault(state),
           MultistageProperties.SOURCE_CONN_PASSWORD.getValidNonblankWithDefault(state),

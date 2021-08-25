@@ -60,5 +60,20 @@ public interface StaticConstants {
   String KEY_WORD_FAIL = "fail";
   String KEY_WORD_SUCCESS = "success";
   String KEY_WORD_ERROR_COLUMN = "errorColumn";
+  String KEY_WORD_INT = "int";
+  String KEY_WORD_LONG = "long";
+  String KEY_WORD_DOUBLE = "double";
+  String KEY_WORD_FLOAT = "float";
+  String KEY_WORD_JSON = "json";
+  String KEY_WORD_CSV = "csv";
+  String KEY_WORD_AVRO = "avro";
+
+  String EXCEPTION_WORK_UNIT_MINIMUM = "Job requires a minimum of %s work unit(s) to proceed because ms.work.unit.min.units = %s.";
+  String EXCEPTION_RECORD_MINIMUM = "Work unit requires a minimum of %s record(s) to succeed because ms.work.unit.min.records = %s.";
+
+  String MSG_ROWS_PROCESSED = "Processed %s records, work unit: %s";
+  String MSG_WORK_UNIT_ALWAYS = "There should be a work unit.";
+  String MSG_LOW_WATER_MARK_ALWAYS = "There should be a low watermark.";
+  String MSG_WORK_UNIT_INFO = "Generating Work Unit: %s, watermark: %s";
   Gson GSON = new Gson();
 }
