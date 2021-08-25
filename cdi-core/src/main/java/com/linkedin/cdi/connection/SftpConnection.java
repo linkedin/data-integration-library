@@ -7,26 +7,20 @@ package com.linkedin.cdi.connection;
 import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.factory.ConnectionClientFactory;
-import com.linkedin.cdi.factory.DefaultConnectionClientFactory;
 import com.linkedin.cdi.factory.sftp.SftpClient;
 import com.linkedin.cdi.keys.ExtractorKeys;
-import com.linkedin.cdi.keys.HttpKeys;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.keys.SftpKeys;
 import com.linkedin.cdi.util.InputStreamUtils;
 import com.linkedin.cdi.util.WorkUnitStatus;
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.State;
-import org.apache.gobblin.source.extractor.filebased.FileBasedHelperException;
-import org.apache.gobblin.source.extractor.filebased.TimestampAwareFileBasedHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,7 +93,7 @@ public class SftpConnection extends MultistageConnection {
       return null;
     }
 
-    boolean isFilewithPrefixExist = files.stream().anyMatch(file -> file.equals(finalPrefix));
+    boolean isFileWithPrefixExist = files.stream().anyMatch(file -> file.equals(finalPrefix));
     log.info("No Of Files to be processed matching the pattern: {}", files.size());
     if (StringUtils.isNotBlank(sftpSourceKeys.getFilesPattern())) {
       status.setBuffer(InputStreamUtils.convertListToInputStream(getFilteredFiles(files)));
@@ -110,14 +104,14 @@ public class SftpConnection extends MultistageConnection {
         String fileToDownload = "";
         if (files.size() == 1) {
           fileToDownload = files.get(0);
-        } else if (isFilewithPrefixExist) {
+        } else if (isFileWithPrefixExist) {
           fileToDownload = finalPrefix;
         }
         if (StringUtils.isNotBlank(fileToDownload)) {
           log.info("Downloading file: {}", files.get(0));
           try {
             status.setBuffer(this.fsClient.getFileStream(fileToDownload));
-          } catch (FileBasedHelperException e) {
+          } catch (Exception e) {
             log.error("Error downloading file {}", fileToDownload, e);
             return null;
           }
@@ -148,8 +142,8 @@ public class SftpConnection extends MultistageConnection {
    * Ex: file path supported "/a/b/*c*"
    * file path not supported "/a/*b/*c*
    * Get files list based on pattern
-   * @param filesPattern
-   * @return
+   * @param filesPattern pattern of content to list
+   * @return list of content
    */
   private List<String> getFiles(String filesPattern) {
     List<String> files = new ArrayList<>();
@@ -167,7 +161,7 @@ public class SftpConnection extends MultistageConnection {
         files.set(i, filepath);
         i++;
       }
-    } catch (FileBasedHelperException | URISyntaxException e) {
+    } catch (Exception e) {
       log.error("Unable to list files " + e.getMessage());
     }
     return files;

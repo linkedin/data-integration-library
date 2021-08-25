@@ -31,14 +31,14 @@ public class SftpMonitor implements SftpProgressMonitor {
   @Setter
   private long logFrequency;
   @Getter
-  private long startime;
+  private long startTime;
 
   @Override
   public void init(int op, String src, String dest, long max) {
     this.op = op;
     this.src = src;
     this.dest = dest;
-    this.startime = System.currentTimeMillis();
+    this.startTime = System.currentTimeMillis();
     this.logFrequency = 0L;
     if (op == SftpProgressMonitor.GET) {
       LOG.info("DOWNLOAD operation has started with src: " + src + " dest: " + dest + " and file length: " + (max
@@ -68,14 +68,14 @@ public class SftpMonitor implements SftpProgressMonitor {
 
   @Override
   public void end() {
-    long secs = (System.currentTimeMillis() - this.startime) / 1000L;
+    long secs = (System.currentTimeMillis() - this.startTime) / 1000L;
     LOG.info("Transfer finished " + this.op + " src: " + this.src + " dest: " + this.dest + " in " + secs + " at "
         + getMbps());
   }
 
   private String getMbps() {
     long mb = this.totalCount / 1000000L;
-    long secs = (System.currentTimeMillis() - this.startime) / 1000L;
+    long secs = (System.currentTimeMillis() - this.startTime) / 1000L;
     double mbps = secs == 0L ? 0.0D : mb * 1.0D / secs;
     return String.format("%.2f", mbps);
   }

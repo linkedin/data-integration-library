@@ -17,7 +17,6 @@ import java.util.Vector;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.source.extractor.extract.sftp.SftpFsHelper;
-import org.apache.gobblin.source.extractor.filebased.FileBasedHelperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +26,7 @@ public class SftpChannelClient implements SftpClient {
   private static final String SFTP_CONNECTION_TIMEOUT_KEY = "sftpConn.timeout";
   private static final int DEFAULT_SFTP_CONNECTION_TIMEOUT_IN_MS = 3000; //in milliseconds
 
-  protected State state = null;
+  protected State state;
   protected Session session = null;
   protected JSch jsch = new JSch();
 
@@ -63,13 +62,13 @@ public class SftpChannelClient implements SftpClient {
    * commands in parallel. All created channels are cleaned up when the session is closed.
    *
    * @return a new {@link ChannelSftp}
-   * @throws SftpException
+   * @throws SftpException  An SftpException
    */
   @Override
   public ChannelSftp getSftpChannel() throws SftpException {
     try {
       ChannelSftp channelSftp = (ChannelSftp) this.session.openChannel("sftp");
-      // In millsec
+      // In milliseconds
       int connTimeout = state.getPropAsInt(SFTP_CONNECTION_TIMEOUT_KEY, DEFAULT_SFTP_CONNECTION_TIMEOUT_IN_MS);
       channelSftp.connect(connTimeout);
       return channelSftp;
@@ -90,27 +89,25 @@ public class SftpChannelClient implements SftpClient {
 
   /**
    * Executes a get SftpCommand and returns an input stream to the file
-   * @throws SftpException
    */
   @Override
-  public InputStream getFileStream(String file) throws FileBasedHelperException {
+  public InputStream getFileStream(String file) {
     SftpMonitor monitor = new SftpMonitor();
     try {
       ChannelSftp channel = getSftpChannel();
       return new SftpChannelFileInputStream(channel.get(file, monitor), channel);
     } catch (SftpException e) {
-      throw new FileBasedHelperException("Cannot download file " + file + " due to " + e.getMessage(), e);
+      throw new RuntimeException("Cannot download file " + file + " due to " + e.getMessage(), e);
     }
   }
 
   /**
-   * Exceute an FTP ls command
-   * @param path
+   * Execute an FTP ls command
+   * @param path the target path to list content
    * @return the list of files and directories
-   * @throws FileBasedHelperException
    */
   @Override
-  public List<String> ls(String path) throws FileBasedHelperException {
+  public List<String> ls(String path) {
     try {
       List<String> list = new ArrayList<>();
       ChannelSftp channel = getSftpChannel();
@@ -121,7 +118,47 @@ public class SftpChannelClient implements SftpClient {
       channel.disconnect();
       return list;
     } catch (SftpException e) {
-      throw new FileBasedHelperException("Cannot execute ls command on sftp connection", e);
+      throw new RuntimeException("Cannot execute ls command on sftp connection", e);
+    }
+  }
+
+  /**
+   * Get file modification time
+   * @param path file path on target to be checked
+   * @return the modification time in long format
+   */
+  @Override
+  public long getFileMTime(String path) {
+    ChannelSftp channelSftp = null;
+    try {
+      channelSftp = getSftpChannel();
+      return channelSftp.lstat(path).getMTime();
+    } catch (SftpException e) {
+      throw new RuntimeException(
+          String.format("Failed to get modified timestamp for file at path %s due to error %s", path,
+              e.getMessage()), e);
+    } finally {
+      if (channelSftp != null) {
+        channelSftp.disconnect();
+      }
+    }
+  }
+
+  /**
+   * Get file size
+   * @param path file path on target to be checked
+   * @return the file size
+   */
+  @Override
+  public long getFileSize(String path) {
+    try {
+      ChannelSftp channelSftp = getSftpChannel();
+      long fileSize = channelSftp.lstat(path).getSize();
+      channelSftp.disconnect();
+      return fileSize;
+    } catch (SftpException e) {
+      throw new RuntimeException(
+          String.format("Failed to get size for file at path %s due to error %s", path, e.getMessage()), e);
     }
   }
 }
