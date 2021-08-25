@@ -33,10 +33,10 @@ public class SftpChannelClient implements SftpClient {
 
   public SftpChannelClient(State state) {
     this.state = state;
-    initialize(state);
+    initializeConnection(state);
   }
 
-  private void initialize(State state) {
+  protected void initializeConnection(State state) {
     JSch.setLogger(new SftpFsHelper.JSchLogger());
     try {
       if (StringUtils.isBlank(Credentials.getProxyHost(state))
