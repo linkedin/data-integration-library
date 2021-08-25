@@ -47,4 +47,14 @@ public class Credentials {
   public static int getProxyPort(State state) {
     return state.getPropAsInt(ConfigurationKeys.SOURCE_CONN_USE_PROXY_PORT, -1);
   }
+
+  public static void log(State state) {
+    LOG.info("privateKey: {}", getPrivateKey(state));
+    LOG.info("knownHosts: {}", getKnownHosts(state));
+    LOG.info("userName: {}", getUserName(state));
+    LOG.info("hostName: {}", getHostName(state));
+    LOG.info("port: {}", getPort(state));
+    LOG.info("proxyHost: {}" , getProxyHost(state));
+    LOG.info("proxyPort: {}", getProxyPort(state));
+  }
 }
