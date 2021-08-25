@@ -4,6 +4,11 @@
 
 package com.linkedin.cdi.source;
 
+import com.linkedin.cdi.configuration.MultistageProperties;
+import com.linkedin.cdi.connection.JdbcConnection;
+import com.linkedin.cdi.extractor.MultistageExtractor;
+import com.linkedin.cdi.keys.JdbcKeys;
+import com.linkedin.cdi.util.CsvUtils;
 import java.sql.Connection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -13,11 +18,6 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.configuration.WorkUnitState;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.connection.JdbcConnection;
-import com.linkedin.cdi.extractor.MultistageExtractor;
-import com.linkedin.cdi.keys.JdbcKeys;
-import com.linkedin.cdi.util.CsvUtils;
 import org.apache.gobblin.source.extractor.Extractor;
 
 

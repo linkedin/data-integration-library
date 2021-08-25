@@ -34,6 +34,7 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.AutoRetryHttpClient;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -104,7 +105,7 @@ public class HttpConnectionTest extends PowerMockTestCase {
     CloseableHttpResponse response = mock(CloseableHttpResponse.class);
 
     conn.setHttpClient(client);
-    when(client.execute(any())).thenReturn(response);
+    when(client.execute(any(HttpUriRequest.class), any(HttpClientContext.class))).thenReturn(response);
 
     WorkUnit workUnit = mock(WorkUnit.class);
     LongWatermark lowWatermark = mock(LongWatermark.class);
@@ -248,7 +249,7 @@ public class HttpConnectionTest extends PowerMockTestCase {
     when(statusLine.getStatusCode()).thenReturn(401);
     when(statusLine.getReasonPhrase()).thenReturn("pagination error");
     when(httpResponse.getStatusLine()).thenReturn(statusLine);
-    when(mockHttpClient.execute(any(HttpUriRequest.class))).thenReturn(httpResponse);
+    when(mockHttpClient.execute(any(HttpUriRequest.class), any(HttpClientContext.class))).thenReturn(httpResponse);
 
     when(state.getProp("ms.watermark", "")).thenReturn("[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"2017-01-01\", \"to\": \"-\"}}]");
     when(state.getProp("extract.table.type", "SNAPSHOT_ONLY")).thenReturn("SNAPSHOT_ONLY");
@@ -350,8 +351,8 @@ public class HttpConnectionTest extends PowerMockTestCase {
     secondaryInput = allKeys.get(MSTAGE_SECONDARY_INPUT.getConfig()).getAsJsonArray();
     when(state.getProp(MSTAGE_SECONDARY_INPUT.getConfig(), new JsonArray().toString())).thenReturn(secondaryInput.toString());
 
-    httpClientFactory = allKeys.get(MSTAGE_HTTP_CLIENT_FACTORY.getConfig()).getAsString();
-    when(state.getProp(MSTAGE_HTTP_CLIENT_FACTORY.getConfig(), StringUtils.EMPTY)).thenReturn(httpClientFactory);
+    httpClientFactory = allKeys.get(MSTAGE_CONNECTION_CLIENT_FACTORY.getConfig()).getAsString();
+    when(state.getProp(MSTAGE_CONNECTION_CLIENT_FACTORY.getConfig(), StringUtils.EMPTY)).thenReturn(httpClientFactory);
 
     httpRequestHeaders = allKeys.get(MSTAGE_HTTP_REQUEST_HEADERS.getConfig()).getAsJsonObject();
     when(state.getProp(MSTAGE_HTTP_REQUEST_HEADERS.getConfig(), new JsonObject().toString())).thenReturn(httpRequestHeaders.toString());

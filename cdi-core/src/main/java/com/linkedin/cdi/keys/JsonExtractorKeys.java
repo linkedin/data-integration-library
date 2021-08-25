@@ -32,7 +32,6 @@ public class JsonExtractorKeys extends ExtractorKeys {
       MultistageProperties.MSTAGE_TOTAL_COUNT_FIELD);
 
   private Iterator<JsonElement> jsonElementIterator = null;
-  private long processedCount;
   private long totalCount;
   private long currentPageNumber = 0;
   private JsonObject pushDowns = new JsonObject();
@@ -43,7 +42,6 @@ public class JsonExtractorKeys extends ExtractorKeys {
     log.debug("These are values of JsonExtractor regarding to Work Unit: {}",
         workUnit == null ? "testing" : workUnit.getProp(MultistageProperties.DATASET_URN_KEY.toString()));
     log.debug("Total rows expected or processed: {}", totalCount);
-    log.debug("Total rows processed: {}", processedCount);
   }
 
   @Override

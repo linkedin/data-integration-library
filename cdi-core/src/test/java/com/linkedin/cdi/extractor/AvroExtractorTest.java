@@ -329,4 +329,232 @@ public class AvroExtractorTest {
     Assert.assertEquals(avroSchema.getName(), "test");
     Assert.assertEquals(avroSchema.getNamespace(), "com.linkedin.test");
   }
+
+  /**
+   * When ms.data.field is an array
+   * data = {
+   *   "results": [
+   *     {
+   *       "field1": "a",
+   *       "field2": "aa"
+   *     },
+   *     {
+   *       "field1": "b",
+   *       "field2": "bb"
+   *     },
+   *     {
+   *       "field1": "c",
+   *       "field2": "cc"
+   *     }
+   *   ]
+   * }
+   * ms.data.field = "results"
+   * @throws Exception exception
+   */
+  @Test
+  public void testMSDataField1() throws Exception {
+    InputStream inputStream = getClass().getResourceAsStream("/avro/ArrayFieldTest.avro");
+    WorkUnitStatus status = WorkUnitStatus.builder().buffer(inputStream).build();
+
+    when(sourceState.getProp("ms.output.schema", "" )).thenReturn("");
+
+    // replace mocked keys with default keys
+    realHttpSource.getWorkunits(sourceState);
+    avroExtractor.jobKeys = jobKeys;
+    avroExtractor.setAvroExtractorKeys(new AvroExtractorKeys());
+    when(jobKeys.getSourceParameters()).thenReturn(realHttpSource.getJobKeys().getSourceParameters());
+    when(jobKeys.getDataField()).thenReturn("results");
+    when(multistageConnection.executeFirst(avroExtractor.workUnitStatus)).thenReturn(status);
+
+    // schema should be of type record
+    Schema schema = avroExtractor.getSchema();
+    Assert.assertEquals(schema.getType(), Schema.Type.RECORD);
+
+    // there should be 1 records processed
+    GenericRecord rst = avroExtractor.readRecord(null);
+    /* expected data = {
+     *   "results": [
+     *     {
+     *       "field1": "a",
+     *       "field2": "aa"
+     *     },
+     *     {
+     *       "field1": "b",
+     *       "field2": "bb"
+     *     },
+     *     {
+     *       "field1": "c",
+     *       "field2": "cc"
+     *     }
+     *   ]
+     * }
+     */
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "results.0.field1").get().toString(), "a");
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "results.0.field2").get().toString(), "aa");
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "results.1.field1").get().toString(), "b");
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "results.1.field2").get().toString(), "bb");
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "results.2.field1").get().toString(), "c");
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "results.2.field2").get().toString(), "cc");
+    while (avroExtractor.hasNext()) {
+      avroExtractor.readRecord(null);
+    }
+    Assert.assertEquals(1, avroExtractor.getAvroExtractorKeys().getProcessedCount());
+  }
+
+  /**
+   * When ms.data.field is a single record
+   * data = {
+   *   "results": {
+   *     "field1": "a",
+   *     "field2": "aa"
+   *   }
+   * }
+   * ms.data.field = "results"
+   * @throws Exception exception
+   */
+  @Test
+  public void testMSDataField2() throws Exception {
+    InputStream inputStream = getClass().getResourceAsStream("/avro/SingleRecordArrayFieldTest.avro");
+    WorkUnitStatus status = WorkUnitStatus.builder().buffer(inputStream).build();
+
+    when(sourceState.getProp("ms.output.schema", "" )).thenReturn("");
+
+    // replace mocked keys with default keys
+    realHttpSource.getWorkunits(sourceState);
+    avroExtractor.jobKeys = jobKeys;
+    avroExtractor.setAvroExtractorKeys(new AvroExtractorKeys());
+    when(jobKeys.getSourceParameters()).thenReturn(realHttpSource.getJobKeys().getSourceParameters());
+    when(jobKeys.getDataField()).thenReturn("results");
+    when(multistageConnection.executeFirst(avroExtractor.workUnitStatus)).thenReturn(status);
+
+    // schema should be of type record
+    Schema schema = avroExtractor.getSchema();
+    Assert.assertEquals(schema.getType(), Schema.Type.RECORD);
+
+    // there should be 1 records processed
+    GenericRecord rst = avroExtractor.readRecord(null);
+    /*
+     * expected data = {
+     *   "results": {
+     *     "field1": "a",
+     *     "field2": "aa"
+     *   }
+     * }
+     */
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "results.field1").get().toString(), "a");
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "results.field2").get().toString(), "aa");
+    while (avroExtractor.hasNext()) {
+      avroExtractor.readRecord(null);
+    }
+    Assert.assertEquals(1, avroExtractor.getAvroExtractorKeys().getProcessedCount());
+  }
+
+  /**
+   * When ms.data.field is deep in a nested structure
+   * data
+   * Record 1 {
+   *     "results": [
+   *         {
+   *             "wrapper": {
+   *                 "field1": [
+   *                     {
+   *                         "field11": "a11",
+   *                         "field12": "a12"
+   *                     },
+   *                     {
+   *                         "field11": "aa11",
+   *                         "field12": "aa12"
+   *                     }
+   *                 ]
+   *             },
+   *             "field2": "aa"
+   *         }
+   *     ]
+   * }
+   * Record 2 {
+   *     "results": [
+   *         {
+   *             "wrapper": {
+   *                 "field1": [
+   *                     {
+   *                         "field11": "b11",
+   *                         "field12": "b12"
+   *                     },
+   *                     {
+   *                         "field11": "bb11",
+   *                         "field12": "bb12"
+   *                     }
+   *                 ]
+   *             },
+   *             "field2": "bb"
+   *         }
+   *     ]
+   * }
+   * ms.data.field = "results.0.wrapper.field1"
+   * @throws Exception exception
+   */
+  @Test
+  public void testMSDataField3() throws Exception {
+    InputStream inputStream = getClass().getResourceAsStream("/avro/NestedDataFieldTest.avro");
+    WorkUnitStatus status = WorkUnitStatus.builder().buffer(inputStream).build();
+
+    when(sourceState.getProp("ms.output.schema", "" )).thenReturn("");
+
+    // replace mocked keys with default keys
+    realHttpSource.getWorkunits(sourceState);
+    avroExtractor.jobKeys = jobKeys;
+    avroExtractor.setAvroExtractorKeys(new AvroExtractorKeys());
+    when(jobKeys.getSourceParameters()).thenReturn(realHttpSource.getJobKeys().getSourceParameters());
+    when(jobKeys.getDataField()).thenReturn("results.0.wrapper.field1");
+    when(multistageConnection.executeFirst(avroExtractor.workUnitStatus)).thenReturn(status);
+
+    // schema should be of type record
+    Schema schema = avroExtractor.getSchema();
+    Assert.assertEquals(schema.getType(), Schema.Type.RECORD);
+
+    // there should be 2 records processed
+    GenericRecord rst = avroExtractor.readRecord(null);
+    /*
+     * expected data = {
+     *     "field1": [
+     *         {
+     *             "field11": "a11",
+     *             "field12": "a12"
+     *         },
+     *         {
+     *             "field11": "aa11",
+     *             "field12": "aa12"
+     *         }
+     *     ]
+     * }
+     */
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "field1.0.field11").get().toString(), "a11");
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "field1.0.field12").get().toString(), "a12");
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "field1.1.field11").get().toString(), "aa11");
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "field1.1.field12").get().toString(), "aa12");
+
+    rst = avroExtractor.readRecord(null);
+    /*
+     * expected data = {
+     *     "field1": [
+     *         {
+     *             "field11": "b11",
+     *             "field12": "b12"
+     *         },
+     *         {
+     *             "field11": "bb11",
+     *             "field12": "bb12"
+     *         }
+     *     ]
+     * }
+     */
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "field1.0.field11").get().toString(), "b11");
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "field1.0.field12").get().toString(), "b12");
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "field1.1.field11").get().toString(), "bb11");
+    Assert.assertEquals(AvroUtils.getFieldValue(rst, "field1.1.field12").get().toString(), "bb12");
+    while (avroExtractor.hasNext()) {
+      avroExtractor.readRecord(null);
+    }
+    Assert.assertEquals(2, avroExtractor.getAvroExtractorKeys().getProcessedCount());
+  }
 }

@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.extractor;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -75,7 +76,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   protected final static String PXD = "P\\d+D";
   protected final static String CONTENT_TYPE_KEY = "Content-Type";
   protected final static List<String> SUPPORTED_DERIVED_FIELD_TYPES =
-      Arrays.asList("epoc", "string", "integer", "number");
+      Arrays.asList(KEY_WORD_EPOC, KEY_WORD_STRING, KEY_WORD_REGEXP, KEY_WORD_BOOLEAN, KEY_WORD_INTEGER, KEY_WORD_NUMBER);
   protected static final String COMMA_STR = ",";
   protected final static String DEFAULT_TIMEZONE = "America/Los_Angeles";
 
@@ -138,14 +139,35 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   @Nullable
   @Override
   public D readRecord(D reuse) {
+    if (extractorKeys.getProcessedCount() % (100 * 1000) == 0) {
+      log.debug(String.format(MSG_ROWS_PROCESSED,
+          extractorKeys.getProcessedCount(),
+          extractorKeys.getSignature()));
+    }
     return null;
   }
 
   @Override
   public void close() {
+    log.info("Closing the work unit: {}", this.extractorKeys.getSignature());
+
+    if (extractorKeys.getProcessedCount() < jobKeys.getMinWorkUnitRecords()) {
+      throw new RuntimeException(String.format(EXCEPTION_RECORD_MINIMUM,
+          jobKeys.getMinWorkUnitRecords(),
+          jobKeys.getMinWorkUnitRecords()));
+    }
+
+    Preconditions.checkNotNull(state.getWorkunit(), MSG_WORK_UNIT_ALWAYS);
+    Preconditions.checkNotNull(state.getWorkunit().getLowWatermark(), MSG_LOW_WATER_MARK_ALWAYS);
     if (state.getWorkingState().equals(WorkUnitState.WorkingState.SUCCESSFUL)) {
       state.setActualHighWatermark(state.getWorkunit().getExpectedHighWatermark(LongWatermark.class));
+    } else if (state.getActualHighWatermark() == null) {
+      // Set the actual high watermark to low watermark explicitly,
+      // replacing the implicit behavior in state.getActualHighWatermark(LongWatermark.class)
+      // avoiding different returns from the two versions of getActualHighWatermark()
+      state.setActualHighWatermark(state.getWorkunit().getLowWatermark(LongWatermark.class));
     }
+
     if (connection != null) {
       connection.closeAll(StringUtils.EMPTY);
     }
@@ -393,8 +415,8 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
         default:
           // by default take the source types
           JsonElement source = JsonUtils.get(entry.getValue().get(KEY_WORD_SOURCE), jobKeys.getOutputSchema());
-          dataType.addProperty(KEY_WORD_TYPE, source.isJsonNull() ? KEY_WORD_STRING
-              : source.getAsJsonObject().get(KEY_WORD_TYPE).getAsString());
+          dataType.addProperty(KEY_WORD_TYPE,
+              source.isJsonNull() ? KEY_WORD_STRING : source.getAsJsonObject().get(KEY_WORD_TYPE).getAsString());
           break;
       }
       column.add("dataType", dataType);
@@ -408,21 +430,21 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
         || VariableUtils.PATTERN.matcher(source).matches());
   }
 
-  protected String generateDerivedFieldValue(Map<String, String> derivedFieldDef,
+  protected String generateDerivedFieldValue(String name, Map<String, String> derivedFieldDef,
       final String inputValue, boolean isStrValueFromSource) {
-    String strValue = StringUtils.EMPTY;
+    String strValue = inputValue;
     long longValue = Long.MIN_VALUE;
     String source = derivedFieldDef.getOrDefault("source", StringUtils.EMPTY);
     String type = derivedFieldDef.get("type");
     String format = derivedFieldDef.getOrDefault("format", StringUtils.EMPTY);
     DateTimeZone timeZone = DateTimeZone.forID(timezone.isEmpty() ? DEFAULT_TIMEZONE : timezone);
 
-    // get the base value from various sources
+    // get the base value from date times or variables
     if (source.equalsIgnoreCase(CURRENT_DATE)) {
       longValue = DateTime.now().getMillis();
     } else if (source.matches(PXD)) {
       Period period = Period.parse(source);
-      longValue  = DateTime.now().withZone(timeZone).minus(period).dayOfMonth().roundFloorCopy().getMillis();
+      longValue = DateTime.now().withZone(timeZone).minus(period).dayOfMonth().roundFloorCopy().getMillis();
     } else if (VariableUtils.PATTERN.matcher(source).matches()) {
       strValue = replaceVariable(source);
     } else if (!StringUtils.isEmpty(source) && !isStrValueFromSource) {
@@ -435,7 +457,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
         if (longValue != Long.MIN_VALUE) {
           strValue = String.valueOf(longValue);
         } else if (!format.equals(StringUtils.EMPTY)) {
-          strValue = deriveEpoc(format, inputValue);
+          strValue = deriveEpoc(format, strValue);
         } else {
           // Otherwise, the strValue should be a LONG string derived from a dynamic variable source
           Assert.assertNotNull(LongValidator.getInstance().validate(strValue));
@@ -443,7 +465,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
         break;
       case "regexp":
         Pattern pattern = Pattern.compile(!format.equals(StringUtils.EMPTY) ? format : "(.*)");
-        Matcher matcher = pattern.matcher(inputValue);
+        Matcher matcher = pattern.matcher(strValue);
         if (matcher.find()) {
           strValue = matcher.group(1);
         } else {
@@ -452,12 +474,17 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
         }
         break;
       case "boolean":
-        if (!StringUtils.isEmpty(inputValue)) {
-          strValue = inputValue;
+        if (StringUtils.isEmpty(strValue)) {
+          log.error("Input value of a boolean derived field should not be empty!");
         }
         break;
       default:
         break;
+    }
+
+    if (StringUtils.isEmpty(strValue)) {
+      failWorkUnit(String.format("Could not extract the value for the derived field %s from %s",
+          name, StringUtils.join(derivedFieldDef)));
     }
     return strValue;
   }
@@ -671,23 +698,21 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
 
     if (state.contains(ConfigurationKeys.EXTRACT_PRIMARY_KEY_FIELDS_KEY)) {
       String[] primaryKeys =
-          state.getProp(ConfigurationKeys.EXTRACT_PRIMARY_KEY_FIELDS_KEY,
-              StringUtils.EMPTY).split(COMMA_STR);
+          state.getProp(ConfigurationKeys.EXTRACT_PRIMARY_KEY_FIELDS_KEY, StringUtils.EMPTY).split(COMMA_STR);
       for (String key: primaryKeys) {
         if (!key.isEmpty()) {
-          elements.add(new SchemaBuilder(key, SchemaBuilder.PRIMITIVE, true, new ArrayList<>())
-              .setPrimitiveType(KEY_WORD_STRING));
+          elements.add(new SchemaBuilder(key, SchemaBuilder.PRIMITIVE, true, new ArrayList<>()).setPrimitiveType(
+              KEY_WORD_STRING));
         }
       }
     }
     if (state.contains(ConfigurationKeys.EXTRACT_DELTA_FIELDS_KEY)) {
       String[] deltaKeys =
-          state.getProp(ConfigurationKeys.EXTRACT_DELTA_FIELDS_KEY,
-              StringUtils.EMPTY).split(COMMA_STR);
+          state.getProp(ConfigurationKeys.EXTRACT_DELTA_FIELDS_KEY, StringUtils.EMPTY).split(COMMA_STR);
       for (String key: deltaKeys) {
         if (!key.isEmpty()) {
-          elements.add(new SchemaBuilder(key, SchemaBuilder.PRIMITIVE, true, new ArrayList<>())
-              .setPrimitiveType(KEY_WORD_TIMESTAMP));
+          elements.add(new SchemaBuilder(key, SchemaBuilder.PRIMITIVE, true, new ArrayList<>()).setPrimitiveType(
+              KEY_WORD_TIMESTAMP));
         }
       }
     }

@@ -23,7 +23,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.gobblin.configuration.State;
 import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
-import com.linkedin.cdi.factory.HttpClientFactory;
+import com.linkedin.cdi.factory.ConnectionClientFactory;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.HttpKeys;
 import com.linkedin.cdi.keys.JobKeys;
@@ -35,6 +35,8 @@ import org.apache.http.HeaderElement;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.util.EntityUtils;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
@@ -77,9 +79,9 @@ public class HttpConnection extends MultistageConnection {
     if (httpClient == null) {
       try {
         Class<?> factoryClass = Class.forName(
-            MultistageProperties.MSTAGE_HTTP_CLIENT_FACTORY.getValidNonblankWithDefault(state));
-        HttpClientFactory factory = (HttpClientFactory) factoryClass.newInstance();
-        httpClient = factory.get(state);
+            MultistageProperties.MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
+        ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.newInstance();
+        httpClient = factory.getHttpClient(state);
       } catch (Exception e) {
         log.error("Error creating HttpClient: {}", e.getMessage());
       }
@@ -212,6 +214,7 @@ public class HttpConnection extends MultistageConnection {
     // trying to make a Http request, capture the client side error and
     // fail the task if any encoding exception or IO exception
     CloseableHttpResponse response;
+    HttpClientContext context = HttpClientContext.create();
     try {
       JsonObject payloads = new JsonObject();
       JsonObject queryParameters = new JsonObject();
@@ -222,8 +225,9 @@ public class HttpConnection extends MultistageConnection {
           queryParameters.add(entry.getKey(), entry.getValue());
         }
       }
-      response = (CloseableHttpResponse) httpClient.execute(
-          command.getHttpRequest(httpUriTemplate, queryParameters, headers, payloads));
+      HttpUriRequest request = command.getHttpRequest(httpUriTemplate, queryParameters, headers, payloads);
+      response = (CloseableHttpResponse) httpClient.execute(request, context);
+      log.debug(context.toString());
     } catch (Exception e) {
       throw new RuntimeException(e.getMessage(), e);
     }

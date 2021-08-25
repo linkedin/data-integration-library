@@ -23,7 +23,7 @@ public class S3ReadConnectionTest {
   public void testGetS3HttpClient() {
     List<WorkUnit> wus = new MultistageSource().getWorkunits(new SourceState());
     WorkUnitState wuState = new WorkUnitState(wus.get(0), new JobState());
-    wuState.setProp(MultistageProperties.MSTAGE_HTTP_CLIENT_FACTORY.getConfig(), "com.linkedin.cdi.factory.ApacheHttpClientFactory");
+    wuState.setProp(MultistageProperties.MSTAGE_CONNECTION_CLIENT_FACTORY.getConfig(), "com.linkedin.cdi.factory.DefaultConnectionClientFactory");
 
     S3SourceV2 source = new S3SourceV2();
     SourceState sourceState = new SourceState();

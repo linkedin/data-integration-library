@@ -17,17 +17,32 @@ LinkedIn Data Integration Library (DIL) is a collection of generic data integrat
 - Ingest data from one Rest API and egress to another (Rest API) on cloud
 
 # Requirements
-* Java >= 1.8
+* JDK 1.8
 
 If building the distribution with tests turned on:
 * Maven version 3.5.3 
 
 # Instructions to build the distribution
 1. Extract the archive file to your local directory.
-2. Set JAVA_HOME
+2. Set JAVA_HOME to use JDK 1.8 (JDK 11+ not supported)
 3. Build
-* Skip tests and build the distribution
-> `./gradlew build -x findbugsMain -x test -x rat -x checkstyleMain` 
-
-* Tests and build the distribution (requires Maven): 
 > `./gradlew build` 
+
+# Instructions to contribute 
+To contribute, please use submit Pull Request (PR) for committers to merge. 
+- Create your own fork on GitHub off the main repository
+- Clone your fork to your local computer
+>- `git clone https://github.com/<<your-github-login>>/data-integration-library.git`
+- Add upstream and verify
+>- `git remote add upstream https://github.com/linkedin/data-integration-library.git`
+>- `git remote -v`
+- Change, test, commit, and push to your fork
+>- `git status`
+>- `git add .`
+>- `git commit -m "comments"`
+>- `git push origin master`
+- Create Pull Request on GitHub with the following details
+>- Title 
+>- Detailed description
+>- Document the tests done
+>- Links to the updated documents

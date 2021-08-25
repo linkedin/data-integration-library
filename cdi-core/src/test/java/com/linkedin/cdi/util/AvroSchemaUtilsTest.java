@@ -65,4 +65,11 @@ public class AvroSchemaUtilsTest {
     Assert.assertEquals(row.getSchema().getFields().size(), 1);
     Assert.assertEquals(row.get("EOF"), "EOF");
   }
+
+  @Test
+  public void testDeepCopy() {
+    GenericRecord row = AvroSchemaUtils.createEOF(state);
+    GenericRecord copiedRow = AvroSchemaUtils.deepCopy(row.getSchema(), row);
+    Assert.assertEquals(row, copiedRow);
+  }
 }

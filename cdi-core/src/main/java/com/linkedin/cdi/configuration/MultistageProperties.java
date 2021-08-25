@@ -7,11 +7,11 @@ package com.linkedin.cdi.configuration;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.factory.DefaultConnectionClientFactory;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.factory.DefaultS3ClientFactory;
 
 
 /**
@@ -117,7 +117,20 @@ public enum MultistageProperties {
    * this value is in milliseconds.
    */
   MSTAGE_CALL_INTERVAL("ms.call.interval.millis", Long.class),
+  MSTAGE_CONVERTER_CSV_MAX_FAILURES("ms.converter.csv.max.failures", Long.class),
+  MSTAGE_CONVERTER_KEEP_NULL_STRINGS("ms.converter.keep.null.strings", Boolean.class) {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) Boolean.FALSE;
+    }
+  },
   MSTAGE_CSV_COLUMN_HEADER("ms.csv.column.header", Boolean.class),
+  MSTAGE_CSV_COLUMN_HEADER_INDEX("ms.csv.column.header.index", Integer.class) {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) Integer.valueOf(0);
+    }
+  },
   /**
    * a comma-separated string, where each value is either an integer or a range
    * representing the index of the field to include
@@ -153,6 +166,18 @@ public enum MultistageProperties {
     @Override
     public <T> T getDefaultValue() {
       return (T) ",";
+    }
+  },
+  /**
+   * By default, CsvExtractor tries to infer the true type of fields when inferring schema
+   * However, in some cases, the inference is not accurate, and users may prefer to keep all fields as strings.
+   * In this case ms.csv.default.field.type = string
+   * Supported types: string | int | long | double | boolean | float
+   */
+  MSTAGE_CSV_DEFAULT_FIELD_TYPE("ms.csv.default.field.type", String.class)  {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) StringUtils.EMPTY;
     }
   },
   /**
@@ -332,13 +357,13 @@ public enum MultistageProperties {
     }
   },
   /**
-   * http.client.factory define an indirect way to specify the type of HttpClient to use.
-   * default = {@link com.linkedin.cdi.factory.ApacheHttpClientFactory}
+   * Define an indirect way to specify the type of connection clients
+   * default = {@link DefaultConnectionClientFactory}
    */
-  MSTAGE_HTTP_CLIENT_FACTORY("ms.http.client.factory", String.class) {
+  MSTAGE_CONNECTION_CLIENT_FACTORY("ms.connection.client.factory", String.class) {
     @Override
     public <T> T getDefaultValue() {
-      return (T) "com.linkedin.cdi.factory.ApacheHttpClientFactory";
+      return (T) "com.linkedin.cdi.factory.DefaultConnectionClientFactory";
     }
   },
   /**
@@ -387,17 +412,6 @@ public enum MultistageProperties {
    * Currently, we don't allow exceptions being made to revert errors by using reason code.
    */
   MSTAGE_HTTP_STATUS_REASONS("ms.http.status.reasons", JsonObject.class),
-  /**
-   * jdbc.client.factory define an indirect way to specify the type of JDBC Client to use.
-   * default = {@link com.linkedin.cdi.factory.DefaultJdbcClientFactory}
-   */
-  MSTAGE_JDBC_CLIENT_FACTORY("ms.jdbc.client.factory", String.class) {
-    @Override
-    public <T> T getDefaultValue() {
-      return (T) "com.linkedin.cdi.factory.DefaultJdbcClientFactory";
-    }
-  },
-
   MSTAGE_JDBC_SCHEMA_REFACTOR("ms.jdbc.schema.refactor", String.class) {
     @Override
     public <T> T getDefaultValue() {
@@ -497,6 +511,24 @@ public enum MultistageProperties {
    * path and fields, etc.
    */
   MSTAGE_PAYLOAD_PROPERTY("ms.payload.property", JsonArray.class),
+  /**
+   * This property is required for inflowValidation with simple count comparison rule
+   * The rule is accepted as a JsonObject with following Keys
+   * 1. "threshold" - represents the percentage of accepted failure records to mark job as passed
+   * 2. "criteria" - this value can be "fail" or "success" , fail represents that input record only has failed records
+   * 3. "errorColumn" - this value is optional and is required when we require to filter the failure records based on a specific column
+   * if the input record has only success records then set this as "success"
+   * Ex: ms.validation.attributes={"threshold": "10", "criteria" : "fail"}
+   */
+  MSTAGE_VALIDATION_ATTRIBUTES("ms.validation.attributes", JsonObject.class) {
+    @Override
+    public <T> T getDefaultValue() {
+      JsonObject attributesJson = new JsonObject();
+      attributesJson.addProperty(StaticConstants.KEY_WORD_THRESHOLD, 0);
+      attributesJson.addProperty(StaticConstants.KEY_WORD_CRITERIA, StaticConstants.KEY_WORD_FAIL);
+      return (T) attributesJson;
+    }
+  },
   MSTAGE_RETENTION("ms.retention", JsonObject.class) {
     @Override
     public <T> T getDefaultValue() {
@@ -505,16 +537,6 @@ public enum MultistageProperties {
       retention.addProperty("publish.dir", "P731D"); // keep 2 years published data
       retention.addProperty("log", "P30D");
       return (T) retention;
-    }
-  },
-  /**
-   * s3.client.factory define an indirect way to specify the type of S3 Client to use.
-   * default = {@link DefaultS3ClientFactory}
-   */
-  MSTAGE_S3_CLIENT_FACTORY("ms.s3.client.factory", String.class) {
-    @Override
-    public <T> T getDefaultValue() {
-      return (T) "com.linkedin.cdi.factory.DefaultS3ClientFactory";
     }
   },
   /**
@@ -733,6 +755,27 @@ public enum MultistageProperties {
    */
   MSTAGE_WATERMARK("ms.watermark", JsonArray.class),
   MSTAGE_WATERMARK_GROUPS("ms.watermark.groups", JsonArray.class),
+  /**
+   * Minimum records to be present in order for the work unit to be successful,
+   * below the minimum value, the work unit will be failed.
+   */
+  MSTAGE_WORK_UNIT_MIN_RECORDS("ms.work.unit.min.records", Long.class) {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) Long.valueOf(0);
+    }
+  },
+  /**
+   * Minimum number of work units to be present in order for the job to proceed,
+   * below the minimum value, the job will be failed. This parameter shold be used
+   * only when there is a unit watermark.
+   */
+  MSTAGE_WORK_UNIT_MIN_UNITS("ms.work.unit.min.units", Long.class) {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) Long.valueOf(0);
+    }
+  },
   MSTAGE_WORK_UNIT_PARALLELISM_MAX("ms.work.unit.parallelism.max", Integer.class) {
     @Override
     public boolean validateNonblank(State state) {
@@ -799,6 +842,16 @@ public enum MultistageProperties {
       return (T) Long.valueOf(500L);
     }
   },
+  MSTAGE_AUDIT_ENABLED("ms.audit.enabled", Boolean.class) {
+    @Override
+    public <T> T getDefaultValue() {
+      return (T) Boolean.FALSE;
+    }
+  },
+  MSTAGE_KAFKA_BROKERS("ms.kafka.brokers", String.class),
+  MSTAGE_KAFKA_SCHEMA_REGISTRY_URL("ms.kafka.schema.registry.url", String.class),
+  MSTAGE_KAFKA_CLIENT_ID("ms.kafka.clientId", String.class),
+  MSTAGE_KAFKA_TOPIC_NAME("ms.kafka.audit.topic.name", String.class),
   // Properties defined in Gobblin, redefine here to leverage the new features like validation
   CONVERTER_CLASSES("converter.classes", String.class),
   DATASET_URN_KEY("dataset.urn", String.class),

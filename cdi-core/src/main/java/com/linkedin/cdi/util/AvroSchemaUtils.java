@@ -22,7 +22,7 @@ public interface AvroSchemaUtils {
    * Utility method to convert JsonArray schema to avro schema
    * @param schema of JsonArray type
    * @return avro schema
-   * @throws UnsupportedDateTypeException
+   * @throws UnsupportedDateTypeException unsupported type
    */
   static Schema fromJsonSchema(JsonArray schema, WorkUnitState state) throws UnsupportedDateTypeException {
     JsonSchema jsonSchema = new JsonSchema(schema);
@@ -72,5 +72,15 @@ public interface AvroSchemaUtils {
     GenericRecord eofRecord = new GenericData.Record(schema);
     eofRecord.put("EOF", "EOF");
     return eofRecord;
+  }
+
+  /**
+   * Makes a deep copy of a value given its schema.
+   * @param schema the schema of the value to deep copy.
+   * @param value the value to deep copy.
+   * @return a deep copy of the given value.
+   */
+  static <T> T deepCopy(Schema schema, T value) {
+    return GenericData.get().deepCopy(schema, value);
   }
 }

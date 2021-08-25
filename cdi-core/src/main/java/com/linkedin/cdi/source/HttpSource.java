@@ -10,6 +10,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.linkedin.cdi.configuration.MultistageProperties;
+import com.linkedin.cdi.connection.HttpConnection;
+import com.linkedin.cdi.extractor.MultistageExtractor;
+import com.linkedin.cdi.keys.HttpKeys;
+import com.linkedin.cdi.util.EncryptionUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -22,11 +27,6 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.configuration.WorkUnitState;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.connection.HttpConnection;
-import com.linkedin.cdi.extractor.MultistageExtractor;
-import com.linkedin.cdi.keys.HttpKeys;
-import com.linkedin.cdi.util.EncryptionUtils;
 import org.apache.gobblin.source.extractor.Extractor;
 
 

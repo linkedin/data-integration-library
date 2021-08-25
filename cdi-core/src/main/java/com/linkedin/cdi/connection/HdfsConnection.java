@@ -5,6 +5,7 @@
 package com.linkedin.cdi.connection;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import java.io.InputStream;
 import java.net.URI;
@@ -66,7 +67,7 @@ public class HdfsConnection extends MultistageConnection {
    */
   @Override
   public WorkUnitStatus execute(final WorkUnitStatus status) {
-    assert hdfsKeys.getSourceUri() != null;
+    Preconditions.checkNotNull(hdfsKeys.getSourceUri(), "ms.source.uri is missing or of wrong format");
     URI uri = URI.create(getWorkUnitSpecificString(hdfsKeys.getSourceUri(),
         getExtractorKeys().getDynamicParameters()));
 
@@ -142,6 +143,7 @@ public class HdfsConnection extends MultistageConnection {
    * @return the file content in an InputStream
    */
   private InputStream readSingleFile(final String path) {
+    log.info("Processing file: {}", path);
     try {
       return fsHelper.getFileStream(path);
     } catch (FileBasedHelperException e) {
