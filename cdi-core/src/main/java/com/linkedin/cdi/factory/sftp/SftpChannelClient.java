@@ -27,9 +27,9 @@ public class SftpChannelClient implements SftpClient {
   private static final String SFTP_CONNECTION_TIMEOUT_KEY = "sftpConn.timeout";
   private static final int DEFAULT_SFTP_CONNECTION_TIMEOUT_IN_MS = 3000; //in milliseconds
 
-  private State state = null;
-  private Session session = null;
-  private JSch jsch = new JSch();
+  protected State state = null;
+  protected Session session = null;
+  protected JSch jsch = new JSch();
 
   public SftpChannelClient(State state) {
     this.state = state;
