@@ -7,10 +7,10 @@ package com.linkedin.cdi.util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.HttpUrl;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -18,6 +18,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 
 
@@ -216,16 +217,16 @@ public enum HttpRequestMethod {
   }
 
   protected String appendParameters(String uri, JsonObject parameters) {
-    HttpUrl url = HttpUrl.parse(uri);
-    if (url != null) {
-      HttpUrl.Builder builder = url.newBuilder();
+    try {
+      URIBuilder builder = new URIBuilder(new URI(uri));
       for (Map.Entry<String, JsonElement> entry : parameters.entrySet()) {
         String key = entry.getKey();
-        builder.addQueryParameter(key, parameters.get(key).getAsString());
+        builder.addParameter(key, parameters.get(key).getAsString());
       }
-      url = builder.build();
+      return builder.build().toString();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
-    return url != null ? url.toString() : uri;
   }
 
   /**
@@ -241,12 +242,16 @@ public enum HttpRequestMethod {
    * @return URL encoded parameters
    */
   protected String jsonToUrlEncoded(JsonObject parameters) {
-    HttpUrl.Builder builder = new HttpUrl.Builder().scheme("https").host("www.dummy.com");
-    for (Map.Entry<String, JsonElement> entry : parameters.entrySet()) {
-      String key = entry.getKey();
-      builder.addQueryParameter(key, parameters.get(key).getAsString());
+    try {
+      URIBuilder builder = new URIBuilder("https://www.dummy.com");
+      for (Map.Entry<String, JsonElement> entry : parameters.entrySet()) {
+        String key = entry.getKey();
+        builder.addParameter(key, parameters.get(key).getAsString());
+      }
+      return EndecoUtils.getEncodedUtf8(builder.build().getQuery());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
-    return builder.build().encodedQuery();
   }
 
   protected HttpUriRequest setEntity(HttpEntityEnclosingRequestBase requestBase, String stringEntity)
