@@ -52,7 +52,6 @@ public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
       throw new RuntimeException(e);
     }
 
-    //HttpUrl url = HttpUrl.parse(MultistageProperties.MSTAGE_SOURCE_URI.getValidNonblankWithDefault(state));
     if (url == null || url.getHost().isEmpty()) {
       throw new RuntimeException("Incorrect configuration in " +
           MultistageProperties.MSTAGE_SOURCE_URI.toString());
@@ -83,10 +82,7 @@ public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
 
     // separate the endpoint, which should be a URL without bucket name, from the domain name
     s3SourceV2Keys.setEndpoint("https://" + getEndpointFromHost(url.getHost()));
-
-    // URL path might have variables, by default HttpUrl will encode '{' and '}'
-    // Here we decode those back to their plain form
-    s3SourceV2Keys.setPrefix(EndecoUtils.decode(url.getPath().substring(1)));
+    s3SourceV2Keys.setPrefix(url.getPath().substring(1));
 
     // separate the bucket name from URI domain name
     s3SourceV2Keys.setBucket(url.getHost().split("\\.")[0]);
