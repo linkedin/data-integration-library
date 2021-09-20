@@ -42,7 +42,7 @@ import org.apache.gobblin.configuration.State;
 @SuppressWarnings("unchecked")
 public enum MultistageProperties {
   /**
-   * Abstinent Period is designed to avoid re-extract a dataset repeatedly. This is particular useful
+   * Abstinent Period is designed to avoid re-extracting a dataset repeatedly. This is particularly useful
    * for situations like downloading files in large quantity.
    *
    * Assuming we will control all data extraction through a time range, including file downloads. Further
