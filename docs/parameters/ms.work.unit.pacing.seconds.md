@@ -1,6 +1,6 @@
 # ms.work.unit.pacing.seconds
 
-**Category**: [work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/work-unit-parameters.md)
+**Category**: [watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/watermark-workunit-parameters.md)
 
 **Type**: integer
 
@@ -14,7 +14,7 @@
 
 ms.work.unit.pacing.seconds can spread out work unit execution by adding a waiting time
 in the front of each work unit's execution. The amount of wait time is based on the order of
-the work units. It is calculated as `i * ms.work.unit.pacing.seconds`, where is the sequence number
+the work units. It is calculated as `i * ms.work.unit.pacing.seconds`, where `i` is the sequence number
 of the work unit.
 
 **Note**: this property can be easily used inappropriately. When there are 3600 work units, and 

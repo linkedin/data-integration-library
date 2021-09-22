@@ -1,6 +1,6 @@
 # ms.work.unit.min.records
 
-**Category**: [work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/work-unit-parameters.md)
+**Category**: [execution](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/execution-parameters.md)
 
 **Type**: integer
 

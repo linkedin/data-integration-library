@@ -198,6 +198,9 @@ the end of pagination when the actually retrieved total number of rows matches o
 
 ## [ms.watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.watermark.md)
 
+`ms.watermark` define watermarks for work unit generation, execution control, 
+and incremental processing. DIL supports 2 types of watermarks, `datetime` and `unit`.
+
 ## ms.watermark.groups
 
 `ms.watermark.groups` is an DIL internal property, and it should not be used explicitly in job configurations.
@@ -228,7 +231,7 @@ alert to operations team.
 
 `ms.work.unit.pacing.seconds` can spread out work unit execution by adding a waiting time
 in the front of each work unit's execution. The amount of wait time is based on the order of
-the work units. It is calculated as `i * ms.work.unit.pacing.seconds`, where is the sequence number
+the work units. It is calculated as `i * ms.work.unit.pacing.seconds`, where `i` is the sequence number
 of the work unit.
 
 ## [ms.work.unit.parallelism.max](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.work.unit.parallelism.max.md)
