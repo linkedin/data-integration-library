@@ -22,33 +22,32 @@ ending condition is met or time out.
 
 ### Use Case 
 
-This asynchronous data extraction, a request is submitted to data source, and the
+In [asynchronous](https://github.com/linkedin/data-integration-library/blob/master/docs/patterns/asynchronous-ingestion-pattern.md)
+data extraction, a request is submitted to data source, and the
 data source will provide updated status when the request is completed, and data 
 are ready for downloading. 
-
 Therefore, the extraction job will keep checking the status after submitting the 
 request by intervals defined in [ms.call.interval.millis](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.call.interval.millis.md).
 
 At the same time, 
 [ms.session.key.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.session.key.field.md)
 can specify the status code when the request is completed or failed. 
-
 In each check, DIL will compare the retrieved status with the expected status, and 
 ends the looping when the status is completed or failed. 
 
 However, DIL will not loop forever, it will timeout if after timeout period none of 
 completed or failed status is returned. 
 
-### Example 1: SalesForce
+### Example 1 
 
-The following SalesForce status check job will wait for the "JobComplete" singal, which indicating
+The following SalesForce status check job will wait for the "JobComplete" signal, which indicating
 the request is ready, and it will timeout after 4 hours. 
 
 `ms.session.key.field={"name": "Sforce-Locator", "condition": {"regexp": "JobComplete"}}`
 
 `ms.wait.timeout.seconds=14400`
 
-## Example 2: 
+### Example 2
 
 The following asynchronous data extraction job will wait for the `complete` or `failed` status
 for 600 seconds by checking every 1 second. 

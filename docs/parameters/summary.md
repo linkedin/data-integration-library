@@ -190,8 +190,12 @@ volume of data and [pagination](https://github.com/linkedin/data-integration-lib
 is used to retrieve data page by page. In cases of pagination, the expected total row count is one way to indicate
 the end of pagination when the actually retrieved total number of rows matches or surpasses the expected total rows.
 
-## [ms.validation.attributes](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.validation.attributes](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.validation.attributes.md)
 
+`ms.validation.attributes` defines a threshold to mark a job as successful or failed. 
+The threshold can be specified as "success" or "failure" thresholds. The former is 
+called a "success" rule, and the later is called a "failure" rule. 
+This property is required for in-flow-validation based simple count comparison.
 
 ## [ms.wait.timeout.seconds](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.wait.timeout.seconds.md)
 
