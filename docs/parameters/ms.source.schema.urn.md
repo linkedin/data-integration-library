@@ -16,19 +16,15 @@
 
 Source schema represents the source data structure. Generally, in a data 
 ingestion scenario, the source data will be read in, projected, filtered, and
-converted.
-
-Source schema can be read from the source, like for JDBC data sources, or parsed
+converted. Source schema can be read from the source, like for JDBC data sources, or parsed
 from actual data, like JSON data, or defined as a string, or defined in a metadata
-store. 
-
-`ms.target.schema.urn` address the option that defines source schema in metadata store. 
+store. `ms.target.schema.urn` address the option that defines source schema in metadata store. 
 
 We generally don't define source schema in schema string format. Instead, we directly
 define the [output schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.output.schema.md)
 if necessary. 
  
-Source schema is a URN string of the following forms:
+`ms.target.schema.urn` is a URN string of the following forms:
 
 - a **dataset** URN, if the source schema can be represented by a dataset,
 the latest schema of the dataset will be read from metadata store,

@@ -14,6 +14,7 @@ with each JsonObject being a column definition.
 
 ## Description
 
+`ms.target.schema` defines the target schema in a JsonArray string.
 Target schema denotes the schema to be passed to writer, this applies
 to situation where the source data are transformed through a converter
 or other processes.
