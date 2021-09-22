@@ -180,9 +180,19 @@ ms.source.uri defines the integration point, which is called data source for dat
 It follows the URI format [here](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier). 
 The only exception is that authority is not supported, because all authority cannot be fit in the URI.
 
-## [ms.target.schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.target.schema.reader.factory](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.target.schema.urn](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.target.schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.target.schema.md)
+
+Target schema denotes the schema to be passed to writer, this applies
+to situation where the source data are transformed through a converter
+or other processes.
+
+## [ms.target.schema.urn](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.target.schema.urn.md)
+
+Generally, target schema should be specified through target schema URN.
+to avoid coding long schema strings.
+An URN can point to the schema storage location on DataHub, which is
+the only supported schema storage for now.
+
 ## [ms.total.count.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.total.count.field.md)
 
 Total Count field directs DIL how to retrieve the expected total row counts. This is important when there are large
@@ -195,7 +205,9 @@ the end of pagination when the actually retrieved total number of rows matches o
 `ms.validation.attributes` defines a threshold to mark a job as successful or failed. 
 The threshold can be specified as "success" or "failure" thresholds. The former is 
 called a "success" rule, and the later is called a "failure" rule. 
-This property is required for in-flow-validation based simple count comparison.
+
+This property is required for [InFlowValidationConverter](https://github.com/linkedin/data-integration-library/blob/master/docs/components/InFlowValidationConverter.md), 
+which is a validation converter based on simple count comparison.
 
 ## [ms.wait.timeout.seconds](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.wait.timeout.seconds.md)
 

@@ -695,12 +695,6 @@ public enum MultistageProperties {
    */
   MSTAGE_TARGET_SCHEMA("ms.target.schema", JsonArray.class),
   MSTAGE_TARGET_SCHEMA_URN("ms.target.schema.urn", String.class),
-  MSTAGE_TARGET_SCHEMA_READER_FACTORY("ms.target.schema.reader.factory", String.class) {
-    @Override
-    public <T> T getDefaultValue() {
-      return (T) "com.linkedin.cdi.factory.reader.MetastoreReader";
-    }
-  },
   /**
    * Total count field is a Json path. This attribute can be used in many
    * types of connectors, typically with Json Extractor

@@ -15,7 +15,9 @@
 `ms.validation.attributes` defines a threshold to mark a job as successful or failed. 
 The threshold can be specified as "success" or "failure" thresholds. The former is 
 called a "success" rule, and the later is called a "failure" rule. 
-This property is required for in-flow-validation based simple count comparison.
+
+This property is required for **InFlowValidationConverter**, which
+is validation converter based on simple count comparison.
  
 In either configuration, job will only succeed if the threshold is met. That means, if the
 rule is defined as "success", the success rate has to be above the threshold; 
@@ -34,12 +36,13 @@ and the failure rate has to be below the threshold if the rule is defined as "fa
 A rule is accepted as a JsonObject with following Keys
 - **threshold**: represents the percentage of acceptable failure or required success
 - **criteria**: this value can be "fail" or "success"
-- **errorColumn**: this value is optional and is required when we require to filter 
-the failure records based on a specific column
+- **errorColumn**: this value is optional, and it is required in order to filter 
+the failure records based on a column, and the records having none-blank 
+value in "errorColumn" are considered failed.
 
 ### Examples
 
-Failede records cannot be more than 10% of total records:
+Failed records cannot be more than 10% of total records:
 
 `ms.validation.attributes={"threshold": "10", "criteria" : "fail"}`
 
