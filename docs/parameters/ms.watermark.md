@@ -32,8 +32,8 @@ There should be no more than 1 unit watermark.
 
 A datetime watermark is a reference. It doesn't directly effect or control
 job execution. The watermark name and boundaries, low watermark 
-and high watermark, can be referenced in variables, which can 
-control execution. 
+and high watermark, can be referenced in [variables](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variable.md),
+which can control execution. 
 See [ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md).
 
 A datetime watermark is a range, defined by its `from` and `to` field. The range
@@ -123,6 +123,19 @@ As a shortcut, a `unit` watermark can also be defined as
 a comma separated string, like "a,b,c", which then will be converted
 to a JsonArray internally.   
 
-A `unit` watermark name can referenced as a [variable](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variable.md). 
-  
+A `unit` watermark name can be referenced as a [variable](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variable.md)
+directly. 
+
+#### unit watermark examples
+
+`ms.watermark = [
+{"name": "system","type": "datetime", "range": {"from": "2021-08-21", "to": "-"}}, 
+{"name": "bucketId", "type": "unit", "units": "null,0,1,2,3,4,5,6,7,8,9"}]
+`  
+
+`ms.watermark = [
+{"name": "dateRange","type": "datetime", "range": {"from": "2020-01-01", "to": "P0D"}}, 
+{"name": "siteName", "type": "unit", "units": "https://siteA/,https://SiteB/...siteZ"}]
+`
+
 [back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mswatermark) 

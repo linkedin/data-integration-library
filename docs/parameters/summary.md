@@ -193,13 +193,33 @@ the end of pagination when the actually retrieved total number of rows matches o
 ## [ms.validation.attributes](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 
 
-## [ms.wait.timeout.seconds](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.wait.timeout.seconds](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.wait.timeout.seconds.md)
 
+`ms.wait.timeout.seconds` is one option to control pagination, it specifies
+how long the job will wait before the session ending (success or failure) status is met. 
 
 ## [ms.watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.watermark.md)
 
 `ms.watermark` define watermarks for work unit generation, execution control, 
 and incremental processing. DIL supports 2 types of watermarks, `datetime` and `unit`.
+
+A datetime watermark is a reference. It doesn't directly effect or control
+job execution. The watermark name and boundaries, low watermark 
+and high watermark, can be referenced in [variables](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variable.md), which can 
+control execution. 
+See [ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md).
+
+A datetime watermark is a range, defined by its `from` and `to` field. The range
+can be further partitioned per other configurations. 
+See [ms.work.unit.partition](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.work.unit.partition.md) 
+
+Therefore, a datetime watermark could generate 1 or more mini-watermarks when 
+partitioned, and each mini-watermark is mapped to a work unit. Therefore, 
+each work unit has its own unique watermark.
+
+A `unit` watermark defines a list of values that will be used by the DIL to
+generate work units. The `unit` watermark name can be referenced as a [variable](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variable.md)
+directly.
 
 ## ms.watermark.groups
 
