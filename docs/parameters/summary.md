@@ -172,12 +172,22 @@ and it should not be used explicitly in job configurations.
 ## [ms.source.data.character.set](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 ## [ms.source.files.pattern](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 ## [ms.source.s3.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.source.schema.reader.factory](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.source.schema.urn](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.source.schema.urn](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.schema.urn.md)
+
+Source schema represents the source data structure. Generally, in a data 
+ingestion scenario, the source data will be read in, projected, filtered, and
+converted.
+
+Source schema can be read from the source, like for JDBC data sources, or parsed
+from actual data, like JSON data, or defined as a string, or defined in a metadata
+store. 
+
+`ms.target.schema.urn` address the option that defines source schema in metadata store. 
+
 ## [ms.source.uri](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.uri.md)
 
 ms.source.uri defines the integration point, which is called data source for data ingestion or target for data egression. 
-It follows the URI format [here](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier). 
+It follows the [URI format](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier). 
 The only exception is that authority is not supported, because all authority cannot be fit in the URI.
 
 ## [ms.target.schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.target.schema.md)

@@ -655,15 +655,6 @@ public enum MultistageProperties {
    */
   MSTAGE_SOURCE_SCHEMA_URN("ms.source.schema.urn", String.class),
   /**
-   * Define a factory parameter to decouple proprietary code from OpenSource code
-   */
-  MSTAGE_SOURCE_SCHEMA_READER_FACTORY("ms.source.schema.reader.factory", String.class) {
-    @Override
-    public <T> T getDefaultValue() {
-      return (T) "com.linkedin.cdi.factory.reader.MetastoreReader";
-    }
-  },
-  /**
    * ms.source.uri defines a data source identifier, it follows the URI format
    * here: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
    *
