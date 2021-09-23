@@ -1,15 +1,12 @@
 # ms.source.uri
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+**Category**: [connection](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/connection-parameters.md)
 
-## Category
-[connection](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/connection-parameters.md)
+**Type**: string
 
-## Type
-string
+**Format**: URI with path segments and parameters
 
-## Format
-URI with path segments and parameters
+**Support DIL Variables**: Yes
 
 ## Required
 Yes
@@ -39,3 +36,5 @@ ms.source.uri=jdbc://data.rightnow.com/marketing?useSSL=true
 ms.source.uri=https://oauth2.googleapis.com/token
 ms.source.uri=https://bucket-name.s3.amazonaws.com/{{s3key}}
 `
+
+[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mssourceuri)

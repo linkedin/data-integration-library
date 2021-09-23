@@ -169,8 +169,24 @@ and it should not be used explicitly in job configurations.
 ## [ms.schema.cleansing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 ## [ms.secondary.input](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 ## [ms.session.key.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.session.key.field.md)
-## [ms.source.data.character.set](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.source.files.pattern](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+
+Session is a state management mechanism over stateless connections.
+For example, although Restful API is stateless, data sources can maintain 
+a session in backend by a status field, a session cursor, or through 
+[pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md).
+
+`ms.session.key.field` specifies the key field for session control 
+and the condition for termination.
+
+## [ms.source.data.character.set](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.data.character.set.md)
+
+`ms.source.data.character.set` specifies a character set to parse JSON or CSV payload. 
+The default source data character set is UTF-8, which should be good for most use cases.
+
+## [ms.source.files.pattern](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.files.pattern.md)
+
+`ms.source.files.pattern` specifies a pattern to filter files from S3 and SFTP sources.
+
 ## [ms.source.s3.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.s3.parameters.md)
 
 `ms.source.s3.parameters` specifies parameters for S3 connection.
