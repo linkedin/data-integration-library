@@ -126,7 +126,11 @@ limited by, the following:
 - Lift up a nested element in the response to the toplevel and make it a toplevel field because only toplevel fields can be primary keys or delta keys 
 - Persist a job execution variable, such as the work unit identifier, into the final dataset 
 
-## [ms.enable.cleansing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.enable.cleansing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.enable.cleansing.md)
+
+Schema cleansing replaces special characters in the schema element names based
+on a pattern. By default, it will replace all blank spaces, $, and @ to underscores.
+
 ## [ms.enable.dynamic.full.load](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 ## [ms.enable.schema.based.filtering](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 ## [ms.encoding](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
@@ -166,7 +170,11 @@ and it should not be used explicitly in job configurations.
 
 ## [ms.retention](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 ## [ms.s3.list.max.keys](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.schema.cleansing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.schema.cleansing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.schema.cleansing.md)
+
+Schema cleansing replaces special characters in the schema element names based
+on a pattern. By default, it will replace all blank spaces, $, and @ to underscores.
+
 ## [ms.secondary.input](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.secondary.input.md)
 
 Secondary inputs provides additional directives to job execution, in addition to

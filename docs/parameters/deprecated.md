@@ -11,3 +11,7 @@ ms.watermark.type can cause parsing error if it is used in GaaS flow specs becau
 its prefix matches another effective parameter ms.watermark. Azkaban projects that still 
 have this job property will have no harm. 
 
+## ms.http.client.factory
+
+ms.http.client.factory and other client factories are replaced 
+by [ms.connection.client.factory](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.connection.client.factory.md)

@@ -18,7 +18,7 @@ the primary inputs of job execution, which is its metadata, i.e, job configurati
 
 `ms.secondary.input` property has attributes to support the following functions:
 
-- **location**: from where the hdfs data will be loaded as secondary input
+- **location**: from where the HDFS data will be loaded as secondary input
 - **fields**: fields that needs to be extracted and added into the work unit state
 - **filters**: rules to include/exclude records from secondary input
 - **category**: specify the type of secondary input
@@ -33,7 +33,7 @@ The following are filtering rules:
  - if no filter is defined on a field, the default filter ".*" is applied to 
  the field, and NULL values are accepted
 
-DIL designed 3 categories of secondary input:
+DIL designed 3 categories of secondary inputs:
 
 - **activation**: `activation` secondary input creates work units
 - **authentication**: `authentication` secondary input provides authentication information,
