@@ -158,18 +158,28 @@ The expected HTTP method to send the requests, decided by the data source.
 ## [ms.normalizer.batch.size](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 ## [ms.output.schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 ## [ms.pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.pagination.md)
+
+`ms.pagination` defines key pagination attributes. 
+
 ## [ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md)
 
 ms.parameter defines a list of named [variables](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variables.md) 
 that can be referenced in other configuration properties using the syntax of double brackets {{variableName}}.
 
-## [ms.payload.property]
+## ms.payload.property
 
 `ms.payload.property` is an internal property that DIL uses to pass payloads to work units, 
 and it should not be used explicitly in job configurations.  
 
-## [ms.retention](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.s3.list.max.keys](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## ms.retention
+
+`ms.retention` is designed for future use.
+
+## [ms.s3.list.max.keys](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.s3.list.max.keys.md)
+
+`ms.s3.list.max.keys` limit the number of keys when doing a "list" operation
+on a S3 bucket. 
+
 ## [ms.schema.cleansing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.schema.cleansing.md)
 
 Schema cleansing replaces special characters in the schema element names based
