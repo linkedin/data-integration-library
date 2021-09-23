@@ -167,7 +167,11 @@ and it should not be used explicitly in job configurations.
 ## [ms.retention](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 ## [ms.s3.list.max.keys](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 ## [ms.schema.cleansing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.secondary.input](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.secondary.input](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.secondary.input.md)
+
+Secondary inputs provides additional directives to job execution, in addition to
+the primary inputs of job execution, which is its metadata, i.e, job configurations. 
+
 ## [ms.session.key.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.session.key.field.md)
 
 Session is a state management mechanism over stateless connections.
@@ -175,8 +179,8 @@ For example, although Restful API is stateless, data sources can maintain
 a session in backend by a status field, a session cursor, or through 
 [pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md).
 
-`ms.session.key.field` specifies the key field for session control 
-and the condition for termination.
+`ms.session.key.field` specifies the key field in response in order to retrieve the 
+status for session control and the condition for termination.
 
 ## [ms.source.data.character.set](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.data.character.set.md)
 

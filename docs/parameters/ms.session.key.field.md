@@ -17,8 +17,8 @@ For example, although Restful API is stateless, data sources can maintain
 a session in backend by a status field, a session cursor, or through 
 [pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md).
 
-`ms.session.key.field` specifies the key field for session control 
-and the condition for termination.
+`ms.session.key.field` specifies the key field in response in order to retrieve the 
+status for session control and the condition for termination.
 
 This property takes the form a JsonObject with a **name**, a **condition**, 
 and a **failCondition**.
@@ -64,7 +64,8 @@ A session can timeout before the stop condition is met. The timeout
 is controlled by property [ms.wait.timeout.seconds](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.wait.timeout.seconds.md),
 which has a default value of 600 seconds. 
 
-This is useful for asynchronous ingestion, for example, we can have the stop condition set 
+This is useful for [asynchronous ingestion](https://github.com/linkedin/data-integration-library/blob/master/docs/patterns/asynchronous-ingestion-pattern.md), 
+for example, we can have the stop condition set 
 as the status value of a successful request, such as "completed" or "ready". 
 When the stop condition is not met during the timeout period, the session 
 will time out (error), and the session will abort (stop and fail).
@@ -74,21 +75,20 @@ HTTP header for SOAP API. Rest API returns JSON response. SOAP API
 returns XML or CSV response. When SOAP API is instructed to return CSV 
 response, the session key value mostly is included in an HTTP header.
 
-Session key can be used in following 2 scenarios:
+Session key can be used in the following 2 scenarios:
 
 - as a session control mechanism over a series of independent requests 
 until the stop condition is met (above)
 - as a session control mechanism over a sequence of dependent requests, 
 with the session key value of first request fed into the next request as 
 input. That means the fetched value of session key, from the 
-`ms.session.key.field`, can be fed into parameters of type [session](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/session-control.md). 
+`ms.session.key.field`, can be fed into variables of type [session](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/session-control.md). 
 
-Parameters are defined in [ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md). 
-When a `session` type parameter is defined, it will implicitly add to 
+Variables are defined in [ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md). 
+When a `session` type variable is defined, it will implicitly add to 
 URL parameters or request bodies if HttpSource is used. 
 However, for the first HTTP request, because the 
-session parameter should be NULL, it will not be used in the request.
-
+session variable has a NULL value, it will not be used in the request.
 
 ### Examples
 
