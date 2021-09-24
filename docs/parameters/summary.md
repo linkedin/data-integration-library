@@ -127,21 +127,51 @@ limited by, the following:
 Schema cleansing replaces special characters in the schema element names based
 on a pattern. By default, it will replace all blank spaces, $, and @ to underscores.
 
-## [ms.enable.dynamic.full.load](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.enable.schema.based.filtering](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.encoding](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.encryption.fields](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.extractor.class](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.extractor.target.file.name](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.extractor.target.file.permission](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.enable.dynamic.full.load](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.enable.dynamic.full.load.md)
+
+`ms.enable.dynamic.full.load` enables or disables dynamic full load.
+When enabled (default) and `extract.is.full = false`, DIL will dynamically 
+perform a full load if it is a SNAPSHOT_ONLY extract or 
+if there is no pre-existing watermarks of the job.
+
+Dynamic full load is a DIL [Single Flow](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/single-flow.md) 
+feature that aims to alleviate users from coding 2 separate flows, 
+one for the full load and one for the incremental load. 
+
+## [ms.enable.schema.based.filtering](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.enable.schema.based.filtering.md)
+
+`ms.enable.schema.based.filtering` enables or disables schema-based filtering,
+or column projection. When enabled, only fields specified schema 
+are projected to final dataset. 
+
+## [ms.encryption.fields](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.encryption.fields.md)
+
+`ms.encryption.fields` specifies a list of fields to be encrypted before
+they are passed to converters. 
+
+## [ms.extractor.class](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extractor.class.md)
+
+`ms.extractor.class` specifies the extractor class to use for data parsing. 
+The choice of extractor is based data format. Currently, DIL designed 4 
+classes of extractors.
+
+## [ms.extractor.target.file.name](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extractor.target.file.name.md)
+
+`ms.extractor.target.file.name` specify the file name when 
+FileDumpExtractor is used. The file name can be specified as a
+string container DIL variables.
+
+## [ms.extractor.target.file.permission](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extractor.target.file.permission.md)
+
+`ms.extractor.target.file.permission` set file permission when 
+FileDumpExtractor is used.
+
 ## [ms.extract.preprocessors](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extract.preprocessors.md)
 
 `ms.extract.preprocessors` define one or more preprocessor classes that
 handles the incoming data before they can be processed by the extractor. 
-
 When input data is compressed or encrypted, the input stream needs to 
 be preprocessed before it can be passed to an DIL extractor to parse.  
-
 `ms.extract.preprocessors` is a comma delimited string if there are 
 more than 1 preprocessors.
 
@@ -155,10 +185,9 @@ preprocessor along with the input.
 
 `ms.http.grace.period.days` addresses the late arrival problem, which is 
 very common if the ingestion source is a data warehouse. 
-
 `ms.http.grace.period.days` defines a Grace Period for incremental extraction, 
-and it impacts how cutoff timestamp should be calculated during the
-increment load. 
+and it adds extra buffer to cutoff timestamp during the
+incremental load so that more data can be included. 
 
 
 ## [ms.http.request.headers](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.http.request.headers.md)

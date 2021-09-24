@@ -15,8 +15,8 @@
 very common if the ingestion source is a data warehouse. 
 
 `ms.http.grace.period.days` defines a Grace Period for incremental extraction, 
-and it impacts how cutoff timestamp should be calculated during the
-increment load. 
+and it adds extra buffer to cutoff timestamp during the
+incremental load so that more data can be included. 
 
 Grace Period is for overlapped data extraction, it assumes that the source can 
 have late arrivals, which are older data that showed up in source 

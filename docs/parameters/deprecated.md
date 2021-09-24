@@ -17,3 +17,5 @@ ms.http.client.factory and other client factories are replaced
 by [ms.connection.client.factory](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.connection.client.factory.md)
 
 ms.http.status.reasons
+
+# ms.encoding
