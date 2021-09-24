@@ -1,6 +1,6 @@
 # ms.watermark
 
-**Category**: [watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/watermark-workunit-parameters.md)
+**Tags**: [watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/watermark-workunit-parameters.md)
 
 **Type**: string
 

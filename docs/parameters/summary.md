@@ -109,12 +109,8 @@ lines of data to skip in the CSV payload. see [CsvExtractor](https://github.com/
 
 
 ## [ms.data.default.type](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-
-
 ## [ms.data.explicit.eof](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-
 ## [ms.data.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-
 ## [ms.derived.fields](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.derived.fields.md)
 
 Derived Fields are calculated fields that serve critical roles in data ingestion process, such as compaction. This includes, but is not
@@ -138,9 +134,33 @@ on a pattern. By default, it will replace all blank spaces, $, and @ to undersco
 ## [ms.extractor.class](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 ## [ms.extractor.target.file.name](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 ## [ms.extractor.target.file.permission](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.extract.preprocessors](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.extract.preprocessor.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.extract.preprocessors](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extract.preprocessors.md)
+
+`ms.extract.preprocessors` define one or more preprocessor classes that
+handles the incoming data before they can be processed by the extractor. 
+
+When input data is compressed or encrypted, the input stream needs to 
+be preprocessed before it can be passed to an DIL extractor to parse.  
+
+`ms.extract.preprocessors` is a comma delimited string if there are 
+more than 1 preprocessors.
+
+## [ms.extract.preprocessor.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extract.preprocessor.parameters.md)
+
+When a source file is encrypted, it requires credentials to decrypt.
+`ms.extract.preprocessor.parameters` defines parameters to pass into the 
+preprocessor along with the input. 
+
 ## [ms.grace.period.days](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.grace.period.days.md)
+
+`ms.http.grace.period.days` addresses the late arrival problem, which is 
+very common if the ingestion source is a data warehouse. 
+
+`ms.http.grace.period.days` defines a Grace Period for incremental extraction, 
+and it impacts how cutoff timestamp should be calculated during the
+increment load. 
+
+
 ## [ms.http.request.headers](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.http.request.headers.md)
 
 `ms.http.request.headers` specifies custom headers including Content-Type that are to be 

@@ -9,6 +9,7 @@
 **Default value**: "{}" (a blank JsonObject)
 
 **Related**:
+- [job property: ms.authentication](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.authentication.md)
 
 ## Description
 
