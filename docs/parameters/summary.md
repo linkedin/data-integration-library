@@ -141,22 +141,58 @@ on a pattern. By default, it will replace all blank spaces, $, and @ to undersco
 ## [ms.extract.preprocessors](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 ## [ms.extract.preprocessor.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
 ## [ms.grace.period.days](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.grace.period.days.md)
-## [ms.http.request.headers](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.http.request.headers](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.http.request.headers.md)
+
+`ms.http.request.headers` specifies custom headers including Content-Type that are to be 
+included in HTTP requests. 
+
 ## [ms.http.request.method](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.http.request.method.md)
 
 The expected HTTP method to send the requests, decided by the data source.
 
-## [ms.http.response.type](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.http.statuses](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.http.status.reasons](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.jdbc.schema.refactor](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.jdbc.statement](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.kafka.brokers](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.kafka.clientId](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.kafka.schema.registry.url](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.kafka.audit.topic.name](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.normalizer.batch.size](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.output.schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.http.response.type](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.http.response.type.md)
+
+`ms.http.response.type` specifies less common response types in addition to
+the default ones "application/json" or "text/csv". 
+
+## [ms.http.statuses](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.http.statuses.md)
+
+`ms.http.statuses` defines status codes that should be treated as success, 
+warning, or error. 
+
+## ms.http.status.reasons
+
+`ms.http.status.reasons` is for future use. 
+
+`http.status.reasons` define reason codes of special meaning in determining
+whether a request was a success or failure. For example, when status is 200, but there is a 
+reason to indicate the request was not successful, then the status.reason can be set:`{"error": ["not found"]}`.
+An HTTP response is considered success if and only if status code is in 
+http.statuses.success and reason code is not in http.status.reasons.error.
+
+Currently, we don't allow exceptions being made to revert errors by using reason code.
+
+## [ms.jdbc.schema.refactor](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.jdbc.schema.refactor.md)
+
+`ms.jdbc.schema.refactor` specifies the function to apply to JDBC schema. 
+The choices are `toupper`, `tolower`, or `none`
+
+## [ms.jdbc.statement](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.jdbc.statement.md)
+
+`ms.jdbc.statement` specifies the SQL statement for data retrieval. The value
+can be any validate statement on any JDBC source.
+
+## [ms.normalizer.batch.size](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.normalizer.batch.size.md)
+
+`ms.normalizer.batch.size` specifies the batch size for the normalizer converter
+to group rows. Setting `ms.normalizer.batch.size` to 1 has special 
+effects of condensing a sparse table.
+
+## [ms.output.schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.output.schema.md)
+
+`ms.output.schema` defines the output schema of extractors. Therefore,
+it is also the input schema of the first converter. 
+
 ## [ms.pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.pagination.md)
 
 `ms.pagination` defines key pagination attributes. 

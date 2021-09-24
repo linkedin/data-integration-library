@@ -27,6 +27,13 @@
 The field names defined by `fields` are element names in the response
 from data source. 
 
+`fields` are optional. If not defined, but initial offset and page size are given, DIL will automatically
+increase page number by 1 and increase offset by page size. DIL will auto-increase
+page number by 1 for each page whenever pagination is enabled.  
+
+Pagination is enabled whenever `fields` or `initialvalues` are provided. 
+If none of them are provided, pagination is disabled. 
+
 Variables can be defined using the special pagination types. 
 See [ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md).
 
