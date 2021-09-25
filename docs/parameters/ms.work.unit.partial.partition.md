@@ -1,6 +1,6 @@
 # ms.work.unit.partial.partition
 
-**Category**: [watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/watermark-workunit-parameters.md)
+**Tags**: [watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#watermark-work-unit-properties)
 
 **Type**: boolean
 

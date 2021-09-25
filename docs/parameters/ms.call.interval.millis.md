@@ -1,22 +1,11 @@
 # ms.call.interval.millis
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+**Tags**: 
+[pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#pagination-properties)
 
-## Category
+**Type**: long
 
-[execution](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/execution-parameters.md)
-
-## Type
-
-long
-
-## Required
-
-No
-
-## Default value
-
-0
+**Default value**: 0
 
 ## Related 
 
@@ -31,3 +20,6 @@ number of executor threads is more than one, ms.call.interval.millis should be m
 allowed by the QPS to avoid QPS violations cross threads.  
 
 APIs might have quota by second and quota by the hour or day. 
+
+[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mscallintervalmillis)
+

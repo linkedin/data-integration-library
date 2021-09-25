@@ -1,6 +1,7 @@
 # ms.source.files.pattern
 
-**Category**: [execution](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/execution-parameters.md)
+**Tags**:
+[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties)
 
 **Type**: string
 

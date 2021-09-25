@@ -1,7 +1,8 @@
 # ms.normalizer.batch.size
 
-**Tags**: [conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/conversion-parameters.md),
-[schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/schema-parameters.md)
+**Tags**: 
+[schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#schema-properties),
+[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
 
 **Type**: integer
 

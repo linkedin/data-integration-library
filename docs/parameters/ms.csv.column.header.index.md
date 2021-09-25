@@ -1,22 +1,11 @@
 # ms.csv.column.header.index
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+**Tags**: 
+[csv extractor](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#csv-extractor-properties)
 
-## Category
+**Type**: integer
 
-[csv extractor](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/csv-extractor-parameters.md)
-
-## Type
-
-integer
-
-## Required
-
-No
-
-## Default value
-
-0
+**Default** value: 0
 
 ## Related 
 - [job property: ms.csv.column.header](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.column.header.md)
@@ -58,3 +47,5 @@ Job configuration would be:
 `ms.csv.column.header.index = 2`
 
 `ms.csv.skip.lines = 3`
+
+[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mscsvcolumnheaderindex)

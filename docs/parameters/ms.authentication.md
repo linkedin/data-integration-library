@@ -1,32 +1,23 @@
 # ms.authentication
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+**Tags**: 
+[authentication](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#authentication-properties)
+[http](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#http-properties)
 
-## Category
+**Type**: string
 
-[authentication](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/authentication-parameters.md)
+**Format**: JsonObject
 
-## Type
+**Default value**: blank
 
-string
-
-## Format
-
-JsonObject
-
-## Required
-
-No
-
-## Default value
-
-blank
-
-## Accepts Variable Substitution
-
-Yes
+**Accepts Variable Substitution**: Yes
 
 ## Related 
+- [ms.http.request.headers](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.http.request.headers.md)
+- [ms.secondary.input](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.secondary.input.md)
+- [ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md)
+- source.conn.username
+- source.conn.password
 
 ## Description 
 
@@ -79,3 +70,5 @@ The typical application of the second way is OAuth2 where the access token need 
 every job execution, and then the updated access token can be read in through secondary input. When the
 access token is read in through secondary input, it is stored in a variable. And that variable can then
 be referenced in the `token` field. 
+
+[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msauthentication)

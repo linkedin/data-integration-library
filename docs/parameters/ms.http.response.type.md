@@ -1,6 +1,7 @@
 # ms.http.response.type
 
-**Tags**: [http](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/http-parameters.md)
+**Tags**: 
+[http](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#http-properties)
 
 **Type**: string
 
@@ -16,10 +17,10 @@
  the default ones "application/json" or "text/csv". 
   
 If you have a custom response type other than "application/json" or "text/csv", 
-you can configure expected response using this parameter  you can configure expected response using this parameter
+you can configure expected response using this parameter.
 
 When `ms.http.response.type` is not configured, the default 
-for CsvExtractor is "text/csv", and for JsonExtractor it is "application/json".
+for CsvExtractor is "text/csv", and for JsonExtractor, it is "application/json".
 
 ### Example
 

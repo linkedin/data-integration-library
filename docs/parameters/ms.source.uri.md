@@ -1,6 +1,8 @@
 # ms.source.uri
 
-**Category**: [connection](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/connection-parameters.md)
+**Tags**: 
+[connection](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#connection-properties),
+[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties)
 
 **Type**: string
 
@@ -11,7 +13,7 @@
 ## Required
 Yes
 
-## Default value
+**Default value**:
 blank
 
 ## Related 

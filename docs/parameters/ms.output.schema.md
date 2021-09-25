@@ -1,6 +1,8 @@
 # ms.output.schema
 
-**Tags**: [schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/schema-parameters.md)
+**Tags**: 
+[schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#schema-properties), 
+[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
 
 **Type**: string
 

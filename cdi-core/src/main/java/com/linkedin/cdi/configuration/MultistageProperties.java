@@ -302,12 +302,6 @@ public enum MultistageProperties {
       return (T) Boolean.TRUE;
     }
   },
-  MSTAGE_ENCODING("ms.encoding", String.class) {
-    @Override
-    public <T> T getDefaultValue() {
-      return (T) "UTF-8";
-    }
-  },
   /**
    * extract.preprocessors define one or more preprocessor classes, see
    * {@link com.linkedin.cdi.preprocessor.GunzipProcessor}

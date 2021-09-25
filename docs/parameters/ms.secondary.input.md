@@ -1,6 +1,8 @@
 # ms.secondary.input
 
-**Category**: [execution](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/execution-parameters.md)
+**Tags**: 
+[watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#watermark-work-unit-properties),
+[authentication](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/authentication-properties.md)
 
 **Type**: string
 
@@ -21,7 +23,7 @@ the primary inputs of job execution, which is its metadata, i.e, job configurati
 - **location**: from where the HDFS data will be loaded as secondary input
 - **fields**: fields that needs to be extracted and added into the work unit state
 - **filters**: rules to include/exclude records from secondary input
-- **category**: specify the type of secondary input
+- **Tags**: specify the type of secondary input
 
 The following are filtering rules:
 

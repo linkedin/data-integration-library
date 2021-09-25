@@ -1,6 +1,7 @@
 # ms.validation.attributes
 
-**Category**: [execution](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/execution-parameters.md)
+**Tags**: 
+[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
 
 **Type**: string
 

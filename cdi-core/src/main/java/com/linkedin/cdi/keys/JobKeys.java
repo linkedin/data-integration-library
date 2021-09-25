@@ -67,7 +67,6 @@ public class JobKeys {
       MultistageProperties.MSTAGE_ENABLE_CLEANSING,
       MultistageProperties.MSTAGE_ENABLE_DYNAMIC_FULL_LOAD,
       MultistageProperties.MSTAGE_ENABLE_SCHEMA_BASED_FILTERING,
-      MultistageProperties.MSTAGE_ENCODING,
       MultistageProperties.MSTAGE_ENCRYPTION_FIELDS,
       MultistageProperties.MSTAGE_GRACE_PERIOD_DAYS,
       MultistageProperties.MSTAGE_OUTPUT_SCHEMA,

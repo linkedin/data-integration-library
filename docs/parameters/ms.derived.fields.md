@@ -1,18 +1,13 @@
 # ms.derived.fields
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+**Tags**:
+[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
 
-## Category
-[life cycle](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/life-cycle-parameters.md)
+**Type**: string
 
-## Type
-string
+**Format**: A JsonArray of JsonObjects
 
-## Format
-A JsonArray of JsonObjects
-
-## Default value
-blank
+**Default value**:blank
 
 ## Related 
 
@@ -95,3 +90,4 @@ Then the derived field can be defined as:
 `[{"name": "extractedDate", "formula": {"type": "epoc", "source": "CURRENTDATE"}}]`
 
 
+[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msderivedfields)

@@ -1,6 +1,7 @@
 # ms.enable.cleansing
 
-**Category**: [execution](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/execution-parameters.md)
+**Tags**: 
+[schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#schema-properties)
 
 **Type**: boolean
 

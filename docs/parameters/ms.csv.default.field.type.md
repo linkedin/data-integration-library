@@ -1,25 +1,20 @@
 # ms.csv.default.field.type
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+**Tags**: 
+[csv extractor](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#csv-extractor-properties)
 
-## Category
+**Type**: string
 
-[csv extractor](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/csv-extractor-parameters.md)
-
-## Type
-
-string
-
-## Required
-
-No
-
-## Default value
-
-blank
+**Default value**: blank
 
 ## Related 
-- [job property: ms.csv.quote.character](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.quote.character.md)
+- [ms.csv.column.header](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.column.header.md)
+- [ms.csv.column.header.index](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.column.header.index.md)
+- [ms.csv.column.projection](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.column.projection.md)
+- [ms.csv.escape.character](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.escape.character.md)
+- [ms.csv.quote.character](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+- [ms.csv.separator](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+- [ms.csv.skip.lines](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.skip.lines.md)
 
 ## Description
 
@@ -30,3 +25,5 @@ However, in some cases, the inference is not accurate, and users may prefer to k
 In this case `ms.csv.default.field.type = string`
 
 Supported types: string | int | long | double | boolean | float
+
+[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mscsvdefaultfieldtype)

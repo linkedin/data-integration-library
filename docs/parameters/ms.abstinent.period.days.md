@@ -1,13 +1,11 @@
 # ms.abstinent.period.days
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
-## Category
-[watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/watermark-parameters.md)
 
-## Type
-integer
+**Tags**: 
+[watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#watermark-work-unit-properties)
 
-## Default value
-0
+**Type**: integer
+
+**Default value**: 0
 
 ## Related 
 
@@ -40,3 +38,5 @@ Therefore, if there is an abstinent period of 30 days, the downloaded files will
 again in 30 days. 
 
 Abstinent period can be set to a large number so that the same file will never be downloaded again.
+
+[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msabstinentperioddays)

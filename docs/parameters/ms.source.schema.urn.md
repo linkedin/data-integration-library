@@ -1,6 +1,9 @@
 # ms.target.schema.urn
 
-**Category**: [execution](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/execution-parameters.md)
+**Tags**: 
+[schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#schema-properties),
+[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties),
+[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties)
 
 **Type**: string
 

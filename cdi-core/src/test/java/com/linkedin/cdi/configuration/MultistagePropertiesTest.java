@@ -106,14 +106,6 @@ public class MultistagePropertiesTest {
   }
 
   /**
-   * Test getDefaultValue for MSTAGE_ENDCODING
-   */
-  @Test
-  public void testGetDefaultValue6() {
-    Assert.assertEquals(MultistageProperties.MSTAGE_ENCODING.getDefaultValue(), "UTF-8");
-  }
-
-  /**
    * Test getDefaultValue
    */
   @Test

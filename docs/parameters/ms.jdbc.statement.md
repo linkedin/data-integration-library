@@ -1,6 +1,7 @@
 # ms.jdbc.statement
 
-**Tags**: 
+**Tags**:
+[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties) 
 
 **Type**: string
 

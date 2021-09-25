@@ -1,6 +1,8 @@
 # ms.wait.timeout.seconds
 
-**Category**: [pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/pagination-parameters.md)
+**Tags**: 
+[pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#pagination-properties),
+[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
 
 **Type**: integer (in seconds)
 

@@ -1,4 +1,5 @@
 # DIL Job Properties
+[Browse Properties by Category](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md)
 
 The following are a full list of DIL job properties. Generally DIL properties complement the job properties defined 
 in Gobblin core. When there is an exception, i.e. when a property replaces one or more Gobblin properties,
@@ -65,16 +66,15 @@ ms.csv.column.header.index specifies the 0-based row index of the header columns
 
 ## [ms.csv.column.projection](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.column.projection.md)
 
-ms.csv.column.projection defines how CSV columns should be arranged and filtered after parse,
-before being sent to converter and writer to persist. 
+`ms.csv.column.projection` defines how CSV columns should be arranged and filtered after parse,
+before being sent to converter and writer to persist.
+This feature is primarily used to extract selected columns from csv source without a header.
 
 Column projection definition is a comma-separated string, where each value is either an 
 integer or a range, with each number representing the 0 based index of the field.
 
 Column projection definition is inclusive, i.e., only the selected fields are included
 in the final dataset, if a column projection is defined.  
-
-This feature is primarily used to extract selected columns from csv source without a header.
 
 ## [ms.csv.default.field.type](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.default.field.type.md)
 
@@ -107,13 +107,21 @@ see [CsvExtractor](https://github.com/linkedin/data-integration-library/blob/mas
 `ms.csv.skip.lines` is a CsvExtractor property, it specifies how many 
 lines of data to skip in the CSV payload. see [CsvExtractor](https://github.com/linkedin/data-integration-library/blob/master/docs/components/CsvExtractor.md)
 
+## [ms.data.default.type](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.data.default.type.md)
 
-## [ms.data.default.type](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+`ms.data.default.type` provides a way to explicitly specifies data 
+types for certain fields. This is necessary when the source data has 
+empty fields, like placeholders, and DIL cannot infer its type properly.
 
+## [ms.data.explicit.eof](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.data.explicit.eof.md)
 
-## [ms.data.explicit.eof](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+`ms.data.explicit.eof` specifies whether an explicit EOF record should 
+be sent to converter after processing all records. 
 
-## [ms.data.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.data.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.data.field.md)
+
+In a nested response, like JSON or Avro, `ms.data.field` specifies
+where the core data (payload) is. 
 
 ## [ms.derived.fields](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.derived.fields.md)
 
@@ -131,16 +139,69 @@ limited by, the following:
 Schema cleansing replaces special characters in the schema element names based
 on a pattern. By default, it will replace all blank spaces, $, and @ to underscores.
 
-## [ms.enable.dynamic.full.load](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.enable.schema.based.filtering](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.encoding](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.encryption.fields](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.extractor.class](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.extractor.target.file.name](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.extractor.target.file.permission](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.extract.preprocessors](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.extract.preprocessor.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.enable.dynamic.full.load](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.enable.dynamic.full.load.md)
+
+`ms.enable.dynamic.full.load` enables or disables dynamic full load.
+When enabled (default) and `extract.is.full = false`, DIL will dynamically 
+perform a full load if it is a SNAPSHOT_ONLY extract or 
+if there is no pre-existing watermarks of the job.
+
+Dynamic full load is a DIL [Single Flow](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/single-flow.md) 
+feature that aims to alleviate users from coding 2 separate flows, 
+one for the full load and one for the incremental load. 
+
+## [ms.enable.schema.based.filtering](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.enable.schema.based.filtering.md)
+
+`ms.enable.schema.based.filtering` enables or disables schema-based filtering,
+or column projection. When enabled, only fields specified schema 
+are projected to final dataset. 
+
+## [ms.encryption.fields](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.encryption.fields.md)
+
+`ms.encryption.fields` specifies a list of fields to be encrypted before
+they are passed to converters. 
+
+## [ms.extractor.class](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extractor.class.md)
+
+`ms.extractor.class` specifies the extractor class to use for data parsing. 
+The choice of extractor is based data format. Currently, DIL designed 4 
+classes of extractors.
+
+## [ms.extractor.target.file.name](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extractor.target.file.name.md)
+
+`ms.extractor.target.file.name` specify the file name when 
+FileDumpExtractor is used. The file name can be specified as a
+string container DIL variables.
+
+## [ms.extractor.target.file.permission](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extractor.target.file.permission.md)
+
+`ms.extractor.target.file.permission` set file permission when 
+FileDumpExtractor is used.
+
+## [ms.extract.preprocessors](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extract.preprocessors.md)
+
+`ms.extract.preprocessors` define one or more preprocessor classes that
+handles the incoming data before they can be processed by the extractor. 
+When input data is compressed or encrypted, the input stream needs to 
+be preprocessed before it can be passed to an DIL extractor to parse.  
+`ms.extract.preprocessors` is a comma delimited string if there are 
+more than 1 preprocessors.
+
+## [ms.extract.preprocessor.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extract.preprocessor.parameters.md)
+
+When a source file is encrypted, it requires credentials to decrypt.
+`ms.extract.preprocessor.parameters` defines parameters to pass into the 
+preprocessor along with the input. 
+
 ## [ms.grace.period.days](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.grace.period.days.md)
+
+`ms.grace.period.days` addresses the late arrival problem, which is 
+very common if the ingestion source is a data warehouse. 
+`ms.grace.period.days` defines a Grace Period for incremental extraction, 
+and it adds extra buffer to cutoff timestamp during the
+incremental load so that more data can be included. 
+
+
 ## [ms.http.request.headers](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.http.request.headers.md)
 
 `ms.http.request.headers` specifies custom headers including Content-Type that are to be 
@@ -181,6 +242,23 @@ The choices are `toupper`, `tolower`, or `none`
 
 `ms.jdbc.statement` specifies the SQL statement for data retrieval. The value
 can be any validate statement on any JDBC source.
+
+## [ms.kafka.brokers](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.kafka.brokers.md)
+
+This specifies the Kafka broker host, such as `kafka.corp.com:1234`
+
+## [ms.kafka.clientId](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.kafka.clientId.md)
+
+This specifies the Kafka client id, such as `dil-audit`
+
+## [ms.kafka.schema.registry.url](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.kafka.schema.registry.url.md)
+
+`ms.kafka.schema.registry.url` specifies the auditing schema registry URL.
+
+## [ms.kafka.audit.topic.name](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.kafka.audit.topic.name.md)
+
+`ms.kafka.audit.topic.name` specifies the auditing topic name, where
+DIL wil send auditing events to if auditing is enabled.
 
 ## [ms.normalizer.batch.size](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.normalizer.batch.size.md)
 

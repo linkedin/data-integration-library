@@ -1,6 +1,7 @@
 # ms.http.request.method
 
-**Tags**: [http](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/http-parameters.md)
+**Tags**: 
+[http](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#http-properties)
 
 **Type**: string
 
