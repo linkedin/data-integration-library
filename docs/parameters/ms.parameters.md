@@ -1,21 +1,14 @@
 # ms.parameters
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+**Tags**: 
+[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties)
+[authentication](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/authentication-properties.md)
 
-## Category
-[execution](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/execution-parameters.md)
+**Type**: string
 
-## Type
-string
+**Format**: A JsonArray of JsonObjects
 
-## Format
-A JsonArray of JsonObjects
-
-## Required
-No
-
-## Default value
-blank
+**Default value**: "[]" (a blank JsonArray)
 
 ## Related 
 - [concept: variables](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variables.md)
@@ -144,3 +137,5 @@ https://api.zoom.us/v2/metrics/webinars?type=past&from={{fromDate}}&to={{toDate}
 `
 
 In execution time, each day range will be processed by a work unit.
+
+[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msparameters)

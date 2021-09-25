@@ -1,18 +1,14 @@
 # ms.total.count.field
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+**Tags**:
+[pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#pagination-properties),
+[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties)
 
-## Category
-[pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/pagination-parameters.md)
+**Type**: string
 
-## Type
-string
+**Format**: A [JsonPath](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/json-path.md) separated by ".", like "level1.level2"
 
-## Format
-A [JsonPath](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/json-path.md) separated by ".", like "level1.level2"
-
-## Default value
-blank
+**Default value**: blank
 
 ## Related 
 
@@ -34,6 +30,8 @@ Example 1: if the response from the source is like this: `{..."total_records" : 
 
 Example 2: if the response from the source is like this `{..."records": {..."totalRecords": 9999...}...}`, then
 the configuration can be `ms.total.count.field = records.totalRecords`. 
+
+[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mstotalcountfield)
 
 
 

@@ -1,6 +1,7 @@
 # ms.work.unit.min.units
 
-**Category**: [work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/work-unit-parameters.md)
+**Tags**: 
+[watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#watermark-work-unit-properties)
 
 **Type**: integer
 

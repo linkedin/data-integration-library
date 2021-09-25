@@ -1,4 +1,5 @@
 # DIL Job Properties
+[Browse Properties by Category](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md)
 
 The following are a full list of DIL job properties. Generally DIL properties complement the job properties defined 
 in Gobblin core. When there is an exception, i.e. when a property replaces one or more Gobblin properties,
@@ -65,16 +66,15 @@ ms.csv.column.header.index specifies the 0-based row index of the header columns
 
 ## [ms.csv.column.projection](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.column.projection.md)
 
-ms.csv.column.projection defines how CSV columns should be arranged and filtered after parse,
-before being sent to converter and writer to persist. 
+`ms.csv.column.projection` defines how CSV columns should be arranged and filtered after parse,
+before being sent to converter and writer to persist.
+This feature is primarily used to extract selected columns from csv source without a header.
 
 Column projection definition is a comma-separated string, where each value is either an 
 integer or a range, with each number representing the 0 based index of the field.
 
 Column projection definition is inclusive, i.e., only the selected fields are included
 in the final dataset, if a column projection is defined.  
-
-This feature is primarily used to extract selected columns from csv source without a header.
 
 ## [ms.csv.default.field.type](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.default.field.type.md)
 
@@ -107,13 +107,21 @@ see [CsvExtractor](https://github.com/linkedin/data-integration-library/blob/mas
 `ms.csv.skip.lines` is a CsvExtractor property, it specifies how many 
 lines of data to skip in the CSV payload. see [CsvExtractor](https://github.com/linkedin/data-integration-library/blob/master/docs/components/CsvExtractor.md)
 
+## [ms.data.default.type](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.data.default.type.md)
 
-## [ms.data.default.type](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+`ms.data.default.type` provides a way to explicitly specifies data 
+types for certain fields. This is necessary when the source data has 
+empty fields, like placeholders, and DIL cannot infer its type properly.
 
+## [ms.data.explicit.eof](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.data.explicit.eof.md)
 
-## [ms.data.explicit.eof](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+`ms.data.explicit.eof` specifies whether an explicit EOF record should 
+be sent to converter after processing all records. 
 
-## [ms.data.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.data.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.data.field.md)
+
+In a nested response, like JSON or Avro, `ms.data.field` specifies
+where the core data (payload) is. 
 
 ## [ms.derived.fields](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.derived.fields.md)
 
@@ -126,63 +134,227 @@ limited by, the following:
 - Lift up a nested element in the response to the toplevel and make it a toplevel field because only toplevel fields can be primary keys or delta keys 
 - Persist a job execution variable, such as the work unit identifier, into the final dataset 
 
-## [ms.enable.cleansing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.enable.dynamic.full.load](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.enable.schema.based.filtering](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.encoding](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.encryption.fields](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.extractor.class](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.extractor.target.file.name](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.extractor.target.file.permission](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.extract.preprocessors](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.extract.preprocessor.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.enable.cleansing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.enable.cleansing.md)
+
+Schema cleansing replaces special characters in the schema element names based
+on a pattern. By default, it will replace all blank spaces, $, and @ to underscores.
+
+## [ms.enable.dynamic.full.load](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.enable.dynamic.full.load.md)
+
+`ms.enable.dynamic.full.load` enables or disables dynamic full load.
+When enabled (default) and `extract.is.full = false`, DIL will dynamically 
+perform a full load if it is a SNAPSHOT_ONLY extract or 
+if there is no pre-existing watermarks of the job.
+
+Dynamic full load is a DIL [Single Flow](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/single-flow.md) 
+feature that aims to alleviate users from coding 2 separate flows, 
+one for the full load and one for the incremental load. 
+
+## [ms.enable.schema.based.filtering](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.enable.schema.based.filtering.md)
+
+`ms.enable.schema.based.filtering` enables or disables schema-based filtering,
+or column projection. When enabled, only fields specified schema 
+are projected to final dataset. 
+
+## [ms.encryption.fields](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.encryption.fields.md)
+
+`ms.encryption.fields` specifies a list of fields to be encrypted before
+they are passed to converters. 
+
+## [ms.extractor.class](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extractor.class.md)
+
+`ms.extractor.class` specifies the extractor class to use for data parsing. 
+The choice of extractor is based data format. Currently, DIL designed 4 
+classes of extractors.
+
+## [ms.extractor.target.file.name](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extractor.target.file.name.md)
+
+`ms.extractor.target.file.name` specify the file name when 
+FileDumpExtractor is used. The file name can be specified as a
+string container DIL variables.
+
+## [ms.extractor.target.file.permission](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extractor.target.file.permission.md)
+
+`ms.extractor.target.file.permission` set file permission when 
+FileDumpExtractor is used.
+
+## [ms.extract.preprocessors](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extract.preprocessors.md)
+
+`ms.extract.preprocessors` define one or more preprocessor classes that
+handles the incoming data before they can be processed by the extractor. 
+When input data is compressed or encrypted, the input stream needs to 
+be preprocessed before it can be passed to an DIL extractor to parse.  
+`ms.extract.preprocessors` is a comma delimited string if there are 
+more than 1 preprocessors.
+
+## [ms.extract.preprocessor.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extract.preprocessor.parameters.md)
+
+When a source file is encrypted, it requires credentials to decrypt.
+`ms.extract.preprocessor.parameters` defines parameters to pass into the 
+preprocessor along with the input. 
+
 ## [ms.grace.period.days](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.grace.period.days.md)
-## [ms.http.request.headers](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+
+`ms.grace.period.days` addresses the late arrival problem, which is 
+very common if the ingestion source is a data warehouse. 
+`ms.grace.period.days` defines a Grace Period for incremental extraction, 
+and it adds extra buffer to cutoff timestamp during the
+incremental load so that more data can be included. 
+
+
+## [ms.http.request.headers](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.http.request.headers.md)
+
+`ms.http.request.headers` specifies custom headers including Content-Type that are to be 
+included in HTTP requests. 
+
 ## [ms.http.request.method](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.http.request.method.md)
 
 The expected HTTP method to send the requests, decided by the data source.
 
-## [ms.http.response.type](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.http.statuses](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.http.status.reasons](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.jdbc.schema.refactor](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.jdbc.statement](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.kafka.brokers](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.kafka.clientId](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.kafka.schema.registry.url](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.kafka.audit.topic.name](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.normalizer.batch.size](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.output.schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.http.response.type](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.http.response.type.md)
+
+`ms.http.response.type` specifies less common response types in addition to
+the default ones "application/json" or "text/csv". 
+
+## [ms.http.statuses](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.http.statuses.md)
+
+`ms.http.statuses` defines status codes that should be treated as success, 
+warning, or error. 
+
+## ms.http.status.reasons
+
+`ms.http.status.reasons` is for future use. 
+
+`http.status.reasons` define reason codes of special meaning in determining
+whether a request was a success or failure. For example, when status is 200, but there is a 
+reason to indicate the request was not successful, then the status.reason can be set:`{"error": ["not found"]}`.
+An HTTP response is considered success if and only if status code is in 
+http.statuses.success and reason code is not in http.status.reasons.error.
+
+Currently, we don't allow exceptions being made to revert errors by using reason code.
+
+## [ms.jdbc.schema.refactor](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.jdbc.schema.refactor.md)
+
+`ms.jdbc.schema.refactor` specifies the function to apply to JDBC schema. 
+The choices are `toupper`, `tolower`, or `none`
+
+## [ms.jdbc.statement](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.jdbc.statement.md)
+
+`ms.jdbc.statement` specifies the SQL statement for data retrieval. The value
+can be any validate statement on any JDBC source.
+
+## [ms.kafka.brokers](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.kafka.brokers.md)
+
+This specifies the Kafka broker host, such as `kafka.corp.com:1234`
+
+## [ms.kafka.clientId](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.kafka.clientId.md)
+
+This specifies the Kafka client id, such as `dil-audit`
+
+## [ms.kafka.schema.registry.url](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.kafka.schema.registry.url.md)
+
+`ms.kafka.schema.registry.url` specifies the auditing schema registry URL.
+
+## [ms.kafka.audit.topic.name](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.kafka.audit.topic.name.md)
+
+`ms.kafka.audit.topic.name` specifies the auditing topic name, where
+DIL wil send auditing events to if auditing is enabled.
+
+## [ms.normalizer.batch.size](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.normalizer.batch.size.md)
+
+`ms.normalizer.batch.size` specifies the batch size for the normalizer converter
+to group rows. Setting `ms.normalizer.batch.size` to 1 has special 
+effects of condensing a sparse table.
+
+## [ms.output.schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.output.schema.md)
+
+`ms.output.schema` defines the output schema of extractors. Therefore,
+it is also the input schema of the first converter. 
+
 ## [ms.pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.pagination.md)
+
+`ms.pagination` defines key pagination attributes. 
+
 ## [ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md)
 
 ms.parameter defines a list of named [variables](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variables.md) 
 that can be referenced in other configuration properties using the syntax of double brackets {{variableName}}.
 
-## [ms.payload.property]
+## ms.payload.property
 
 `ms.payload.property` is an internal property that DIL uses to pass payloads to work units, 
 and it should not be used explicitly in job configurations.  
 
-## [ms.retention](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.s3.list.max.keys](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.schema.cleansing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.secondary.input](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## ms.retention
+
+`ms.retention` is designed for future use.
+
+## [ms.s3.list.max.keys](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.s3.list.max.keys.md)
+
+`ms.s3.list.max.keys` limit the number of keys when doing a "list" operation
+on a S3 bucket. 
+
+## [ms.schema.cleansing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.schema.cleansing.md)
+
+Schema cleansing replaces special characters in the schema element names based
+on a pattern. By default, it will replace all blank spaces, $, and @ to underscores.
+
+## [ms.secondary.input](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.secondary.input.md)
+
+Secondary inputs provides additional directives to job execution, in addition to
+the primary inputs of job execution, which is its metadata, i.e, job configurations. 
+
 ## [ms.session.key.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.session.key.field.md)
-## [ms.source.data.character.set](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.source.files.pattern](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.source.s3.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.source.schema.reader.factory](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.source.schema.urn](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+
+Session is a state management mechanism over stateless connections.
+For example, although Restful API is stateless, data sources can maintain 
+a session in backend by a status field, a session cursor, or through 
+[pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md).
+
+`ms.session.key.field` specifies the key field in response in order to retrieve the 
+status for session control and the condition for termination.
+
+## [ms.source.data.character.set](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.data.character.set.md)
+
+`ms.source.data.character.set` specifies a character set to parse JSON or CSV payload. 
+The default source data character set is UTF-8, which should be good for most use cases.
+
+## [ms.source.files.pattern](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.files.pattern.md)
+
+`ms.source.files.pattern` specifies a pattern to filter files from S3 and SFTP sources.
+
+## [ms.source.s3.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.s3.parameters.md)
+
+`ms.source.s3.parameters` specifies parameters for S3 connection.
+
+## [ms.source.schema.urn](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.schema.urn.md)
+
+Source schema represents the source data structure. Generally, in a data 
+ingestion scenario, the source data will be read in, projected, filtered, and
+converted. Source schema can be read from the source, like for JDBC data sources, or parsed
+from actual data, like JSON data, or defined as a string, or defined in a metadata
+store. `ms.target.schema.urn` address the option that defines source schema in metadata store. 
+
 ## [ms.source.uri](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.uri.md)
 
-ms.source.uri defines the integration point, which is called data source for data ingestion or target for data egression. 
-It follows the URI format [here](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier). 
+`ms.source.uri` defines the integration point, which is called data source for data ingestion or target for data egression. 
+It follows the [URI format](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier). 
 The only exception is that authority is not supported, because all authority cannot be fit in the URI.
 
-## [ms.target.schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.target.schema.reader.factory](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-## [ms.target.schema.urn](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.target.schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.target.schema.md)
+
+`ms.target.schema` defines the target schema in a JsonArray string. 
+Target schema denotes the schema to be passed to writer, this applies
+to situation where the source data are transformed through a converter
+or other processes.
+
+## [ms.target.schema.urn](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.target.schema.urn.md)
+
+Generally, target schema should be specified through target schema URN.
+to avoid coding long schema strings.
+An URN can point to the schema storage location on DataHub, which is
+the only supported schema storage for now.
+
 ## [ms.total.count.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.total.count.field.md)
 
 Total Count field directs DIL how to retrieve the expected total row counts. This is important when there are large
@@ -190,13 +362,42 @@ volume of data and [pagination](https://github.com/linkedin/data-integration-lib
 is used to retrieve data page by page. In cases of pagination, the expected total row count is one way to indicate
 the end of pagination when the actually retrieved total number of rows matches or surpasses the expected total rows.
 
-## [ms.validation.attributes](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+## [ms.validation.attributes](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.validation.attributes.md)
 
+`ms.validation.attributes` defines a threshold to mark a job as successful or failed. 
+The threshold can be specified as "success" or "failure" thresholds. The former is 
+called a "success" rule, and the later is called a "failure" rule. 
 
-## [ms.wait.timeout.seconds](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
+This property is required for [InFlowValidationConverter](https://github.com/linkedin/data-integration-library/blob/master/docs/components/InFlowValidationConverter.md), 
+which is a validation converter based on simple count comparison.
 
+## [ms.wait.timeout.seconds](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.wait.timeout.seconds.md)
+
+`ms.wait.timeout.seconds` is one option to control pagination, it specifies
+how long the job will wait before the session ending (success or failure) status is met. 
 
 ## [ms.watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.watermark.md)
+
+`ms.watermark` define watermarks for work unit generation, execution control, 
+and incremental processing. DIL supports 2 types of watermarks, `datetime` and `unit`.
+
+A datetime watermark is a reference. It doesn't directly effect or control
+job execution. The watermark name and boundaries, low watermark 
+and high watermark, can be referenced in [variables](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variable.md), which can 
+control execution. 
+See [ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md).
+
+A datetime watermark is a range, defined by its `from` and `to` field. The range
+can be further partitioned per other configurations. 
+See [ms.work.unit.partition](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.work.unit.partition.md) 
+
+Therefore, a datetime watermark could generate 1 or more mini-watermarks when 
+partitioned, and each mini-watermark is mapped to a work unit. Therefore, 
+each work unit has its own unique watermark.
+
+A `unit` watermark defines a list of values that will be used by the DIL to
+generate work units. The `unit` watermark name can be referenced as a [variable](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variable.md)
+directly.
 
 ## ms.watermark.groups
 
@@ -228,7 +429,7 @@ alert to operations team.
 
 `ms.work.unit.pacing.seconds` can spread out work unit execution by adding a waiting time
 in the front of each work unit's execution. The amount of wait time is based on the order of
-the work units. It is calculated as `i * ms.work.unit.pacing.seconds`, where is the sequence number
+the work units. It is calculated as `i * ms.work.unit.pacing.seconds`, where `i` is the sequence number
 of the work unit.
 
 ## [ms.work.unit.parallelism.max](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.work.unit.parallelism.max.md)

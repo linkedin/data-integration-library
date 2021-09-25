@@ -1,21 +1,13 @@
 # ms.http.request.method
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+**Tags**: 
+[http](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#http-properties)
 
-## Category
-[http](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/http-parameters.md)
+**Type**: string
 
-## Type
-string
+**Format**: one of the values of get, put, post, and delete
 
-## Format
-get/put/post/delete
-
-## Required
-No
-
-## Default value
-blank
+**Default value**: blank (equivalent to GET)
 
 ## Related 
 
@@ -28,4 +20,7 @@ The expected HTTP method to send the requests, decided by the API.
 - PUT: parameters are sent to API in request body
 - DELETE: parameters are sent to API in request body
 
-URL parameters are URL encoded.
+**Note**: URL parameters are URL encoded.
+
+[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mshttprequestmethod)
+

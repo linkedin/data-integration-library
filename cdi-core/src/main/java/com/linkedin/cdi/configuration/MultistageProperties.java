@@ -302,12 +302,6 @@ public enum MultistageProperties {
       return (T) Boolean.TRUE;
     }
   },
-  MSTAGE_ENCODING("ms.encoding", String.class) {
-    @Override
-    public <T> T getDefaultValue() {
-      return (T) "UTF-8";
-    }
-  },
   /**
    * extract.preprocessors define one or more preprocessor classes, see
    * {@link com.linkedin.cdi.preprocessor.GunzipProcessor}
@@ -655,15 +649,6 @@ public enum MultistageProperties {
    */
   MSTAGE_SOURCE_SCHEMA_URN("ms.source.schema.urn", String.class),
   /**
-   * Define a factory parameter to decouple proprietary code from OpenSource code
-   */
-  MSTAGE_SOURCE_SCHEMA_READER_FACTORY("ms.source.schema.reader.factory", String.class) {
-    @Override
-    public <T> T getDefaultValue() {
-      return (T) "com.linkedin.cdi.factory.reader.MetastoreReader";
-    }
-  },
-  /**
    * ms.source.uri defines a data source identifier, it follows the URI format
    * here: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
    *
@@ -695,12 +680,6 @@ public enum MultistageProperties {
    */
   MSTAGE_TARGET_SCHEMA("ms.target.schema", JsonArray.class),
   MSTAGE_TARGET_SCHEMA_URN("ms.target.schema.urn", String.class),
-  MSTAGE_TARGET_SCHEMA_READER_FACTORY("ms.target.schema.reader.factory", String.class) {
-    @Override
-    public <T> T getDefaultValue() {
-      return (T) "com.linkedin.cdi.factory.reader.MetastoreReader";
-    }
-  },
   /**
    * Total count field is a Json path. This attribute can be used in many
    * types of connectors, typically with Json Extractor
