@@ -62,8 +62,8 @@ The following are related to conversion (converters):
 - [ms.csv.column.projection](ms.csv.column.projection.md)
 - [ms.csv.default.field.type](ms.csv.default.field.type.md)
 - [ms.csv.escape.character](ms.csv.escape.character.md)
-- [ms.csv.quote.character]()
-- [ms.csv.separator]()
+- [ms.csv.quote.character](ms.csv.quote.character.md)
+- [ms.csv.separator](ms.csv.separator.md)
 - [ms.csv.skip.lines](ms.csv.skip.lines.md)
 
 # Execution Properties

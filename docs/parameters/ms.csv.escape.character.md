@@ -12,8 +12,8 @@
 - [ms.csv.column.header.index](ms.csv.column.header.index.md)
 - [ms.csv.column.projection](ms.csv.column.projection.md)
 - [ms.csv.default.field.type](ms.csv.default.field.type.md)
-- [ms.csv.quote.character]()
-- [ms.csv.separator]()
+- [ms.csv.quote.character](ms.csv.quote.character.md)
+- [ms.csv.separator](ms.csv.separator.md)
 - [ms.csv.skip.lines](ms.csv.skip.lines.md)
 
 ## Description

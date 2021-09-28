@@ -90,13 +90,13 @@ ms.csv.escape.character specifies how characters can be escaped.
 Default is "u005C" (backslash '\'). 
 see [CsvExtractor](https://github.com/linkedin/data-integration-library/blob/master/docs/components/CsvExtractor.md)
 
-## [ms.csv.quote.character]()
+## [ms.csv.quote.character](ms.csv.quote.character.md)
 
 ms.csv.quote.character specifies how source data are enclosed by columns.
 Default is double-quote. 
 see [CsvExtractor](https://github.com/linkedin/data-integration-library/blob/master/docs/components/CsvExtractor.md)
 
-## [ms.csv.separator]()
+## [ms.csv.separator](ms.csv.separator.md)
 
 `ms.csv.separator` specifies the delimiter in the source csv file. 
 Default is comma. 
