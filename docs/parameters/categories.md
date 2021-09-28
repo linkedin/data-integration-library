@@ -15,7 +15,7 @@ The following are related to authentication:
 - [ms.authentication](ms.authentication.md)
 - [ms.http.request.headers](ms.http.request.headers.md)
 - [ms.secondary.input](ms.secondary.input.md)
-- [ms.Properties](ms.Properties.md)
+- [ms.parameters](ms.parameters.md)
 - source.conn.username
 - source.conn.password
 
@@ -25,14 +25,14 @@ The following are related to connections:
 
 - [ms.connection.client.factory](ms.connection.client.factory.md)
 - [ms.source.uri](ms.source.uri.md)
-- [ms.source.s3.Properties](ms.source.s3.Properties.md)
+- [ms.source.s3.parameters](ms.source.s3.parameters.md)
 - source.conn.username
 - source.conn.password
 
 The following could also be related to connections as they define variables:
 
 - [ms.secondary.input](ms.secondary.input.md)
-- [ms.Properties](ms.Properties.md)
+- [ms.parameters](ms.parameters.md)
 
 # Conversion Properties
 
