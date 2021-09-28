@@ -1,7 +1,7 @@
 # ms.data.field
 
 **Tags**:
-[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties)
+[source](categories.md#source-properties)
 
 **Type**: string
 
@@ -45,5 +45,5 @@ then pick `details` from it, then pick the first row in the array,
 and then pick the `errors` element.
 - `ms.data.field=partialFailureError.details.0.errors`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msdatafield)
+[back to summary](summary.md#msdatafield)
 

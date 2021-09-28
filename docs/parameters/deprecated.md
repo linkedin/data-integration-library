@@ -13,7 +13,7 @@ have this job property will have no harm.
 
 ## ms.encoding
 
-`ms.encoding` is replaced by [ms.source.data.character.set](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.data.character.set.md).
+`ms.encoding` is replaced by [ms.source.data.character.set](ms.source.data.character.set.md).
 
 ## Factories
 
@@ -21,5 +21,5 @@ have this job property will have no harm.
 - ms.source.schema.reader.factory
 - ms.target.schema.reader.factory
 
-Above factories are replaced by [ms.connection.client.factory](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.connection.client.factory.md)
+Above factories are replaced by [ms.connection.client.factory](ms.connection.client.factory.md)
 

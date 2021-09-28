@@ -1,14 +1,14 @@
 # ms.work.unit.min.units
 
 **Tags**: 
-[watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#watermark-work-unit-properties)
+[watermark & work unit](categories.md#watermark-work-unit-properties)
 
 **Type**: integer
 
 **Default value**: 0
 
 **Related**:
- - [job property: ms.work.unit.min.records](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.work.unit.min.records.md)
+ - [job property: ms.work.unit.min.records](ms.work.unit.min.records.md)
  
 ## Description
 
@@ -20,4 +20,4 @@ This is particularly useful when a data ingestion job expects daily files, for e
 is no file on one day, then the job will fail, generating a failure email, alerting there is no
 file. 
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+[back to summary](summary.md)

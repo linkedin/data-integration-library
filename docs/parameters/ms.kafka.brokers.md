@@ -1,16 +1,16 @@
 # ms.kafka.brokers
 
 **Tags**: 
-[auditing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#auditing-properties)
+[auditing](categories.md#auditing-properties)
 
 **Type**: string
 
 **Default value**: blank
 
 **Related**:
-- [ms.kafka.clientId](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.kafka.clientId.md)
-- [ms.kafka.schema.registry.url](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.kafka.schema.registry.url.md)
-- [ms.kafka.audit.topic.name](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.kafka.audit.topic.name.md)
+- [ms.kafka.clientId](ms.kafka.clientId.md)
+- [ms.kafka.schema.registry.url](ms.kafka.schema.registry.url.md)
+- [ms.kafka.audit.topic.name](ms.kafka.audit.topic.name.md)
 
 ## Description
 
@@ -19,6 +19,6 @@
 **Note**: This is not fully ready for open source use. 
 
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mskafkabroker)
+[back to summary](summary.md#mskafkabroker)
 
  

@@ -1,7 +1,7 @@
 # ms.extractor.target.file.name
 
 **Tags**: 
-[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
+[conversion](categories.md#conversion-properties)
 
 **Type**: string
 
@@ -10,7 +10,7 @@
 **Accepts DIL Variables**: yes
 
 **Related**:
-- [ms.extractor.target.file.permission](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extractor.target.file.permission.md)
+- [ms.extractor.target.file.permission](ms.extractor.target.file.permission.md)
 
 ## Description
 
@@ -26,4 +26,4 @@ without going through converters or writers.
 
 `ms.extractor.target.file.name={{s3key}}`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msextractortargetfilename)
+[back to summary](summary.md#msextractortargetfilename)

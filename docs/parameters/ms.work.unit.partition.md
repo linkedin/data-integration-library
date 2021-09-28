@@ -1,6 +1,6 @@
 # ms.work.unit.partition
 
-**Tags**: [watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#watermark-work-unit-properties)
+**Tags**: [watermark & work unit](categories.md#watermark-work-unit-properties)
 
 **Type**: string
 
@@ -10,7 +10,7 @@
 
 **Related**:
  
-- [job property: ms.watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.watermark.md)
+- [job property: ms.watermark](ms.watermark.md)
 
 ## Description
 
@@ -29,7 +29,7 @@ unit to take a week load of data, set this value to `weekly`.
 
 More information about the various partition schemes:
 
-- **monthly**: the [watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.watermark.md)
+- **monthly**: the [watermark](ms.watermark.md)
 is partitioned by months from the starting date of the watermark.
 For example, if watermark starts from Jan-5, then the first partition is 
 Jan-5 (milliseconds of midnight on Jan-5 inclusive)
@@ -37,19 +37,19 @@ to Feb-5 (milliseconds of midnight Feb-5 exclusive), and so on.
 It is recommended to pick a start date at the month beginning. If a month end
 date is picked as watermark start date, then the partitioning results can be wacky. 
 
-- **weekly**: the [watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.watermark.md)
+- **weekly**: the [watermark](ms.watermark.md)
 is partitioned by weeks from the starting day of the watermark.
 For example, if watermark starts from a Monday, then the first partition is 
 Monday (milliseconds of midnight on Monday inclusive)
 to the next Monday (milliseconds of midnight on next Monday exclusive), and so on.
 The watermark start date can be a date that falls on any day.  
 
-- **daily**: the [watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.watermark.md)
+- **daily**: the [watermark](ms.watermark.md)
 is partitioned by days from the starting date of the watermark, with 
 each partition starting from a date (milliseconds of midnight of the date inclusive)
 to the next date (milliseconds of midnight of next date exclusive), and so on.
 
-- **hourly**: the [watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.watermark.md)
+- **hourly**: the [watermark](ms.watermark.md)
 is partitioned by hours from the starting date-time of the watermark, with 
 each partition starting from a date-time (milliseconds of the date-time inclusive)
 to the next date-time an hour away (milliseconds of the next date-time exclusive), and so on.
@@ -80,4 +80,4 @@ if a range is smaller than full partition range, for example `{"monthly": ["2020
 it will still generate a full partition. So to avoid confusion, the range should be, at minimum, 1 partition size. 
 That means, a range should at least 1 month for monthly, or at least 1 week for weekly etc.
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+[back to summary](summary.md)

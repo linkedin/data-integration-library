@@ -1,7 +1,7 @@
 # ms.encryption.fields
 
 **Tags**: 
-[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
+[conversion](categories.md#conversion-properties)
 
 **Type**: string
 
@@ -28,5 +28,5 @@ name can be Json Path.
 `ms.encryption.fields=["access_token", "client_secret", "refresh_token"]`
 `ms.encryption.fields=["emailAddress", "settings.publicKey"]`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msencryptionfields)
+[back to summary](summary.md#msencryptionfields)
 

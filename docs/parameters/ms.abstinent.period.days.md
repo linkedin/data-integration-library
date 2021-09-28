@@ -1,7 +1,7 @@
 # ms.abstinent.period.days
 
 **Tags**: 
-[watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#watermark-work-unit-properties)
+[watermark & work unit](categories.md#watermark-work-unit-properties)
 
 **Type**: integer
 
@@ -11,7 +11,7 @@
 
 - [key concept: watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/watermark.md)
 - [key concept: work-unit](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/work-unit.md)
-- [Property: ms.grace.period.days](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.grace.period.days.md)
+- [Property: ms.grace.period.days](ms.grace.period.days.md)
 - [How to: abstinent period](https://github.com/linkedin/data-integration-library/blob/master/docs/how-to/abstinent-period.md)
 - [How to: grace period](https://github.com/linkedin/data-integration-library/blob/master/docs/how-to/grace-period.md)
 
@@ -39,4 +39,4 @@ again in 30 days.
 
 Abstinent period can be set to a large number so that the same file will never be downloaded again.
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msabstinentperioddays)
+[back to summary](summary.md#msabstinentperioddays)

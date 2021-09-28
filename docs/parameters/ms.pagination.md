@@ -1,7 +1,7 @@
 # ms.pagination
 
 **Tags**: 
-[pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#pagination-properties)
+[pagination](categories.md#pagination-properties)
 
 **Type**: string
 
@@ -11,8 +11,8 @@
 
 **Related**:
 - [key concept: pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md)
-- [ms.session.key.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.session.key.field.md)
-- [ms.total.count.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.total.count.field.md)
+- [ms.session.key.field](ms.session.key.field.md)
+- [ms.total.count.field](ms.total.count.field.md)
 
 ## Description
 
@@ -39,7 +39,7 @@ Pagination is enabled whenever `fields` or `initialvalues` are provided.
 If none of them are provided, pagination is disabled. 
 
 Variables can be defined using the special pagination types. 
-See [ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md).
+See [ms.parameters](ms.parameters.md).
 
 ### Example 1
 
@@ -84,4 +84,4 @@ And the first request URL becomes:
 And the second request will auto increment the offset, and the URL becomes:
 `https://api.abc.com/q?offset=5000&limit=5000`
   
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mspagination)
+[back to summary](summary.md#mspagination)

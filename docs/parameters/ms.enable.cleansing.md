@@ -1,7 +1,7 @@
 # ms.enable.cleansing
 
 **Tags**: 
-[schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#schema-properties)
+[schema](categories.md#schema-properties)
 
 **Type**: boolean
 
@@ -23,10 +23,10 @@ can be expensive.
 
 This configuration has no impact on schemas from metadata stores.
 
-If defined, [ms.schema.cleansing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.schema.cleansing.md) 
+If defined, [ms.schema.cleansing](ms.schema.cleansing.md) 
 supersedes `ms.enable.cleansing`
 If `ms.schema.cleansing` is not defined, DIL will check `ms.enable.cleansing`.
-If `ms.enable.cleansing` is true, DIL will do the [default cleansing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.schema.cleansing.md). 
+If `ms.enable.cleansing` is true, DIL will do the [default cleansing](ms.schema.cleansing.md). 
 
 ### Statement of Direction
 
@@ -38,4 +38,4 @@ The following disables schema cleansing if `ms.schema.cleansing` is not defined.
 
 - `ms.enable.cleansing=false`
  
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msenablecleansing)
+[back to summary](summary.md#msenablecleansing)

@@ -1,7 +1,7 @@
 # ms.s3.list.max.keys
 
 **Tags**: 
-[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties)
+[source](categories.md#source-properties)
 
 **Type**: integer
 
@@ -15,7 +15,7 @@
 on a S3 bucket. 
 
 In retrieve files from S3, DIL will first try listing the keys using the path
-from [ms.source.uri](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.uri.md),
+from [ms.source.uri](ms.source.uri.md),
 DIL will only perform a "download" if there is only 1 key. 
 
 If there are multiple keys from the given location, DIL will just write the
@@ -30,4 +30,4 @@ See [Two Step File Download](https://github.com/linkedin/data-integration-librar
 
 `ms.s3.list.max.keys` will be merged into `ms.source.s3.parameters`.
   
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mss3listmaxkeys)
+[back to summary](summary.md#mss3listmaxkeys)

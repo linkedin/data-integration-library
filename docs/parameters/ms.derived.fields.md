@@ -1,7 +1,7 @@
 # ms.derived.fields
 
 **Tags**:
-[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
+[conversion](categories.md#conversion-properties)
 
 **Type**: string
 
@@ -90,4 +90,4 @@ Then the derived field can be defined as:
 `[{"name": "extractedDate", "formula": {"type": "epoc", "source": "CURRENTDATE"}}]`
 
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msderivedfields)
+[back to summary](summary.md#msderivedfields)
