@@ -39,7 +39,7 @@ but currently we support only 1 unit watermark. So there
 is 1 unit watermark variables from properties. The unit watermark 
 can have multiple units (values), each of them will be 
 distributed into one of the work units, and therefore, 
-each work unit has 1 value under the same variable name.
+each work unit has 1 unique value under the same variable name.
 
 ### Option 3: [ms.pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.pagination.md)
 
@@ -75,12 +75,6 @@ An `authentication` secondary input can have 1 and only 1 records,
 but allow multiple fields. That means it can generate multiple variables,
 with each variable having only 1 value. 
 `authentication` variable will be shared across all work units. 
-
-### Option 6:[ms.watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.watermark.md)
-
-Each "unit" watermark is a variable, and its name is the unit watermark name. Each 
-unit watermark value is carried to 1 work unit and given to the named variable within
-that work unit. 
 
 ## Parameters
 
