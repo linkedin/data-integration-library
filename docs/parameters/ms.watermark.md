@@ -13,8 +13,9 @@
 
 - [job property: ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md).
 - [job property: ms.work.unit.partition](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.work.unit.partition.md)
-- [concept: variable](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variable.md) 
-- [concept: work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/work-unit.md)
+- [key concept: variable](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variable.md) 
+- [key concept: work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/work-unit.md)
+- [key concept: watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/watermark.md)
 
 ## Description
 

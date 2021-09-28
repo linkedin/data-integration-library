@@ -11,7 +11,7 @@
 **Default value**: blank
 
 **Related**:
-- [concept: schema](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/schema.md)
+- [key concept: schema](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/schema.md)
 
 ## Description
 

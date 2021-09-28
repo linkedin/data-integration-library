@@ -49,4 +49,6 @@ To contribute, please use submit Pull Request (PR) for committers to merge.
 
 # Detailed Documents
 
-[Deprecated Job Properties](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/deprecated.md)
+- [Job Properties](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+- [Job Properties by Category](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md)
+- [Deprecated Job Properties](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/deprecated.md)

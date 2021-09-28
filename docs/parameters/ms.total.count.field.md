@@ -12,7 +12,7 @@
 
 ## Related 
 
-- [Concept: pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md)
+- [key concept: pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md)
 
 Total Count field directs DIL how to retrieve the expected total row counts. This is important when there are large
 volume of data and [pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md) 

@@ -1,7 +1,8 @@
 # ms.session.key.field
 
 **Tags**:
-[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties)
+[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties),
+[pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#pagination-properties)
 
 **Type**: string
 
@@ -10,6 +11,9 @@
 **Default value**: "{}" (a blank JsonObject)
 
 **Related**:
+- [key concept: pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md)
+- [ms.pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.pagination.md)
+- [ms.total.count.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.total.count.field.md)
 
 ## Description
 
