@@ -2,7 +2,7 @@
 
 **Tags**: 
 [source](categories.md#source-properties)
-[authentication](authentication-properties.md)
+[authentication](categories.md#authentication-properties)
 
 **Type**: string
 

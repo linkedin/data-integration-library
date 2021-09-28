@@ -2,7 +2,7 @@
 
 **Tags**: 
 [http](categories.md#http-properties),
-[authentication](authentication-properties.md)
+[authentication](categories.md#authentication-properties)
 
 **Type**: string
 

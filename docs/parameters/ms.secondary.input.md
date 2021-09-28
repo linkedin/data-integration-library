@@ -2,7 +2,7 @@
 
 **Tags**: 
 [watermark & work unit](categories.md#watermark-work-unit-properties),
-[authentication](authentication-properties.md)
+[authentication](categories.md#authentication-properties)
 
 **Type**: string
 
