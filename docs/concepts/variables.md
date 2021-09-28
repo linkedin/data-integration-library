@@ -134,4 +134,4 @@ For S3 protocol, variables are used for substitution in the following properties
 - [ms.derived.fields](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.derived.fields.md)  
 - [ms.extractor.target.file.name](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extractor.target.file.name.md)
 
-[Back to Summary](summary.md)
+[Back to Summary](summary.md#variables)
