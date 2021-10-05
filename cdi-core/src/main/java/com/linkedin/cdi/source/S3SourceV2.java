@@ -13,12 +13,12 @@ import com.linkedin.cdi.connection.S3Connection;
 import com.linkedin.cdi.extractor.MultistageExtractor;
 import com.linkedin.cdi.keys.S3Keys;
 import com.linkedin.cdi.util.EndecoUtils;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.HttpUrl;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.gobblin.configuration.State;
@@ -43,8 +43,16 @@ public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
   protected void initialize(State state) {
     super.initialize(state);
     s3SourceV2Keys.logUsage(state);
-    HttpUrl url = HttpUrl.parse(MultistageProperties.MSTAGE_SOURCE_URI.getValidNonblankWithDefault(state));
-    if (url == null || url.host().isEmpty()) {
+
+    URL url = null;
+    try {
+      String sourceUri = MultistageProperties.MSTAGE_SOURCE_URI.getValidNonblankWithDefault(state);
+      url = new URL(sourceUri.replaceAll("(s3|S3)://", "https://"));
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+    if (url == null || url.getHost().isEmpty()) {
       throw new RuntimeException("Incorrect configuration in " +
           MultistageProperties.MSTAGE_SOURCE_URI.toString());
     }
@@ -73,14 +81,11 @@ public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
     }
 
     // separate the endpoint, which should be a URL without bucket name, from the domain name
-    s3SourceV2Keys.setEndpoint("https://" + getEndpointFromHost(url.host()));
-
-    // URL path might have variables, by default HttpUrl will encode '{' and '}'
-    // Here we decode those back to their plain form
-    s3SourceV2Keys.setPrefix(EndecoUtils.decode(url.encodedPath().substring(1)));
+    s3SourceV2Keys.setEndpoint("https://" + getEndpointFromHost(url.getHost()));
+    s3SourceV2Keys.setPrefix(url.getPath().substring(1));
 
     // separate the bucket name from URI domain name
-    s3SourceV2Keys.setBucket(url.host().split("\\.")[0]);
+    s3SourceV2Keys.setBucket(url.getHost().split("\\.")[0]);
 
     s3SourceV2Keys.setFilesPattern(MultistageProperties.MSTAGE_SOURCE_FILES_PATTERN.getProp(state));
     s3SourceV2Keys.setMaxKeys(MultistageProperties.MSTAGE_S3_LIST_MAX_KEYS.getValidNonblankWithDefault(state));

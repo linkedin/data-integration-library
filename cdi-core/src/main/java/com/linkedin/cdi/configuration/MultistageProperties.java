@@ -42,7 +42,7 @@ import org.apache.gobblin.configuration.State;
 @SuppressWarnings("unchecked")
 public enum MultistageProperties {
   /**
-   * Abstinent Period is designed to avoid re-extract a dataset repeatedly. This is particular useful
+   * Abstinent Period is designed to avoid re-extracting a dataset repeatedly. This is particularly useful
    * for situations like downloading files in large quantity.
    *
    * Assuming we will control all data extraction through a time range, including file downloads. Further
@@ -300,12 +300,6 @@ public enum MultistageProperties {
     @Override
     public <T> T getDefaultValue() {
       return (T) Boolean.TRUE;
-    }
-  },
-  MSTAGE_ENCODING("ms.encoding", String.class) {
-    @Override
-    public <T> T getDefaultValue() {
-      return (T) "UTF-8";
     }
   },
   /**
@@ -655,15 +649,6 @@ public enum MultistageProperties {
    */
   MSTAGE_SOURCE_SCHEMA_URN("ms.source.schema.urn", String.class),
   /**
-   * Define a factory parameter to decouple proprietary code from OpenSource code
-   */
-  MSTAGE_SOURCE_SCHEMA_READER_FACTORY("ms.source.schema.reader.factory", String.class) {
-    @Override
-    public <T> T getDefaultValue() {
-      return (T) "com.linkedin.cdi.factory.reader.MetastoreReader";
-    }
-  },
-  /**
    * ms.source.uri defines a data source identifier, it follows the URI format
    * here: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
    *
@@ -695,12 +680,6 @@ public enum MultistageProperties {
    */
   MSTAGE_TARGET_SCHEMA("ms.target.schema", JsonArray.class),
   MSTAGE_TARGET_SCHEMA_URN("ms.target.schema.urn", String.class),
-  MSTAGE_TARGET_SCHEMA_READER_FACTORY("ms.target.schema.reader.factory", String.class) {
-    @Override
-    public <T> T getDefaultValue() {
-      return (T) "com.linkedin.cdi.factory.reader.MetastoreReader";
-    }
-  },
   /**
    * Total count field is a Json path. This attribute can be used in many
    * types of connectors, typically with Json Extractor

@@ -14,7 +14,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import okhttp3.HttpUrl;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.http.client.methods.HttpDelete;
@@ -38,7 +37,7 @@ import static org.powermock.api.mockito.PowerMockito.*;
  */
 
 @Test
-@PrepareForTest({HttpUrl.class, VariableUtils.class})
+@PrepareForTest({VariableUtils.class})
 public class HttpRequestMethodTest extends PowerMockTestCase {
 
   final static String FROM_DATETIME = "2017-01-02T00:00:00-0800";
@@ -154,17 +153,6 @@ public class HttpRequestMethodTest extends PowerMockTestCase {
     when(VariableUtils.replaceWithTracking(uri, parameters, true)).thenReturn(new ImmutablePair<>(uri, parameters));
     when(VariableUtils.replaceWithTracking(headers.get(CONTENT_TYPE), parameters)).thenReturn(new ImmutablePair<>(CONTENT_TYPE, parameters));
     Assert.assertEquals(HttpRequestMethod.POST.getHttpRequest(String.format(BASE_URI, VERSION_2), parameters, headers).toString(), expected);
-  }
-
-  /**
-   * Test appendParameters with null uri
-   * Expected: null
-   */
-  @Test
-  public void testAppendParametersWithNullUri() {
-    PowerMockito.mockStatic(HttpUrl.class);
-    when(HttpUrl.parse(null)).thenReturn(null);
-    Assert.assertEquals(HttpRequestMethod.PUT.appendParameters(null, null), null);
   }
 
   private void addContentType() {

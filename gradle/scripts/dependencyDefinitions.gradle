@@ -180,7 +180,5 @@ ext.externalDependency = [
     "gobblin-runtime": "org.apache.gobblin:gobblin-runtime:" + gobblinVersion,
     "gobblin-sql": "org.apache.gobblin:gobblin-sql:" + gobblinVersion,
     "gobblin-utility": "org.apache.gobblin:gobblin-utility:" + gobblinVersion,
-
-    "okhttp": "com.squareup.okhttp3:okhttp:4.8.0",
     "commonsValidator": "commons-validator:commons-validator:1.6"
 ]

@@ -7,18 +7,25 @@ package com.linkedin.cdi.util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.HttpUrl;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicNameValuePair;
 
 
 /**
@@ -79,8 +86,7 @@ public enum HttpRequestMethod {
     protected HttpUriRequest getHttpRequestContentUrlEncoded(String uriTemplate, JsonObject parameters)
         throws UnsupportedEncodingException {
       Pair<String, JsonObject> replaced = replaceVariables(uriTemplate, parameters);
-      String urlEncoded = jsonToUrlEncoded(replaced.getValue());
-      return setEntity(new HttpPost(replaced.getKey()), urlEncoded);
+      return setEntity(new HttpPost(replaced.getKey()), jsonToUrlEncodedEntity(replaced.getValue()));
     }
   },
 
@@ -100,7 +106,7 @@ public enum HttpRequestMethod {
     protected HttpUriRequest getHttpRequestContentUrlEncoded(String uriTemplate, JsonObject parameters)
         throws UnsupportedEncodingException {
       Pair<String, JsonObject> replaced = replaceVariables(uriTemplate, parameters);
-      return setEntity(new HttpPut(replaced.getKey()), jsonToUrlEncoded(replaced.getValue()));
+      return setEntity(new HttpPut(replaced.getKey()), jsonToUrlEncodedEntity(replaced.getValue()));
     }
   },
 
@@ -216,20 +222,19 @@ public enum HttpRequestMethod {
   }
 
   protected String appendParameters(String uri, JsonObject parameters) {
-    HttpUrl url = HttpUrl.parse(uri);
-    if (url != null) {
-      HttpUrl.Builder builder = url.newBuilder();
+    try {
+      URIBuilder builder = new URIBuilder(new URI(uri));
       for (Map.Entry<String, JsonElement> entry : parameters.entrySet()) {
-        String key = entry.getKey();
-        builder.addQueryParameter(key, parameters.get(key).getAsString());
+        builder.addParameter(entry.getKey(), entry.getValue().getAsString());
       }
-      url = builder.build();
+      return builder.build().toString();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
-    return url != null ? url.toString() : uri;
   }
 
   /**
-   * Convert Json formatted parameter set to Url Encoded format as requested by
+   * Convert Json formatted parameter set to Url Encoded Entity as requested by
    * Content-Type: application/x-www-form-urlencoded
    * Json Example:
    *    {"param1": "value1", "param2": "value2"}
@@ -238,20 +243,27 @@ public enum HttpRequestMethod {
    *   param1=value1&param2=value2
    *
    * @param parameters Json structured parameters
-   * @return URL encoded parameters
+   * @return URL encoded entity
    */
-  protected String jsonToUrlEncoded(JsonObject parameters) {
-    HttpUrl.Builder builder = new HttpUrl.Builder().scheme("https").host("www.dummy.com");
-    for (Map.Entry<String, JsonElement> entry : parameters.entrySet()) {
-      String key = entry.getKey();
-      builder.addQueryParameter(key, parameters.get(key).getAsString());
+  protected UrlEncodedFormEntity jsonToUrlEncodedEntity(JsonObject parameters) {
+    try {
+      List<NameValuePair> nameValuePairs = new ArrayList<>();
+      for (Map.Entry<String, JsonElement> entry : parameters.entrySet()) {
+        nameValuePairs.add(new BasicNameValuePair(entry.getKey(),entry.getValue().getAsString()));
+      }
+      return new UrlEncodedFormEntity(nameValuePairs, StandardCharsets.UTF_8);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
-    return builder.build().encodedQuery();
   }
 
   protected HttpUriRequest setEntity(HttpEntityEnclosingRequestBase requestBase, String stringEntity)
       throws UnsupportedEncodingException {
-    requestBase.setEntity(new StringEntity(stringEntity));
+    return setEntity(requestBase, new StringEntity(stringEntity));
+  }
+
+  protected HttpUriRequest setEntity(HttpEntityEnclosingRequestBase requestBase, StringEntity stringEntity) {
+    requestBase.setEntity(stringEntity);
     return requestBase;
   }
 }
