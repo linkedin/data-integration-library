@@ -1,7 +1,7 @@
 # ms.data.explicit.eof
 
 **Tags**: 
-[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
+[conversion](categories.md#conversion-properties)
 
 **Type**: boolean
 
@@ -30,5 +30,5 @@ that it can flush out the last batch of records.
 ### Example
 
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msdataexpliciteof)
+[back to summary](summary.md#msdataexpliciteof)
 

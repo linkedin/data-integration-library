@@ -1,8 +1,8 @@
 # ms.normalizer.batch.size
 
 **Tags**: 
-[schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#schema-properties),
-[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
+[schema](categories.md#schema-properties),
+[conversion](categories.md#conversion-properties)
 
 **Type**: integer
 
@@ -10,9 +10,9 @@
 
 **Related**:
 
-- [job property: ms.target.schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.target.schema.md)
-- [job property: ms.target.schema.urn](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.target.schema.urn.md)
-- [job property: ms.source.schema.urn](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.schema.urn.md)
+- [job property: ms.target.schema](ms.target.schema.md)
+- [job property: ms.target.schema.urn](ms.target.schema.urn.md)
+- [job property: ms.source.schema.urn](ms.source.schema.urn.md)
 
 ## Description
 
@@ -59,4 +59,4 @@ The output data could be like
 - {"survey": "A", "responses": {"q1":"...", "q2":"...", "q3":"...", ...}}
 - {"survey": "B", "responses": {"qa":"...", "qb":"...", "qc":"...", ...}}
  
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msnormalizerbatchsize)
+[back to summary](summary.md#msnormalizerbatchsize)

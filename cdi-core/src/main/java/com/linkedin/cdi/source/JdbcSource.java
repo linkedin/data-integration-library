@@ -12,23 +12,38 @@ import com.linkedin.cdi.util.CsvUtils;
 import java.sql.Connection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.source.extractor.Extractor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /***
  * JdbcSource handles JDBC protocol
  *
  */
-
-@Slf4j
 public class JdbcSource extends MultistageSource<Schema, GenericRecord> {
-  @Setter
+  private static final Logger LOG = LoggerFactory.getLogger(JdbcSource.class);
+
+  public ConcurrentMap<MultistageExtractor, Connection> getMemberConnections() {
+    return memberConnections;
+  }
+
+  public void setMemberConnections(ConcurrentMap<MultistageExtractor, Connection> memberConnections) {
+    this.memberConnections = memberConnections;
+  }
+
+  public JdbcKeys getJdbcSourceKeys() {
+    return jdbcSourceKeys;
+  }
+
+  public void setJdbcSourceKeys(JdbcKeys jdbcSourceKeys) {
+    this.jdbcSourceKeys = jdbcSourceKeys;
+  }
+
   private ConcurrentMap<MultistageExtractor, Connection> memberConnections = new ConcurrentHashMap<>();
   private JdbcKeys jdbcSourceKeys = null;
 

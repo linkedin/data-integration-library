@@ -1,7 +1,7 @@
 # ms.extractor.class
 
 **Tags**: 
-[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
+[conversion](categories.md#conversion-properties)
 
 **Type**: string
 
@@ -29,4 +29,4 @@ going through converters and writers. In this case, the incoming data can be any
 
 `ms.extractor.class=com.linkedin.cdi.extractor.AvroExtractor`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msextractorclass)
+[back to summary](summary.md#msextractorclass)

@@ -6,16 +6,14 @@ package com.linkedin.cdi.keys;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.configuration.MultistageProperties;
+import com.linkedin.cdi.util.HttpRequestMethod;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.util.HttpRequestMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -23,10 +21,8 @@ import com.linkedin.cdi.util.HttpRequestMethod;
  *
  * @author chrli
  */
-@Slf4j
-@Getter (AccessLevel.PUBLIC)
-@Setter(AccessLevel.PUBLIC)
 public class HttpKeys extends JobKeys {
+  private static final Logger LOG = LoggerFactory.getLogger(HttpKeys.class);
   final private static List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
       MultistageProperties.SOURCE_CONN_USERNAME,
       MultistageProperties.SOURCE_CONN_PASSWORD,
@@ -46,19 +42,75 @@ public class HttpKeys extends JobKeys {
   @Override
   public void logDebugAll() {
     super.logDebugAll();
-    log.debug("These are values in HttpSource");
-    log.debug("Http Request Headers: {}", httpRequestHeaders);
-    //log.debug("Http Request Headers with Authentication: {}", httpRequestHeadersWithAuthentication.toString());
-    log.debug("Http Request Method: {}", httpRequestMethod);
-    log.debug("Http Statuses: {}", httpStatuses);
-    log.debug("Initial values of dynamic parameters: {}", initialParameters);
+    LOG.debug("These are values in HttpSource");
+    LOG.debug("Http Request Headers: {}", httpRequestHeaders);
+    //LOG.debug("Http Request Headers with Authentication: {}", httpRequestHeadersWithAuthentication.toString());
+    LOG.debug("Http Request Method: {}", httpRequestMethod);
+    LOG.debug("Http Statuses: {}", httpStatuses);
+    LOG.debug("Initial values of dynamic parameters: {}", initialParameters);
   }
 
   @Override
   public void logUsage(State state) {
     super.logUsage(state);
     for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      log.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
+      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
     }
+  }
+
+  public JsonObject getAuthentication() {
+    return authentication;
+  }
+
+  public void setAuthentication(JsonObject authentication) {
+    this.authentication = authentication;
+  }
+
+  public JsonObject getHttpRequestHeaders() {
+    return httpRequestHeaders;
+  }
+
+  public void setHttpRequestHeaders(JsonObject httpRequestHeaders) {
+    this.httpRequestHeaders = httpRequestHeaders;
+  }
+
+  public Map<String, String> getHttpRequestHeadersWithAuthentication() {
+    return httpRequestHeadersWithAuthentication;
+  }
+
+  public void setHttpRequestHeadersWithAuthentication(Map<String, String> httpRequestHeadersWithAuthentication) {
+    this.httpRequestHeadersWithAuthentication = httpRequestHeadersWithAuthentication;
+  }
+
+  public String getHttpRequestMethod() {
+    return httpRequestMethod;
+  }
+
+  public void setHttpRequestMethod(String httpRequestMethod) {
+    this.httpRequestMethod = httpRequestMethod;
+  }
+
+  public JsonObject getInitialParameters() {
+    return initialParameters;
+  }
+
+  public void setInitialParameters(JsonObject initialParameters) {
+    this.initialParameters = initialParameters;
+  }
+
+  public Map<String, List<Integer>> getHttpStatuses() {
+    return httpStatuses;
+  }
+
+  public void setHttpStatuses(Map<String, List<Integer>> httpStatuses) {
+    this.httpStatuses = httpStatuses;
+  }
+
+  public Map<String, List<String>> getHttpStatusReasons() {
+    return httpStatusReasons;
+  }
+
+  public void setHttpStatusReasons(Map<String, List<String>> httpStatusReasons) {
+    this.httpStatusReasons = httpStatusReasons;
   }
 }

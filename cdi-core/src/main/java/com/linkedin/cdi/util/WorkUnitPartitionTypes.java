@@ -6,15 +6,16 @@ package com.linkedin.cdi.util;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.configuration.MultistageProperties;
 import java.util.Comparator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
@@ -40,7 +41,6 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
  * @author chrli
  *
  */
-@Slf4j
 public enum WorkUnitPartitionTypes {
   NONE("none", 0) {
     @Override
@@ -113,6 +113,7 @@ public enum WorkUnitPartitionTypes {
     }
   };
 
+  private static final Logger LOG = LoggerFactory.getLogger(WorkUnitPartitionTypes.class);
   final private String partitionType;
   final protected Integer interval;
   final private Boolean isMultiDayPartitioned;
@@ -153,7 +154,7 @@ public enum WorkUnitPartitionTypes {
         return WorkUnitPartitionTypes.COMPOSITE;
       }
     } catch (Exception e) {
-      log.error("Error parsing the partition type string, please check job property: "
+      LOG.error("Error parsing the partition type string, please check job property: "
           + MultistageProperties.MSTAGE_WORK_UNIT_PARTITION.toString(), e);
     }
     return null;

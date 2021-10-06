@@ -7,6 +7,8 @@ package com.linkedin.cdi.converter;
 import com.google.common.base.Optional;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.linkedin.cdi.configuration.MultistageProperties;
+import com.linkedin.cdi.util.AvroSchemaUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,9 +20,6 @@ import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.converter.Converter;
 import org.apache.gobblin.converter.SchemaConversionException;
 import org.apache.gobblin.converter.SingleRecordIterable;
-import org.apache.gobblin.converter.avro.UnsupportedDateTypeException;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.util.AvroSchemaUtils;
 import org.apache.gobblin.util.AvroUtils;
 import org.apache.gobblin.util.EmptyIterable;
 
@@ -92,11 +91,7 @@ public class AvroNormalizerConverter extends Converter<Schema, Schema, GenericRe
       buildIntermediateSchemas(schema);
     }
 
-    try {
-      finalSchema = AvroSchemaUtils.fromJsonSchema(targetSchema, workUnitState);
-    } catch (UnsupportedDateTypeException e) {
-      throw new SchemaConversionException(e);
-    }
+    finalSchema = AvroSchemaUtils.fromJsonSchema(targetSchema, workUnitState);
     return finalSchema;
   }
 

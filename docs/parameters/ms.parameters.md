@@ -1,8 +1,8 @@
 # ms.parameters
 
 **Tags**: 
-[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties)
-[authentication](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/authentication-properties.md)
+[source](categories.md#source-properties)
+[authentication](categories.md#authentication-properties)
 
 **Type**: string
 
@@ -11,52 +11,82 @@
 **Default value**: "[]" (a blank JsonArray)
 
 ## Related 
-- [concept: variables](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variables.md)
-- [concept: watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/watermark.md)
-- [concept: pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md)
-- [job property: ms.session.key.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.session.key.field.md)
-- [job property: ms.watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.watermark.md)
-- [job property: ms.pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.pagination.md)
+- [key concept: variables](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variables.md)
+- [key concept: watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/watermark.md)
+- [key concept: pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md)
+- [job property: ms.session.key.field](ms.session.key.field.md)
+- [job property: ms.watermark](ms.watermark.md)
+- [job property: ms.pagination](ms.pagination.md)
 
 ## Description 
 
-ms.parameter defines a list of named [variables](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variables.md) 
-that can be referenced in other configuration properties using the syntax of double brackets {{variableName}}.
+ms.parameter defines a list of **named parameters**,
+which are also [**variables**](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variables.md) 
+that can be referenced in other configuration properties 
+using the syntax of double brackets **{{variableName}}**.
 
-Defined variables can have either static values or dynamically derived values using a formula. 
+Parameters are special variables that are used to execute requests (Http request, JDBC request, and Sftp request, etc).
+Other variables are just kept internally, they are not used to execute requests.
 
-Defined variables can recursively use other defined variables in definition, but the recursion level shall not be more than 1.   
+Parameters can have either static values or dynamically derived 
+values using a formula. 
 
-Variables will have values in string format. Presently other formats, like integer, are not considered, instead, integer values
+Parameters can recursively use other defined variables in definition, 
+but the recursion level shall not be more than 1.   
+
+Parameters will have values in string format. Presently other formats, 
+like integer, are not considered, instead, integer values
 will be carried as strings. 
 
-The following types of variables are designed: 
+### Types of Parameters
+
+The following types of parameters are designed: 
 
 - **list**: list is the default type, which means a primitive string.
 
-- **object**: a `object` variable contains recursively defined variables.
+- **object**: a `object` parameter contains recursively defined parameters.
 
-- **watermark**, a `watermark` variable derives its value from [watermarks](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/watermark.md). 
-Because watermarks are work unit specific, so variables defined as `watermark` type 
-would have different values for each work unit.
+- **watermark**, a `watermark` parameter derives its value from [watermarks](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/watermark.md). 
+Because watermarks are work unit specific, so parameters defined as `watermark` type 
+would have different values for each work unit. When define a parameter off a 
+time watermark, the value can be "low" or "high", which means using 
+low watermark or high watermark values, and the format can be "**datetime**", 
+"**epoc-second**", or **unspecified**. If format is not specified, it will be 
+**epoch millisecond**. That's the default format. When the format is "**datetime**", 
+a pattern can specified for the output. The pattern is normally ISO 
+Java date time string. Timezone is supported. Milli-seconds are supported. 
+Micro-seconds are not supported, but you can format the milli-second 
+in 6 digits, i.e., the last 3 digits will be just 0s.
  
-- **session**, a `session` variable derives its value from the [session control](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/session-control.md) variable.
+- **session**, a `session` parameter derives its value from the 
+[session control](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/session-control.md) variable.
 
-- **pagestart**, a `pagestart` variable derives its value from the starting row number of next page during the pagination process. 
-The page-start variable can be named differently in each application. Examples are "offset", "start", "from" etc.
+- **pagestart**, a `pagestart` parameter derives its value from the starting row 
+number of next page during the pagination process. 
+The page-start parameter can be named differently in each application. 
+Examples are "offset", "start", "from" etc.
  
-- **pagesize**, a `pagesize` variable derives its value from the given pagination size during the pagination process. 
-The page-size variable can be named differently in each application. Examples are "limit", "size" etc.
+- **pagesize**, a `pagesize` parameter derives its value from the given 
+pagination size during the pagination process. 
+The page-size parameter can be named differently in each application. 
+Examples are "limit", "size" etc.
 
-- **pageno**, a `pageno` variable derives its value from the page number of next page during the pagination process.
+- **pageno**, a `pageno` parameter derives its value from the page number of 
+next page during the pagination process.
 The page-no variable can be named differently in each application. Examples are "next", "page_number" etc.
 
-- **jsonarray**, a `jsonarray` variable defines are raw JsonArray. A JsonArray variable can take a very complex 
-JsonArray object, and it doesn't require
+- **jsonarray**, a `jsonarray` parameter defines are raw JsonArray. A JsonArray
+parameter can take a very complex JsonArray object, and it doesn't require
 each element be recursively defined, like what `object` type variables do. 
+For example: `ms.parameters=[{'name':'groupBys','type':'jsonarray','value':[{'heading':'CASE_ID','dimensionName':'CASE_ID','groupType':'FIELD','details':{}}, {'heading':'CASE','dimensionName':'CASE','groupType':'FIELD','details':{}}]`
 
-- **jsonobject**, a `jsonobject` variable defines are raw JsonObject. A JsonObject variable can take a very complex JsonObject object, 
-and it doesn't require  each element be recursively defined, like what `object` type variables do. 
+- **jsonobject**, a `jsonobject` parameter defines are raw JsonObject. 
+A JsonObject parameter can take a very complex JsonObject object, 
+and it doesn't require  each element be recursively defined, 
+like what `object` type parameter does. For example:  
+`ms.parameters=[{"name":"token","type":"JSONOBJECT", "value": {"client_id": "999999", "scopes": ["read", "write"]}}]`  
+**Note** the value of "value" element is not quoted, otherwise, it will be 
+treated as a primitive string.
   
 ### Sending Dynamic Requests
   
@@ -68,7 +98,7 @@ for JDBC and S3._
 For HTTP requests, variables will be used to form the final URI. In such case, the variable can be 
 used in the URI path segments or as URI parameter.
 
-- When used in URI path, the variable name need to be specified in [URI template](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.uri.md) 
+- When used in URI path, the variable name need to be specified in [URI template](ms.source.uri.md) 
 as a variable contained in {{}}.
 
 - When used as URI parameters, the variable name can be specified in URI template. If not used in the URI template, 
@@ -138,4 +168,4 @@ https://api.zoom.us/v2/metrics/webinars?type=past&from={{fromDate}}&to={{toDate}
 
 In execution time, each day range will be processed by a work unit.
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msparameters)
+[back to summary](summary.md#msparameters)

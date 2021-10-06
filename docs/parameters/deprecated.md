@@ -11,13 +11,15 @@ and some are replaced by new parameters.
 its prefix matches another effective parameter ms.watermark. Azkaban projects that still 
 have this job property will have no harm. 
 
-## ms.http.client.factory
-
-`ms.http.client.factory `and other client factories are replaced 
-by [ms.connection.client.factory](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.connection.client.factory.md)
-
-ms.http.status.reasons
-
 ## ms.encoding
 
-`ms.encoding` is replaced by [ms.source.data.character.set](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.data.character.set.md).
+`ms.encoding` is replaced by [ms.source.data.character.set](ms.source.data.character.set.md).
+
+## Factories
+
+- ms.http.client.factory
+- ms.source.schema.reader.factory
+- ms.target.schema.reader.factory
+
+Above factories are replaced by [ms.connection.client.factory](ms.connection.client.factory.md)
+

@@ -1,8 +1,8 @@
 # ms.source.uri
 
 **Tags**: 
-[connection](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#connection-properties),
-[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties)
+[connection](categories.md#connection-properties),
+[source](categories.md#source-properties)
 
 **Type**: string
 
@@ -39,4 +39,4 @@ ms.source.uri=https://oauth2.googleapis.com/token
 ms.source.uri=https://bucket-name.s3.amazonaws.com/{{s3key}}
 `
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mssourceuri)
+[back to summary](summary.md#mssourceuri)

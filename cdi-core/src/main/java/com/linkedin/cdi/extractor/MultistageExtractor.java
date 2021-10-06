@@ -9,27 +9,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.annotation.Nullable;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.validator.routines.LongValidator;
-import org.apache.gobblin.configuration.ConfigurationKeys;
-import org.apache.gobblin.configuration.State;
-import org.apache.gobblin.configuration.WorkUnitState;
 import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.connection.MultistageConnection;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
@@ -49,6 +28,23 @@ import com.linkedin.cdi.util.ParameterTypes;
 import com.linkedin.cdi.util.SchemaBuilder;
 import com.linkedin.cdi.util.VariableUtils;
 import com.linkedin.cdi.util.WorkUnitStatus;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.annotation.Nullable;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.validator.routines.LongValidator;
+import org.apache.gobblin.configuration.ConfigurationKeys;
+import org.apache.gobblin.configuration.State;
+import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.source.extractor.Extractor;
 import org.apache.gobblin.source.extractor.extract.LongWatermark;
 import org.joda.time.DateTime;
@@ -56,6 +52,8 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
@@ -70,8 +68,8 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
  * @param <S> The schema class
  * @param <D> The data class
  */
-@Slf4j
 public class MultistageExtractor<S, D> implements Extractor<S, D> {
+  private static final Logger LOG = LoggerFactory.getLogger(MultistageExtractor.class);
   protected final static String CURRENT_DATE = "currentdate";
   protected final static String PXD = "P\\d+D";
   protected final static String CONTENT_TYPE_KEY = "Content-Type";
@@ -80,29 +78,98 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   protected static final String COMMA_STR = ",";
   protected final static String DEFAULT_TIMEZONE = "America/Los_Angeles";
 
-  @Setter
   protected String timezone = "";
-  @Getter(AccessLevel.PUBLIC)
-  @Setter(AccessLevel.PACKAGE)
   protected WorkUnitStatus workUnitStatus = WorkUnitStatus.builder().build();
-
-  @Getter(AccessLevel.PUBLIC)
   protected WorkUnitState state = null;
   protected MultistageSchemaBasedFilter<?> rowFilter = null;
   protected Boolean eof = false;
   // subclass might override this to decide whether to do record
   // level pagination
   protected Iterator<JsonElement> payloadIterator = null;
-  @Getter
   ExtractorKeys extractorKeys = new ExtractorKeys();
-  @Getter
   JsonObject currentParameters = null;
-  @Getter
-  @Setter
   MultistageConnection connection = null;
-  @Getter
-  @Setter
   JobKeys jobKeys;
+
+  public String getTimezone() {
+    return timezone;
+  }
+
+  public void setTimezone(String timezone) {
+    this.timezone = timezone;
+  }
+
+  public WorkUnitStatus getWorkUnitStatus() {
+    return workUnitStatus;
+  }
+
+  public void setWorkUnitStatus(WorkUnitStatus workUnitStatus) {
+    this.workUnitStatus = workUnitStatus;
+  }
+
+  public WorkUnitState getState() {
+    return state;
+  }
+
+  public void setState(WorkUnitState state) {
+    this.state = state;
+  }
+
+  public MultistageSchemaBasedFilter<?> getRowFilter() {
+    return rowFilter;
+  }
+
+  public void setRowFilter(MultistageSchemaBasedFilter<?> rowFilter) {
+    this.rowFilter = rowFilter;
+  }
+
+  public Boolean getEof() {
+    return eof;
+  }
+
+  public void setEof(Boolean eof) {
+    this.eof = eof;
+  }
+
+  public Iterator<JsonElement> getPayloadIterator() {
+    return payloadIterator;
+  }
+
+  public void setPayloadIterator(Iterator<JsonElement> payloadIterator) {
+    this.payloadIterator = payloadIterator;
+  }
+
+  public ExtractorKeys getExtractorKeys() {
+    return extractorKeys;
+  }
+
+  public void setExtractorKeys(ExtractorKeys extractorKeys) {
+    this.extractorKeys = extractorKeys;
+  }
+
+  public JsonObject getCurrentParameters() {
+    return currentParameters;
+  }
+
+  public void setCurrentParameters(JsonObject currentParameters) {
+    this.currentParameters = currentParameters;
+  }
+
+  public MultistageConnection getConnection() {
+    return connection;
+  }
+
+  public void setConnection(MultistageConnection connection) {
+    this.connection = connection;
+  }
+
+  public JobKeys getJobKeys() {
+    return jobKeys;
+  }
+
+  public void setJobKeys(JobKeys jobKeys) {
+    this.jobKeys = jobKeys;
+  }
 
   public MultistageExtractor(WorkUnitState state, JobKeys jobKeys) {
     this.state = state;
@@ -140,7 +207,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   @Override
   public D readRecord(D reuse) {
     if (extractorKeys.getProcessedCount() % (100 * 1000) == 0) {
-      log.debug(String.format(MSG_ROWS_PROCESSED,
+      LOG.debug(String.format(MSG_ROWS_PROCESSED,
           extractorKeys.getProcessedCount(),
           extractorKeys.getSignature()));
     }
@@ -149,7 +216,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
 
   @Override
   public void close() {
-    log.info("Closing the work unit: {}", this.extractorKeys.getSignature());
+    LOG.info("Closing the work unit: {}", this.extractorKeys.getSignature());
 
     if (extractorKeys.getProcessedCount() < jobKeys.getMinWorkUnitRecords()) {
       throw new RuntimeException(String.format(EXCEPTION_RECORD_MINIMUM,
@@ -257,10 +324,10 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
       if (this.jobKeys.hasSourceSchema()) {
         schemaArray = this.jobKeys.getSourceSchema();
         schemaArray = JsonUtils.deepCopy(schemaArray).getAsJsonArray();
-        log.info("Source provided schema: {}", schemaArray.toString());
+        LOG.info("Source provided schema: {}", schemaArray.toString());
       } else if (extractorKeys.getInferredSchema() != null) {
         schemaArray = JsonUtils.deepCopy(extractorKeys.getInferredSchema()).getAsJsonArray();
-        log.info("Inferred schema: {}", schemaArray.toString());
+        LOG.info("Inferred schema: {}", schemaArray.toString());
       }
     }
 
@@ -294,7 +361,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
         try {
           Thread.sleep(100L);
         } catch (Exception e) {
-          log.warn(e.getMessage());
+          LOG.warn(e.getMessage());
         }
       }
     }
@@ -346,7 +413,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
               (StreamProcessor<?>) clazz.getConstructor(JsonObject.class).newInstance(preprocessorParams);
           builder.add(instance);
         } catch (Exception e) {
-          log.error("Error creating preprocessor: {}, Exception: {}", p, e.getMessage());
+          LOG.error("Error creating preprocessor: {}, Exception: {}", p, e.getMessage());
         }
       }
     }
@@ -359,7 +426,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
    */
   protected void failWorkUnit(String error) {
     if (!StringUtils.isEmpty(error)) {
-      log.error(error);
+      LOG.error(error);
     }
     this.state.setWorkingState(WorkUnitState.WorkingState.FAILED);
   }
@@ -469,13 +536,13 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
         if (matcher.find()) {
           strValue = matcher.group(1);
         } else {
-          log.error("Regular expression finds no match!");
+          LOG.error("Regular expression finds no match!");
           strValue = "no match";
         }
         break;
       case "boolean":
         if (StringUtils.isEmpty(strValue)) {
-          log.error("Input value of a boolean derived field should not be empty!");
+          LOG.error("Input value of a boolean derived field should not be empty!");
         }
         break;
       default:
@@ -496,14 +563,14 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
    * then an exception should be logged in debug mode, and an empty string returned.
    */
   protected String extractText(InputStream input) {
-    log.debug("Parsing response InputStream as Text");
+    LOG.debug("Parsing response InputStream as Text");
     String data = "";
     if (input != null) {
       try {
         data = InputStreamUtils.extractText(input,
             MultistageProperties.MSTAGE_SOURCE_DATA_CHARACTER_SET.getValidNonblankWithDefault(state));
       } catch (Exception e) {
-        log.debug(e.toString());
+        LOG.debug(e.toString());
       }
     }
     return data;
@@ -522,8 +589,8 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
     if (wuStatus.getMessages() != null && wuStatus.getMessages().containsKey("contentType")) {
       String contentType = wuStatus.getMessages().get("contentType");
       if (!contentType.equalsIgnoreCase(expectedContentType)) {
-        log.info("Content is {}, expecting {}", contentType, expectedContentType);
-        log.debug(extractText(wuStatus.getBuffer()));
+        LOG.info("Content is {}, expecting {}", contentType, expectedContentType);
+        LOG.debug(extractText(wuStatus.getBuffer()));
         return false;
       }
     }
@@ -534,8 +601,8 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
     if (wuStatus.getMessages() != null && wuStatus.getMessages().containsKey("contentType")) {
       String contentType = wuStatus.getMessages().get("contentType");
       if (!expectedContentType.contains(contentType.toLowerCase())) {
-        log.info("Content is {}, expecting {}", contentType, expectedContentType.toString());
-        log.debug(extractText(wuStatus.getBuffer()));
+        LOG.info("Content is {}, expecting {}", contentType, expectedContentType.toString());
+        LOG.debug(extractText(wuStatus.getBuffer()));
         return false;
       }
     }
@@ -609,14 +676,14 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
     // Fail if the session failCondition is met
     if (isSessionStateFailed()) {
       String message = String.format("Session fail condition is met: %s", jobKeys.getSessionStateFailCondition());
-      log.warn(message);
+      LOG.warn(message);
       throw new RuntimeException(message);
     }
 
     // if stop condition is present but the condition has not been met, we
     // will check if the session should time out
     if (DateTime.now().getMillis() > extractorKeys.getStartTime() + jobKeys.getSessionTimeout()) {
-      log.warn("Session time out after {} seconds", jobKeys.getSessionTimeout() / 1000);
+      LOG.warn("Session time out after {} seconds", jobKeys.getSessionTimeout() / 1000);
       throw new RuntimeException("Session timed out before ending condition is met");
     }
 
@@ -785,9 +852,9 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
         }
       }
     } catch (Exception e) {
-      log.error("Encoding error is not expected, but : {}", e.getMessage());
+      LOG.error("Encoding error is not expected, but : {}", e.getMessage());
     }
-    log.debug("Final parameters: {}", finalParameter.toString());
+    LOG.debug("Final parameters: {}", finalParameter.toString());
     return finalParameter;
   }
 
@@ -876,10 +943,10 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   }
 
   protected void logUsage(State state) {
-    log.info("Checking essential (not always mandatory) parameters...");
-    log.info("Values can be default values for the specific type if the property is not configured");
+    LOG.info("Checking essential (not always mandatory) parameters...");
+    LOG.info("Values can be default values for the specific type if the property is not configured");
     for (MultistageProperties p : JobKeys.ESSENTIAL_PARAMETERS) {
-      log.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
+      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
     }
   }
 

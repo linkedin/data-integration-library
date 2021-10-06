@@ -11,26 +11,24 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import com.linkedin.cdi.factory.ConnectionClientFactory;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.gobblin.configuration.State;
 import com.linkedin.cdi.configuration.MultistageProperties;
+import com.linkedin.cdi.factory.ConnectionClientFactory;
 import com.linkedin.cdi.factory.reader.SchemaReader;
 import com.linkedin.cdi.util.DateTimeUtils;
 import com.linkedin.cdi.util.HdfsReader;
 import com.linkedin.cdi.util.JsonUtils;
 import com.linkedin.cdi.util.ParameterTypes;
 import com.linkedin.cdi.util.WorkUnitPartitionTypes;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.gobblin.configuration.State;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
@@ -49,11 +47,8 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
  *
  * @author chrli
  */
-
-@Slf4j
-@Getter(AccessLevel.PUBLIC)
-@Setter(AccessLevel.PUBLIC)
 public class JobKeys {
+  private static final Logger LOG = LoggerFactory.getLogger(JobKeys.class);
   final static public Gson GSON = new Gson();
   final static public List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
       MultistageProperties.SOURCE_CLASS,
@@ -215,7 +210,7 @@ public class JobKeys {
       try {
         retValue = sessionKeyField.get("failCondition").getAsJsonObject().get("regexp").getAsString();
       } catch (Exception e) {
-        log.debug("failCondition is not defined: {}", sessionKeyField);
+        LOG.debug("failCondition is not defined: {}", sessionKeyField);
       }
     }
     return retValue;
@@ -242,8 +237,8 @@ public class JobKeys {
     if (!this.hasOutputSchema()) {
       setOutputSchema(JsonUtils.deepCopy(sourceSchema).getAsJsonArray());
     }
-    log.debug("Source Schema: {}", sourceSchema.toString());
-    log.debug("Output Schema: {}", outputSchema.toString());
+    LOG.debug("Source Schema: {}", sourceSchema.toString());
+    LOG.debug("Output Schema: {}", outputSchema.toString());
     return this;
   }
 
@@ -269,7 +264,7 @@ public class JobKeys {
      */
     if (isPaginationEnabled()) {
       if (totalCountField == null && !isSessionStateEnabled()) {
-        log.warn("Pagination is enabled, but there is no total count field or session \n"
+        LOG.warn("Pagination is enabled, but there is no total count field or session \n"
             + "control to stop it. Pagination will stop only when a blank page is returned from source. \n"
             + "Please check the configuration of essential parameters if such condition can happen.");
       }
@@ -282,7 +277,7 @@ public class JobKeys {
      */
     if (!hasOutputSchema()) {
       if (!state.getProp(MultistageProperties.MSTAGE_OUTPUT_SCHEMA.getConfig(), StringUtils.EMPTY).isEmpty()) {
-        log.error("Output schema is specified but it is an invalid or empty JsonArray");
+        LOG.error("Output schema is specified but it is an invalid or empty JsonArray");
         return false;
       }
     }
@@ -293,7 +288,7 @@ public class JobKeys {
     if (getWorkUnitPartitionType() == null) {
       String partTypeString = state.getProp(MultistageProperties.MSTAGE_WORK_UNIT_PARTITION.getConfig());
       if (!StringUtils.isBlank(partTypeString)) {
-        log.error("ms.work.unit.partition has a unaccepted value: {}", partTypeString);
+        LOG.error("ms.work.unit.partition has a unaccepted value: {}", partTypeString);
         return false;
       }
     } else if (getWorkUnitPartitionType() == WorkUnitPartitionTypes.COMPOSITE) {
@@ -304,7 +299,7 @@ public class JobKeys {
       if (WorkUnitPartitionTypes.COMPOSITE.getRanges(
           DateTime.parse("2001-01-01"),
           DateTime.now(), true).size() < 1) {
-        log.error("ms.work.unit.partition has incorrect or non-ISO-formatted date time values");
+        LOG.error("ms.work.unit.partition has incorrect or non-ISO-formatted date time values");
         return false;
       }
     }
@@ -319,24 +314,24 @@ public class JobKeys {
   }
 
   public void logDebugAll() {
-    log.debug("These are values in MultistageSource");
-    log.debug("Source Uri: {}", sourceUri);
-    log.debug("Total count field: {}", totalCountField);
-    log.debug("Pagination: fields {}, initial values {}", paginationFields.toString(), paginationInitValues.toString());
-    log.debug("Session key field definition: {}", sessionKeyField.toString());
-    log.debug("Call interval in milliseconds: {}", callInterval);
-    log.debug("Session timeout: {}", sessionTimeout);
-    log.debug("Derived fields definition: {}", derivedFields.toString());
-    log.debug("Output schema definition: {}", outputSchema.toString());
-    log.debug("Watermark definition: {}", watermarkDefinition.toString());
-    log.debug("Encrypted fields: {}", encryptionField);
-    log.debug("Retry Delay: {}", retryDelayInSec);
-    log.debug("Retry Count: {}", retryCount);
+    LOG.debug("These are values in MultistageSource");
+    LOG.debug("Source Uri: {}", sourceUri);
+    LOG.debug("Total count field: {}", totalCountField);
+    LOG.debug("Pagination: fields {}, initial values {}", paginationFields.toString(), paginationInitValues.toString());
+    LOG.debug("Session key field definition: {}", sessionKeyField.toString());
+    LOG.debug("Call interval in milliseconds: {}", callInterval);
+    LOG.debug("Session timeout: {}", sessionTimeout);
+    LOG.debug("Derived fields definition: {}", derivedFields.toString());
+    LOG.debug("Output schema definition: {}", outputSchema.toString());
+    LOG.debug("Watermark definition: {}", watermarkDefinition.toString());
+    LOG.debug("Encrypted fields: {}", encryptionField);
+    LOG.debug("Retry Delay: {}", retryDelayInSec);
+    LOG.debug("Retry Count: {}", retryCount);
   }
 
   public void logUsage(State state) {
     for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      log.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
+      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
     }
   }
 
@@ -470,7 +465,7 @@ public class JobKeys {
         partitionType.addSubRange(start, end, WorkUnitPartitionTypes.fromString(partitionTypeString));
       }
     } catch (Exception e) {
-      log.error("Error parsing composite partition string: "
+      LOG.error("Error parsing composite partition string: "
               + MultistageProperties.MSTAGE_WORK_UNIT_PARTITION.getValidNonblankWithDefault(state).toString()
               + "\n partitions may not be generated properly.",
           e);
@@ -525,19 +520,19 @@ public class JobKeys {
   }
 
   public Map<String, JsonArray> readSecondaryInputs(State state, final long retries) throws InterruptedException {
-    log.info("Trying to read secondary input with retry = {}", retries);
+    LOG.info("Trying to read secondary input with retry = {}", retries);
     Map<String, JsonArray> secondaryInputs = readContext(state);
 
     // Check if authentication is ready, and if not, whether retry is required
     JsonArray authentications = secondaryInputs.get(KEY_WORD_AUTHENTICATION);
     if ((authentications == null || authentications.size() == 0) && this.getIsSecondaryAuthenticationEnabled()
         && retries > 0) {
-      log.info("Authentication tokens are expected from secondary input, but not ready");
-      log.info("Will wait for {} seconds and then retry reading the secondary input", this.getRetryDelayInSec());
+      LOG.info("Authentication tokens are expected from secondary input, but not ready");
+      LOG.info("Will wait for {} seconds and then retry reading the secondary input", this.getRetryDelayInSec());
       TimeUnit.SECONDS.sleep(this.getRetryDelayInSec());
       return readSecondaryInputs(state, retries - 1);
     }
-    log.info("Successfully read secondary input, no more retry");
+    LOG.info("Successfully read secondary input, no more retry");
     return secondaryInputs;
   }
 
@@ -563,7 +558,7 @@ public class JobKeys {
       }
       return schemaReader.read(state, urn).getAsJsonArray();
     } catch (Exception e) {
-      log.error("Error reading schema based on urn: {}", urn);
+      LOG.error("Error reading schema based on urn: {}", urn);
       throw new RuntimeException(e);
     }
   }
@@ -613,5 +608,233 @@ public class JobKeys {
     return !hasTargetSchema() && StringUtils.isNotBlank(urn)
         ? readSchemaFromUrn(state, urn)
         : getTargetSchema();
+  }
+
+  public Map<String, Map<String, String>> getDerivedFields() {
+    return derivedFields;
+  }
+
+  public void setDerivedFields(Map<String, Map<String, String>> derivedFields) {
+    this.derivedFields = derivedFields;
+  }
+
+  public Map<String, String> getDefaultFieldTypes() {
+    return defaultFieldTypes;
+  }
+
+  public void setDefaultFieldTypes(Map<String, String> defaultFieldTypes) {
+    this.defaultFieldTypes = defaultFieldTypes;
+  }
+
+  public JsonArray getSourceSchema() {
+    return sourceSchema;
+  }
+
+  public JsonArray getOutputSchema() {
+    return outputSchema;
+  }
+
+  public void setOutputSchema(JsonArray outputSchema) {
+    this.outputSchema = outputSchema;
+  }
+
+  public JsonArray getTargetSchema() {
+    return targetSchema;
+  }
+
+  public void setTargetSchema(JsonArray targetSchema) {
+    this.targetSchema = targetSchema;
+  }
+
+  public JsonObject getSessionKeyField() {
+    return sessionKeyField;
+  }
+
+  public void setSessionKeyField(JsonObject sessionKeyField) {
+    this.sessionKeyField = sessionKeyField;
+  }
+
+  public String getTotalCountField() {
+    return totalCountField;
+  }
+
+  public void setTotalCountField(String totalCountField) {
+    this.totalCountField = totalCountField;
+  }
+
+  public JsonArray getSourceParameters() {
+    return sourceParameters;
+  }
+
+  public void setSourceParameters(JsonArray sourceParameters) {
+    this.sourceParameters = sourceParameters;
+  }
+
+  public Map<ParameterTypes, String> getPaginationFields() {
+    return paginationFields;
+  }
+
+  public void setPaginationFields(Map<ParameterTypes, String> paginationFields) {
+    this.paginationFields = paginationFields;
+  }
+
+  public Map<ParameterTypes, Long> getPaginationInitValues() {
+    return paginationInitValues;
+  }
+
+  public void setPaginationInitValues(Map<ParameterTypes, Long> paginationInitValues) {
+    this.paginationInitValues = paginationInitValues;
+  }
+
+  public long getSessionTimeout() {
+    return sessionTimeout;
+  }
+
+  public void setSessionTimeout(long sessionTimeout) {
+    this.sessionTimeout = sessionTimeout;
+  }
+
+  public long getCallInterval() {
+    return callInterval;
+  }
+
+  public void setCallInterval(long callInterval) {
+    this.callInterval = callInterval;
+  }
+
+  public JsonArray getEncryptionField() {
+    return encryptionField;
+  }
+
+  public void setEncryptionField(JsonArray encryptionField) {
+    this.encryptionField = encryptionField;
+  }
+
+  public boolean isEnableCleansing() {
+    return enableCleansing;
+  }
+
+  public void setEnableCleansing(boolean enableCleansing) {
+    this.enableCleansing = enableCleansing;
+  }
+
+  public String getDataField() {
+    return dataField;
+  }
+
+  public void setDataField(String dataField) {
+    this.dataField = dataField;
+  }
+
+  public JsonArray getWatermarkDefinition() {
+    return watermarkDefinition;
+  }
+
+  public void setWatermarkDefinition(JsonArray watermarkDefinition) {
+    this.watermarkDefinition = watermarkDefinition;
+  }
+
+  public long getRetryDelayInSec() {
+    return retryDelayInSec;
+  }
+
+  public void setRetryDelayInSec(long retryDelayInSec) {
+    this.retryDelayInSec = retryDelayInSec;
+  }
+
+  public long getRetryCount() {
+    return retryCount;
+  }
+
+  public void setRetryCount(long retryCount) {
+    this.retryCount = retryCount;
+  }
+
+  public Boolean getIsPartialPartition() {
+    return isPartialPartition;
+  }
+
+  public void setIsPartialPartition(Boolean partialPartition) {
+    isPartialPartition = partialPartition;
+  }
+
+  public JsonArray getSecondaryInputs() {
+    return secondaryInputs;
+  }
+
+  public void setSecondaryInputs(JsonArray secondaryInputs) {
+    this.secondaryInputs = secondaryInputs;
+  }
+
+  public WorkUnitPartitionTypes getWorkUnitPartitionType() {
+    return workUnitPartitionType;
+  }
+
+  public void setWorkUnitPartitionType(WorkUnitPartitionTypes workUnitPartitionType) {
+    this.workUnitPartitionType = workUnitPartitionType;
+  }
+
+  public Boolean getIsSecondaryAuthenticationEnabled() {
+    return isSecondaryAuthenticationEnabled;
+  }
+
+  public void setIsSecondaryAuthenticationEnabled(Boolean secondaryAuthenticationEnabled) {
+    isSecondaryAuthenticationEnabled = secondaryAuthenticationEnabled;
+  }
+
+  public String getSourceUri() {
+    return sourceUri;
+  }
+
+  public void setSourceUri(String sourceUri) {
+    this.sourceUri = sourceUri;
+  }
+
+  public SchemaReader getSchemaReader() {
+    return schemaReader;
+  }
+
+  public void setSchemaReader(SchemaReader schemaReader) {
+    this.schemaReader = schemaReader;
+  }
+
+  public String getSchemaCleansingPattern() {
+    return schemaCleansingPattern;
+  }
+
+  public void setSchemaCleansingPattern(String schemaCleansingPattern) {
+    this.schemaCleansingPattern = schemaCleansingPattern;
+  }
+
+  public String getSchemaCleansingReplacement() {
+    return schemaCleansingReplacement;
+  }
+
+  public void setSchemaCleansingReplacement(String schemaCleansingReplacement) {
+    this.schemaCleansingReplacement = schemaCleansingReplacement;
+  }
+
+  public Boolean getSchemaCleansingNullable() {
+    return schemaCleansingNullable;
+  }
+
+  public void setSchemaCleansingNullable(Boolean schemaCleansingNullable) {
+    this.schemaCleansingNullable = schemaCleansingNullable;
+  }
+
+  public long getMinWorkUnits() {
+    return minWorkUnits;
+  }
+
+  public void setMinWorkUnits(long minWorkUnits) {
+    this.minWorkUnits = minWorkUnits;
+  }
+
+  public long getMinWorkUnitRecords() {
+    return minWorkUnitRecords;
+  }
+
+  public void setMinWorkUnitRecords(long minWorkUnitRecords) {
+    this.minWorkUnitRecords = minWorkUnitRecords;
   }
 }

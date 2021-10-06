@@ -1,14 +1,14 @@
 # ms.extract.preprocessors
 
 **Tags**: 
-[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
+[conversion](categories.md#conversion-properties)
 
 **Type**: string
 
 **Default value**: blank
 
 **Related**:
-- [job property: ms.extract.preprocessor.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extract.preprocessor.parameters.md)
+- [job property: ms.extract.preprocessor.parameters](ms.extract.preprocessor.parameters.md)
 
 ## Description
 
@@ -34,4 +34,4 @@ compressed and then encrypted data.
 
 
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msextractpreprocessors)
+[back to summary](summary.md#msextractpreprocessors)

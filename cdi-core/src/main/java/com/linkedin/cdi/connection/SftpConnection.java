@@ -18,14 +18,12 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-@Slf4j
 public class SftpConnection extends MultistageConnection {
   private static final Logger LOG = LoggerFactory.getLogger(SftpConnection.class);
 
@@ -46,7 +44,7 @@ public class SftpConnection extends MultistageConnection {
   @Override
   public boolean closeAll(String message) {
     if (this.fsClient != null) {
-      log.info("Shutting down FileSystem connection");
+      LOG.info("Shutting down FileSystem connection");
       this.fsClient.close();
       fsClient = null;
     }
@@ -73,14 +71,14 @@ public class SftpConnection extends MultistageConnection {
     WorkUnitStatus status = super.executeFirst(workUnitStatus);
     String path = getPath();
     String finalPrefix = getWorkUnitSpecificString(path, getExtractorKeys().getDynamicParameters());
-    log.info("File path found is: " + finalPrefix);
+    LOG.info("File path found is: " + finalPrefix);
     try {
       if (getFsClient() == null) {
-        log.error("Error initializing SFTP connection");
+        LOG.error("Error initializing SFTP connection");
         return null;
       }
     } catch (Exception e) {
-      log.error("Error initializing SFTP connection", e);
+      LOG.error("Error initializing SFTP connection", e);
       return null;
     }
 
@@ -89,12 +87,12 @@ public class SftpConnection extends MultistageConnection {
     try {
        files = getFiles(finalPrefix);
     } catch (Exception e) {
-      log.error("Error reading file list", e);
+      LOG.error("Error reading file list", e);
       return null;
     }
 
     boolean isFileWithPrefixExist = files.stream().anyMatch(file -> file.equals(finalPrefix));
-    log.info("No Of Files to be processed matching the pattern: {}", files.size());
+    LOG.info("No Of Files to be processed matching the pattern: {}", files.size());
     if (StringUtils.isNotBlank(sftpSourceKeys.getFilesPattern())) {
       status.setBuffer(InputStreamUtils.convertListToInputStream(getFilteredFiles(files)));
     } else {
@@ -108,15 +106,15 @@ public class SftpConnection extends MultistageConnection {
           fileToDownload = finalPrefix;
         }
         if (StringUtils.isNotBlank(fileToDownload)) {
-          log.info("Downloading file: {}", files.get(0));
+          LOG.info("Downloading file: {}", files.get(0));
           try {
             status.setBuffer(this.fsClient.getFileStream(fileToDownload));
           } catch (Exception e) {
-            log.error("Error downloading file {}", fileToDownload, e);
+            LOG.error("Error downloading file {}", fileToDownload, e);
             return null;
           }
         } else {
-          log.warn("Invalid set of parameters. Please make sure to set source directory, entity and file pattern");
+          LOG.warn("Invalid set of parameters. Please make sure to set source directory, entity and file pattern");
         }
       }
     }
@@ -147,7 +145,7 @@ public class SftpConnection extends MultistageConnection {
    */
   private List<String> getFiles(String filesPattern) {
     List<String> files = new ArrayList<>();
-    log.info("Files to be processed from input " + filesPattern);
+    LOG.info("Files to be processed from input " + filesPattern);
     try {
       files = fsClient.ls(filesPattern);
       int i = 0;
@@ -162,7 +160,7 @@ public class SftpConnection extends MultistageConnection {
         i++;
       }
     } catch (Exception e) {
-      log.error("Unable to list files " + e.getMessage());
+      LOG.error("Unable to list files " + e.getMessage());
     }
     return files;
   }

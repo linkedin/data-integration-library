@@ -6,7 +6,7 @@ package com.linkedin.cdi.converter;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import lombok.SneakyThrows;
+import com.linkedin.cdi.util.AvroSchemaUtils;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
@@ -14,7 +14,6 @@ import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.converter.DataConversionException;
 import org.apache.gobblin.converter.SchemaConversionException;
 import org.apache.gobblin.converter.avro.UnsupportedDateTypeException;
-import com.linkedin.cdi.util.AvroSchemaUtils;
 import org.apache.gobblin.source.workunit.Extract;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -34,9 +33,8 @@ public class AvroNormalizerConverterTest {
   Schema outputSchema;
   WorkUnitState state;
 
-  @SneakyThrows
   @BeforeMethod
-  public void beforeMethod() {
+  public void beforeMethod() throws UnsupportedDateTypeException {
     _avroNormalizerConverter = new AvroNormalizerConverter();
     state = mock(WorkUnitState.class);
     Extract extract = new Extract(Extract.TableType.SNAPSHOT_ONLY, "com.linkedin.test", "test");

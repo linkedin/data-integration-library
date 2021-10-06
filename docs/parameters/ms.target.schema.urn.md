@@ -1,8 +1,8 @@
 # ms.target.schema.urn
 
 **Tags**: 
-[schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#schema-properties), 
-[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
+[schema](categories.md#schema-properties), 
+[conversion](categories.md#conversion-properties)
 
 **Type**: string
 
@@ -11,7 +11,7 @@
 **Default value**: blank
 
 **Related**:
-- [job property: ms.target.schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.target.schema.md)
+- [job property: ms.target.schema](ms.target.schema.md)
 
 ## Description
 
@@ -28,4 +28,4 @@ the only supported schema storage for now.
 
 `ms.target.schema.urn=urn:li:registeredSchema:(PEGASUS,draft-schema/com.linkedin.google.UploadClickConversionsRequest)`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mstargetschemaurn)   
+[back to summary](summary.md#mstargetschemaurn)   

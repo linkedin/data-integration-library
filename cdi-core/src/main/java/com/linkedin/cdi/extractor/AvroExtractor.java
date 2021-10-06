@@ -7,22 +7,6 @@ package com.linkedin.cdi.extractor;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.gson.JsonArray;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.annotation.Nullable;
-import lombok.Getter;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.avro.Schema;
-import org.apache.avro.file.DataFileStream;
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericDatumReader;
-import org.apache.avro.generic.GenericRecord;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.gobblin.configuration.WorkUnitState;
-import org.apache.gobblin.converter.avro.UnsupportedDateTypeException;
 import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.filter.AvroSchemaBasedFilter;
 import com.linkedin.cdi.keys.AvroExtractorKeys;
@@ -31,7 +15,22 @@ import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.util.AvroSchemaUtils;
 import com.linkedin.cdi.util.JsonIntermediateSchema;
 import com.linkedin.cdi.util.SchemaUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.annotation.Nullable;
+import org.apache.avro.Schema;
+import org.apache.avro.file.DataFileStream;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericDatumReader;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.gobblin.configuration.WorkUnitState;
+import org.apache.gobblin.converter.avro.UnsupportedDateTypeException;
 import org.apache.gobblin.util.AvroUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
@@ -49,10 +48,13 @@ import static org.apache.avro.Schema.Type.*;
  *
  * @author esong
  */
-@Slf4j
 public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
-  @Getter
+  private static final Logger LOG = LoggerFactory.getLogger(AvroExtractor.class);
   private AvroExtractorKeys avroExtractorKeys = new AvroExtractorKeys();
+
+  public AvroExtractorKeys getAvroExtractorKeys() {
+    return avroExtractorKeys;
+  }
 
   public AvroExtractor(WorkUnitState state, JobKeys jobKeys) {
     super(state, jobKeys);
@@ -84,11 +86,10 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
    *
    * @return the schema of the extracted record set in AvroSchema
    */
-  @SneakyThrows
   @Override
   public Schema getSchema() {
-    Schema avroSchema;
-    log.debug("Retrieving schema definition");
+    Schema avroSchema = null;
+    LOG.debug("Retrieving schema definition");
     if (this.jobKeys.hasOutputSchema()) {
       // take pre-defined fixed schema
       JsonArray schemaArray = jobKeys.getOutputSchema();
@@ -194,7 +195,7 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
         avroExtractorKeys.setIsValidOutputSchema(SchemaUtils.isValidOutputSchema(schemaColumns, fieldNames));
       }
     } catch (Exception e) {
-      log.error("Source Error: {}", e.getMessage());
+      LOG.error("Source Error: {}", e.getMessage());
       state.setWorkingState(WorkUnitState.WorkingState.FAILED);
       return false;
     }
@@ -378,9 +379,8 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
    * Utility method to convert JsonArray schema to avro schema
    * @param schema of JsonArray type
    * @return avro schema
-   * @throws UnsupportedDateTypeException unsupported type exception
    */
-  private Schema fromJsonSchema(JsonArray schema) throws UnsupportedDateTypeException {
+  private Schema fromJsonSchema(JsonArray schema){
     return AvroSchemaUtils.fromJsonSchema(schema, state);
   }
 
@@ -478,12 +478,6 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
    * @return avro schema
    */
   private Schema createMinimumAvroSchema() {
-    Schema schema;
-    try {
-      schema = fromJsonSchema(createMinimumSchema());
-    } catch (UnsupportedDateTypeException e) {
-      throw new IllegalStateException("Should not get here since the minimum schema only contains supported types");
-    }
-    return schema;
+    return fromJsonSchema(createMinimumSchema());
   }
 }

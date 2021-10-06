@@ -1,7 +1,7 @@
 # ms.work.unit.pacing.seconds
 
 **Tags**: 
-[watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#watermark-work-unit-properties)
+[watermark & work unit](categories.md#watermark-work-unit-properties)
 
 **Type**: integer
 
@@ -9,7 +9,7 @@
 
 **Related**:
  
-- [job property: ms.work.unit.partition](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.work.unit.partition.md)
+- [job property: ms.work.unit.partition](ms.work.unit.partition.md)
 
 ## Description
 
@@ -28,4 +28,4 @@ Assuming there are 100 work units, and we set `ms.work.unit.pacing.seconds=10`, 
 work unit will not start processing until 10th second. Therefore, work units are spread out by
 10 second gaps.  
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+[back to summary](summary.md)

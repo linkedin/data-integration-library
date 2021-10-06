@@ -1,7 +1,7 @@
 # ms.data.default.type
 
 **Tags**: 
-[schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#schema-properties)
+[schema](categories.md#schema-properties)
 
 **Type**: string
 
@@ -24,5 +24,5 @@ value. We can explicitly put a type for them.
 
 - `ms.data.default.type={"extension": "string", "personalMeetingUrls": "string"}`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msdatadefaulttype)
+[back to summary](summary.md#msdatadefaulttype)
 

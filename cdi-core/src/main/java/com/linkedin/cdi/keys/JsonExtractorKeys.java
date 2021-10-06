@@ -7,15 +7,13 @@ package com.linkedin.cdi.keys;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.configuration.MultistageProperties;
 import java.util.Iterator;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import org.apache.gobblin.source.workunit.WorkUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -23,10 +21,8 @@ import org.apache.gobblin.source.workunit.WorkUnit;
  *
  * @author chrli
  */
-@Slf4j
-@Getter(AccessLevel.PUBLIC)
-@Setter
 public class JsonExtractorKeys extends ExtractorKeys {
+  private static final Logger LOG = LoggerFactory.getLogger(JsonExtractorKeys.class);
   final private static List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
       MultistageProperties.MSTAGE_DATA_FIELD,
       MultistageProperties.MSTAGE_TOTAL_COUNT_FIELD);
@@ -39,16 +35,48 @@ public class JsonExtractorKeys extends ExtractorKeys {
   @Override
   public void logDebugAll(WorkUnit workUnit) {
     super.logDebugAll(workUnit);
-    log.debug("These are values of JsonExtractor regarding to Work Unit: {}",
+    LOG.debug("These are values of JsonExtractor regarding to Work Unit: {}",
         workUnit == null ? "testing" : workUnit.getProp(MultistageProperties.DATASET_URN_KEY.toString()));
-    log.debug("Total rows expected or processed: {}", totalCount);
+    LOG.debug("Total rows expected or processed: {}", totalCount);
   }
 
   @Override
   public void logUsage(State state) {
     super.logUsage(state);
     for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      log.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
+      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
     }
+  }
+
+  public Iterator<JsonElement> getJsonElementIterator() {
+    return jsonElementIterator;
+  }
+
+  public void setJsonElementIterator(Iterator<JsonElement> jsonElementIterator) {
+    this.jsonElementIterator = jsonElementIterator;
+  }
+
+  public long getTotalCount() {
+    return totalCount;
+  }
+
+  public void setTotalCount(long totalCount) {
+    this.totalCount = totalCount;
+  }
+
+  public long getCurrentPageNumber() {
+    return currentPageNumber;
+  }
+
+  public void setCurrentPageNumber(long currentPageNumber) {
+    this.currentPageNumber = currentPageNumber;
+  }
+
+  public JsonObject getPushDowns() {
+    return pushDowns;
+  }
+
+  public void setPushDowns(JsonObject pushDowns) {
+    this.pushDowns = pushDowns;
   }
 }

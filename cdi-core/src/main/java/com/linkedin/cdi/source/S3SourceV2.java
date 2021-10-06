@@ -12,29 +12,35 @@ import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.connection.S3Connection;
 import com.linkedin.cdi.extractor.MultistageExtractor;
 import com.linkedin.cdi.keys.S3Keys;
-import com.linkedin.cdi.util.EndecoUtils;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.source.extractor.Extractor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
 
 
-@Slf4j
 public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
+  private static final Logger LOG = LoggerFactory.getLogger(S3SourceV2.class);
   private static final String KEY_REGION = "region";
   private static final String KEY_CONNECTION_TIMEOUT = "connection_timeout";
   private static final HashSet<String> S3_REGIONS_SET =
       Region.regions().stream().map(region -> region.toString()).collect(Collectors.toCollection(HashSet::new));
-  @Getter
   private S3Keys s3SourceV2Keys = new S3Keys();
+
+  public S3Keys getS3SourceV2Keys() {
+    return s3SourceV2Keys;
+  }
+
+  public void setS3SourceV2Keys(S3Keys s3SourceV2Keys) {
+    this.s3SourceV2Keys = s3SourceV2Keys;
+  }
 
   public S3SourceV2() {
     s3SourceV2Keys = new S3Keys();

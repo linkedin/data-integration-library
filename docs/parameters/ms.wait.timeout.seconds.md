@@ -1,8 +1,8 @@
 # ms.wait.timeout.seconds
 
 **Tags**: 
-[pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#pagination-properties),
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+[pagination](categories.md#pagination-properties),
+[back to summary](summary.md)
 
 **Type**: integer (in seconds)
 
@@ -10,15 +10,15 @@
 
 **Related**:
 
-- [job property: ms.call.interval.millis](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.call.interval.millis.md).
-- [job property: ms.session.key.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.session.key.field.md)
+- [job property: ms.call.interval.millis](ms.call.interval.millis.md).
+- [job property: ms.session.key.field](ms.session.key.field.md)
 
 ## Description
 
 `ms.wait.timeout.seconds` is one option to control pagination, it specifies
 how long the job will wait before the session ending (success or failure) status is met. 
  
-When there is no total expected-row-count ([ms.total.count.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.total.count.field.md) is blank), 
+When there is no total expected-row-count ([ms.total.count.field](ms.total.count.field.md) is blank), 
 the pagination will keep looping and waiting until either the session 
 ending condition is met or time out.
 
@@ -29,10 +29,10 @@ data extraction, a request is submitted to data source, and the
 data source will provide updated status when the request is completed, and data 
 are ready for downloading. 
 Therefore, the extraction job will keep checking the status after submitting the 
-request by intervals defined in [ms.call.interval.millis](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.call.interval.millis.md).
+request by intervals defined in [ms.call.interval.millis](ms.call.interval.millis.md).
 
 At the same time, 
-[ms.session.key.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.session.key.field.md)
+[ms.session.key.field](ms.session.key.field.md)
 can specify the status code when the request is completed or failed. 
 In each check, DIL will compare the retrieved status with the expected status, and 
 ends the looping when the status is completed or failed. 
@@ -60,4 +60,4 @@ for 600 seconds by checking every 1 second.
 
 `ms.wait.timeout.seconds=600`
         
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mswaittimeoutseconds)   
+[back to summary](summary.md#mswaittimeoutseconds)   

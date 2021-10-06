@@ -1,8 +1,8 @@
 # ms.authentication
 
 **Tags**: 
-[authentication](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#authentication-properties)
-[http](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#http-properties)
+[authentication](categories.md#authentication-properties)
+[http](categories.md#http-properties)
 
 **Type**: string
 
@@ -13,9 +13,9 @@
 **Accepts Variable Substitution**: Yes
 
 ## Related 
-- [ms.http.request.headers](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.http.request.headers.md)
-- [ms.secondary.input](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.secondary.input.md)
-- [ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md)
+- [ms.http.request.headers](ms.http.request.headers.md)
+- [ms.secondary.input](ms.secondary.input.md)
+- [ms.parameters](ms.parameters.md)
 - source.conn.username
 - source.conn.password
 
@@ -71,4 +71,4 @@ every job execution, and then the updated access token can be read in through se
 access token is read in through secondary input, it is stored in a variable. And that variable can then
 be referenced in the `token` field. 
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msauthentication)
+[back to summary](summary.md#msauthentication)

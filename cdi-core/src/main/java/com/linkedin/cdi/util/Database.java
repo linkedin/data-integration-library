@@ -6,25 +6,37 @@ package com.linkedin.cdi.util;
 
 import com.google.common.base.Preconditions;
 import java.net.URI;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * a list of databases
  */
-@Slf4j
 public enum Database {
   MYSQL("MySql", "com.mysql.cj.jdbc.Driver"),
   SQLSERVER("SqlServer", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
   ORACLE("Oracle", "oracle.jdbc.driver.OracleDriver"),
   HSQLDB("HSqlDb", "org.hsqldb.jdbcDriver");
 
+  private static final Logger LOG = LoggerFactory.getLogger(Database.class);
   final static String PROTOCOL_PREFIX = "jdbc:";
 
-  @Getter private String name;
-  @Getter private String dbType;
-  @Getter private String defaultDriver;
+  private String name;
+  private String dbType;
+  private String defaultDriver;
+
+  public String getName() {
+    return name;
+  }
+
+  public String getDbType() {
+    return dbType;
+  }
+
+  public String getDefaultDriver() {
+    return defaultDriver;
+  }
 
   Database(String name, String driver) {
     this.name = name;

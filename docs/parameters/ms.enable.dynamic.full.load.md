@@ -1,7 +1,7 @@
 # ms.enable.dynamic.full.load
 
 **Tags**: 
-[execution](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#execution-properties)
+[execution](categories.md#execution-properties)
 
 **Type**: boolean
 
@@ -31,5 +31,5 @@ set `ms.enable.dynamic.full.load`, as its default is true.
 
 `ms.enable.dynamic.full.load=true`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msenabledynamicfullload)
+[back to summary](summary.md#msenabledynamicfullload)
 

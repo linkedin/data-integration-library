@@ -1,9 +1,9 @@
 # ms.target.schema.urn
 
 **Tags**: 
-[schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#schema-properties),
-[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties),
-[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties)
+[schema](categories.md#schema-properties),
+[conversion](categories.md#conversion-properties),
+[source](categories.md#source-properties)
 
 **Type**: string
 
@@ -12,8 +12,8 @@
 **Default value**: blank
 
 **Related**:
-- [job property: ms.target.schema.urn](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.target.schema.urn.md)
-- [job property: ms.output.schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.output.schema.md)
+- [job property: ms.target.schema.urn](ms.target.schema.urn.md)
+- [job property: ms.output.schema](ms.output.schema.md)
 
 ## Description
 
@@ -24,7 +24,7 @@ from actual data, like JSON data, or defined as a string, or defined in a metada
 store. `ms.target.schema.urn` address the option that defines source schema in metadata store. 
 
 We generally don't define source schema in schema string format. Instead, we directly
-define the [output schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.output.schema.md)
+define the [output schema](ms.output.schema.md)
 if necessary. 
  
 `ms.target.schema.urn` is a URN string of the following forms:
@@ -42,4 +42,4 @@ response structure when calling Google batch upload API.
 
 `ms.source.schema.urn=urn:li:registeredSchema:(PEGASUS,dil-draft-schema/com.linkedin.google.BatchinsertResponse)`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mssourceschemaurn)   
+[back to summary](summary.md#mssourceschemaurn)   

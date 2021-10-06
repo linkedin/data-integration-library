@@ -16,6 +16,7 @@ import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.keys.AvroExtractorKeys;
 import com.linkedin.cdi.util.AvroSchemaUtils;
 import com.linkedin.cdi.util.JsonIntermediateSchema;
+import org.apache.gobblin.converter.avro.UnsupportedDateTypeException;
 import org.apache.gobblin.source.workunit.Extract;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -52,7 +53,7 @@ public class AvroSchemaBasedFilterTest {
   }
 
   @Test
-  public void testFilter() {
+  public void testFilter() throws UnsupportedDateTypeException {
     // The case where one column is filtered out
     JsonArray rawSchemaArray = GSON.fromJson(
         "[{\"columnName\":\"id0\",\"isNullable\":\"true\",\"dataType\":{\"type\":\"string\"}}]", JsonArray.class);
