@@ -94,11 +94,7 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
       // take pre-defined fixed schema
       JsonArray schemaArray = jobKeys.getOutputSchema();
       setRowFilter(schemaArray);
-      try {
-        avroSchema = fromJsonSchema(schemaArray);
-      } catch (Exception e) {
-        throw new RuntimeException("Error converting Json schema to Avro schema", e);
-      }
+      avroSchema = fromJsonSchema(schemaArray);
     } else {
       avroSchema = processInputStream(0) ? avroExtractorKeys.getAvroOutputSchema()
           : createMinimumAvroSchema();
@@ -149,11 +145,7 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
       GenericRecord row = extractDataField(getNext());
       AvroSchemaBasedFilter avroSchemaBasedFilter = (AvroSchemaBasedFilter) rowFilter;
       if (avroSchemaBasedFilter != null) {
-        try {
-          row = avroSchemaBasedFilter.filter(row);
-        } catch (Exception e) {
-          throw new RuntimeException("Error filtering row", e);
-        }
+        row = avroSchemaBasedFilter.filter(row);
       }
       return addDerivedFields(row);
     }
@@ -387,9 +379,8 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
    * Utility method to convert JsonArray schema to avro schema
    * @param schema of JsonArray type
    * @return avro schema
-   * @throws UnsupportedDateTypeException unsupported type exception
    */
-  private Schema fromJsonSchema(JsonArray schema) throws UnsupportedDateTypeException {
+  private Schema fromJsonSchema(JsonArray schema){
     return AvroSchemaUtils.fromJsonSchema(schema, state);
   }
 
@@ -487,12 +478,6 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
    * @return avro schema
    */
   private Schema createMinimumAvroSchema() {
-    Schema schema;
-    try {
-      schema = fromJsonSchema(createMinimumSchema());
-    } catch (UnsupportedDateTypeException e) {
-      throw new IllegalStateException("Should not get here since the minimum schema only contains supported types");
-    }
-    return schema;
+    return fromJsonSchema(createMinimumSchema());
   }
 }
