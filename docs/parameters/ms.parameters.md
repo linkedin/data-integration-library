@@ -1,8 +1,8 @@
 # ms.parameters
 
 **Tags**: 
-[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties)
-[authentication](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/authentication-properties.md)
+[source](categories.md#source-properties)
+[authentication](categories.md#authentication-properties)
 
 **Type**: string
 
@@ -14,9 +14,9 @@
 - [key concept: variables](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variables.md)
 - [key concept: watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/watermark.md)
 - [key concept: pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md)
-- [job property: ms.session.key.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.session.key.field.md)
-- [job property: ms.watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.watermark.md)
-- [job property: ms.pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.pagination.md)
+- [job property: ms.session.key.field](ms.session.key.field.md)
+- [job property: ms.watermark](ms.watermark.md)
+- [job property: ms.pagination](ms.pagination.md)
 
 ## Description 
 
@@ -98,7 +98,7 @@ for JDBC and S3._
 For HTTP requests, variables will be used to form the final URI. In such case, the variable can be 
 used in the URI path segments or as URI parameter.
 
-- When used in URI path, the variable name need to be specified in [URI template](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.source.uri.md) 
+- When used in URI path, the variable name need to be specified in [URI template](ms.source.uri.md) 
 as a variable contained in {{}}.
 
 - When used as URI parameters, the variable name can be specified in URI template. If not used in the URI template, 
@@ -168,4 +168,4 @@ https://api.zoom.us/v2/metrics/webinars?type=past&from={{fromDate}}&to={{toDate}
 
 In execution time, each day range will be processed by a work unit.
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msparameters)
+[back to summary](summary.md#msparameters)

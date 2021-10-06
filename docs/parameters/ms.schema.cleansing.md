@@ -1,7 +1,7 @@
 # ms.schema.cleansing
 
 **Tags**: 
-[schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#schema-properties)
+[schema](categories.md#schema-properties)
 
 **Type**: string
 
@@ -29,7 +29,7 @@ If false, the schema inference will try to detect nullability from samples.
 
 This configuration has no impact on schemas from metadata stores.
 
-If defined, `ms.schema.cleansing` supersedes [ms.enable.cleansing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.enable.cleansing.md)
+If defined, `ms.schema.cleansing` supersedes [ms.enable.cleansing](ms.enable.cleansing.md)
 If `ms.schema.cleansing` is not defined, DIL will check `ms.enable.cleansing`.
 If `ms.enable.cleansing` is true, DIL will do the default cleansing. 
 
@@ -52,4 +52,4 @@ The following additionally replaces "-" (hyphen) with "_"(underscore).
  
 - `ms.schema.cleansing={"enabled": "true", "pattern": "(\\s|\\$|@|-)"}`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msschemacleansing)
+[back to summary](summary.md#msschemacleansing)

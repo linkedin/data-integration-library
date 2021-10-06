@@ -5,6 +5,7 @@
 package com.linkedin.cdi.keys;
 
 import com.google.common.collect.Lists;
+import com.linkedin.cdi.configuration.MultistageProperties;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
@@ -13,14 +14,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import org.apache.gobblin.source.workunit.WorkUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -28,10 +26,8 @@ import org.apache.gobblin.source.workunit.WorkUnit;
  *
  * @author chrli
  */
-@Slf4j
-@Getter(AccessLevel.PUBLIC)
-@Setter
 public class CsvExtractorKeys extends ExtractorKeys {
+  private static final Logger LOG = LoggerFactory.getLogger(CsvExtractorKeys.class);
   final private static List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
       MultistageProperties.MSTAGE_CSV_COLUMN_HEADER,
       MultistageProperties.MSTAGE_CSV_SEPARATOR,
@@ -64,17 +60,129 @@ public class CsvExtractorKeys extends ExtractorKeys {
   @Override
   public void logDebugAll(WorkUnit workUnit) {
     super.logDebugAll(workUnit);
-    log.debug("These are values of CsvExtractor regarding to Work Unit: {}",
+    LOG.debug("These are values of CsvExtractor regarding to Work Unit: {}",
         workUnit == null ? "testing" : workUnit.getProp(MultistageProperties.DATASET_URN_KEY.toString()));
-    log.debug("Is column header present: {}", columnHeader);
-    log.debug("Total rows to skip: {}", rowsToSkip);
+    LOG.debug("Is column header present: {}", columnHeader);
+    LOG.debug("Total rows to skip: {}", rowsToSkip);
   }
 
   @Override
   public void logUsage(State state) {
     super.logUsage(state);
     for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      log.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
+      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
     }
+  }
+
+  public Iterator<String[]> getCsvIterator() {
+    return csvIterator;
+  }
+
+  public void setCsvIterator(Iterator<String[]> csvIterator) {
+    this.csvIterator = csvIterator;
+  }
+
+  public long getCurrentPageNumber() {
+    return currentPageNumber;
+  }
+
+  public void setCurrentPageNumber(long currentPageNumber) {
+    this.currentPageNumber = currentPageNumber;
+  }
+
+  public Boolean getColumnHeader() {
+    return columnHeader;
+  }
+
+  public void setColumnHeader(Boolean columnHeader) {
+    this.columnHeader = columnHeader;
+  }
+
+  public int getColumnHeaderIndex() {
+    return columnHeaderIndex;
+  }
+
+  public void setColumnHeaderIndex(int columnHeaderIndex) {
+    this.columnHeaderIndex = columnHeaderIndex;
+  }
+
+  public int getRowsToSkip() {
+    return rowsToSkip;
+  }
+
+  public void setRowsToSkip(int rowsToSkip) {
+    this.rowsToSkip = rowsToSkip;
+  }
+
+  public String getSeparator() {
+    return separator;
+  }
+
+  public void setSeparator(String separator) {
+    this.separator = separator;
+  }
+
+  public String getQuoteCharacter() {
+    return quoteCharacter;
+  }
+
+  public void setQuoteCharacter(String quoteCharacter) {
+    this.quoteCharacter = quoteCharacter;
+  }
+
+  public String getEscapeCharacter() {
+    return escapeCharacter;
+  }
+
+  public void setEscapeCharacter(String escapeCharacter) {
+    this.escapeCharacter = escapeCharacter;
+  }
+
+  public Map<String, Integer> getColumnToIndexMap() {
+    return columnToIndexMap;
+  }
+
+  public void setColumnToIndexMap(Map<String, Integer> columnToIndexMap) {
+    this.columnToIndexMap = columnToIndexMap;
+  }
+
+  public Deque<String[]> getSampleRows() {
+    return sampleRows;
+  }
+
+  public void setSampleRows(Deque<String[]> sampleRows) {
+    this.sampleRows = sampleRows;
+  }
+
+  public String[] getHeaderRow() {
+    return headerRow;
+  }
+
+  public void setHeaderRow(String[] headerRow) {
+    this.headerRow = headerRow;
+  }
+
+  public Set<Integer> getColumnProjection() {
+    return columnProjection;
+  }
+
+  public void setColumnProjection(Set<Integer> columnProjection) {
+    this.columnProjection = columnProjection;
+  }
+
+  public Boolean getIsValidOutputSchema() {
+    return isValidOutputSchema;
+  }
+
+  public void setIsValidOutputSchema(Boolean validOutputSchema) {
+    isValidOutputSchema = validOutputSchema;
+  }
+
+  public String getDefaultFieldType() {
+    return defaultFieldType;
+  }
+
+  public void setDefaultFieldType(String defaultFieldType) {
+    this.defaultFieldType = defaultFieldType;
   }
 }

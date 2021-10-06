@@ -6,8 +6,6 @@ package com.linkedin.cdi.factory.sftp;
 
 import com.jcraft.jsch.SftpProgressMonitor;
 import com.linkedin.cdi.factory.DefaultConnectionClientFactory;
-import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,19 +17,60 @@ import org.slf4j.LoggerFactory;
 public class SftpMonitor implements SftpProgressMonitor {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultConnectionClientFactory.class);
 
-  @Getter
   private int op;
-  @Getter
   private String src;
-  @Getter
   private String dest;
-  @Getter
   private long totalCount;
-  @Getter
-  @Setter
   private long logFrequency;
-  @Getter
   private long startTime;
+
+  public int getOp() {
+    return op;
+  }
+
+  public void setOp(int op) {
+    this.op = op;
+  }
+
+  public String getSrc() {
+    return src;
+  }
+
+  public void setSrc(String src) {
+    this.src = src;
+  }
+
+  public String getDest() {
+    return dest;
+  }
+
+  public void setDest(String dest) {
+    this.dest = dest;
+  }
+
+  public long getTotalCount() {
+    return totalCount;
+  }
+
+  public void setTotalCount(long totalCount) {
+    this.totalCount = totalCount;
+  }
+
+  public long getLogFrequency() {
+    return logFrequency;
+  }
+
+  public void setLogFrequency(long logFrequency) {
+    this.logFrequency = logFrequency;
+  }
+
+  public long getStartTime() {
+    return startTime;
+  }
+
+  public void setStartTime(long startTime) {
+    this.startTime = startTime;
+  }
 
   @Override
   public void init(int op, String src, String dest, long max) {

@@ -1,7 +1,7 @@
 # ms.call.interval.millis
 
 **Tags**: 
-[pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#pagination-properties)
+[pagination](categories.md#pagination-properties)
 
 **Type**: long
 
@@ -21,5 +21,5 @@ allowed by the QPS to avoid QPS violations cross threads.
 
 APIs might have quota by second and quota by the hour or day. 
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mscallintervalmillis)
+[back to summary](summary.md#mscallintervalmillis)
 

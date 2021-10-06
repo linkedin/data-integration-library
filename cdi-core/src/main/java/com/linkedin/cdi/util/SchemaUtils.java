@@ -5,12 +5,11 @@
 package com.linkedin.cdi.util;
 
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-@Slf4j
 public class SchemaUtils {
-
+  private static final Logger LOG = LoggerFactory.getLogger(SchemaUtils.class);
   // Following best practices for utility classes to have a private constructor
   private SchemaUtils() {
     throw new IllegalStateException("Utility class");
@@ -39,10 +38,10 @@ public class SchemaUtils {
     }
     boolean isValidSchema = j == schemaColumns.size();
     if (!isValidSchema) {
-      log.error(
+      LOG.error(
           "Schema columns and source columns do not match: " + "undefined columns in schema or column order mismatch");
-      log.debug("Schema column: {}", schemaColumns);
-      log.debug("Source columns: {}", sourceColumns);
+      LOG.debug("Schema column: {}", schemaColumns);
+      LOG.debug("Source columns: {}", sourceColumns);
     }
     return isValidSchema;
   }

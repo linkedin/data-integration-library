@@ -1,8 +1,8 @@
 # ms.session.key.field
 
 **Tags**:
-[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties),
-[pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#pagination-properties)
+[source](categories.md#source-properties),
+[pagination](categories.md#pagination-properties)
 
 **Type**: string
 
@@ -12,8 +12,8 @@
 
 **Related**:
 - [key concept: pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md)
-- [ms.pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.pagination.md)
-- [ms.total.count.field](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.total.count.field.md)
+- [ms.pagination](ms.pagination.md)
+- [ms.total.count.field](ms.total.count.field.md)
 
 ## Description
 
@@ -66,7 +66,7 @@ total expected rows and status, the data can have duplicate, and actual
 extracted rows in log file should show more rows extracted than expected.
 
 A session can timeout before the stop condition is met. The timeout 
-is controlled by property [ms.wait.timeout.seconds](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.wait.timeout.seconds.md),
+is controlled by property [ms.wait.timeout.seconds](ms.wait.timeout.seconds.md),
 which has a default value of 600 seconds. 
 
 This is useful for [asynchronous ingestion](https://github.com/linkedin/data-integration-library/blob/master/docs/patterns/asynchronous-ingestion-pattern.md), 
@@ -89,7 +89,7 @@ with the session key value of first request fed into the next request as
 input. That means the fetched value of session key, from the 
 `ms.session.key.field`, can be fed into variables of type [session](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/session-control.md). 
 
-Variables are defined in [ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md). 
+Variables are defined in [ms.parameters](ms.parameters.md). 
 When a `session` type variable is defined, it will implicitly add to 
 URL parameters or request bodies if HttpSource is used. 
 However, for the first HTTP request, because the 
@@ -118,4 +118,4 @@ streaming data.
 
 - `ms.session.key.field={"name": "end_of_stream", "condition": {"regexp": "^true$"}}`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mssessionkeyfield)
+[back to summary](summary.md#mssessionkeyfield)

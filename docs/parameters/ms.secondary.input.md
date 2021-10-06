@@ -1,8 +1,8 @@
 # ms.secondary.input
 
 **Tags**: 
-[watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#watermark-work-unit-properties),
-[authentication](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/authentication-properties.md)
+[watermark & work unit](categories.md#watermark-work-unit-properties),
+[authentication](categories.md#authentication-properties)
 
 **Type**: string
 
@@ -107,4 +107,4 @@ In the following, we egress the normalized records from a prior job (`${preproce
 
 - `ms.secondary.input=[{"path": "${job.dir}/${extract.namespace}/${preprocess.table.name}", "fields": ["conversions"], "category": "payload"}]`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mssecondaryinput)
+[back to summary](summary.md#mssecondaryinput)

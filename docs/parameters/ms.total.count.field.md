@@ -1,8 +1,8 @@
 # ms.total.count.field
 
 **Tags**:
-[pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#pagination-properties),
-[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties)
+[pagination](categories.md#pagination-properties),
+[source](categories.md#source-properties)
 
 **Type**: string
 
@@ -31,7 +31,7 @@ Example 1: if the response from the source is like this: `{..."total_records" : 
 Example 2: if the response from the source is like this `{..."records": {..."totalRecords": 9999...}...}`, then
 the configuration can be `ms.total.count.field = records.totalRecords`. 
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mstotalcountfield)
+[back to summary](summary.md#mstotalcountfield)
 
 
 

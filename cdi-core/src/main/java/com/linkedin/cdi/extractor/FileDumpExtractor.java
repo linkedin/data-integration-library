@@ -9,15 +9,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
-import javax.annotation.Nullable;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.gobblin.configuration.WorkUnitState;
 import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.FileDumpExtractorKeys;
@@ -27,21 +18,33 @@ import com.linkedin.cdi.preprocessor.OutputStreamProcessor;
 import com.linkedin.cdi.preprocessor.StreamProcessor;
 import com.linkedin.cdi.util.ParameterTypes;
 import com.linkedin.cdi.util.VariableUtils;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
+import javax.annotation.Nullable;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * FileDumpExtractor takes an InputStream, applies proper preprocessors, and saves the InputStream
  * to a file.
  */
-@Slf4j
 public class FileDumpExtractor extends MultistageExtractor<String, String> {
+  private static final Logger LOG = LoggerFactory.getLogger(FileDumpExtractor.class);
   private final static int HADOOP_DEFAULT_FILE_LENGTH_LIMIT = 255;
-  @Getter
   private FileDumpExtractorKeys fileDumpExtractorKeys = new FileDumpExtractorKeys();
+
+  public FileDumpExtractorKeys getFileDumpExtractorKeys() {
+    return fileDumpExtractorKeys;
+  }
 
   public FileDumpExtractor(WorkUnitState state, JobKeys jobKeys) {
     super(state, jobKeys);
@@ -128,13 +131,13 @@ public class FileDumpExtractor extends MultistageExtractor<String, String> {
     }
 
     if (StringUtils.isBlank(fileDumpExtractorKeys.getFileName())) {
-      log.error("File name is empty so cannot dump onto the file system.");
+      LOG.error("File name is empty so cannot dump onto the file system.");
       this.state.setWorkingState(WorkUnitState.WorkingState.FAILED);
       return false;
     }
 
     if (workUnitStatus.getBuffer() == null) {
-      log.info("Received a NULL InputStream, end the work unit");
+      LOG.info("Received a NULL InputStream, end the work unit");
       return false;
     }
 
@@ -156,7 +159,7 @@ public class FileDumpExtractor extends MultistageExtractor<String, String> {
       }
       writeToFileSystem(input, fileName);
     } catch (Exception e) {
-      log.error("Error while extracting from source or writing to target", e);
+      LOG.error("Error while extracting from source or writing to target", e);
       this.state.setWorkingState(WorkUnitState.WorkingState.FAILED);
       return false;
     }
@@ -199,7 +202,7 @@ public class FileDumpExtractor extends MultistageExtractor<String, String> {
       is.close();
       os.flush();
       os.close();
-      log.info("FileDumpExtractor: written {} bytes to file {}", totalBytes, dumplocation);
+      LOG.info("FileDumpExtractor: written {} bytes to file {}", totalBytes, dumplocation);
     } catch (IOException e) {
       throw new RuntimeException("Unable to dump file at specified location from FileDumpExtractor", e);
     }
@@ -220,15 +223,15 @@ public class FileDumpExtractor extends MultistageExtractor<String, String> {
       List<String> segments = Lists.newArrayList(filePath.split(Path.SEPARATOR));
       String fileName = segments.get(segments.size() - 1);
       if (fileName.length() > HADOOP_DEFAULT_FILE_LENGTH_LIMIT) {
-        log.warn("File name is truncated to {} characters", HADOOP_DEFAULT_FILE_LENGTH_LIMIT);
+        LOG.warn("File name is truncated to {} characters", HADOOP_DEFAULT_FILE_LENGTH_LIMIT);
         fileName = fileName.substring(0, HADOOP_DEFAULT_FILE_LENGTH_LIMIT - 1);
       }
       segments.remove(segments.size() - 1);
       segments.add(fileName);
       return Joiner.on(Path.SEPARATOR_CHAR).join(segments);
     } catch (Exception e) {
-      log.error("Error resolving placeholders in {}", MultistageProperties.MSTAGE_EXTRACTOR_TARGET_FILE_NAME.toString());
-      log.error("The value \"{}\" will be used as is", fileNameTemplate);
+      LOG.error("Error resolving placeholders in {}", MultistageProperties.MSTAGE_EXTRACTOR_TARGET_FILE_NAME.toString());
+      LOG.error("The value \"{}\" will be used as is", fileNameTemplate);
       return fileNameTemplate;
     }
   }

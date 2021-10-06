@@ -32,20 +32,22 @@ If building the distribution with tests turned on:
 To contribute, please use submit Pull Request (PR) for committers to merge. 
 - Create your own fork on GitHub off the main repository
 - Clone your fork to your local computer
->- `git clone https://github.com/<<your-github-login>>/data-integration-library.git`
+    - `git clone https://github.com/<<your-github-login>>/data-integration-library.git`
 - Add upstream and verify
->- `git remote add upstream https://github.com/linkedin/data-integration-library.git`
->- `git remote -v`
+    - `git remote add upstream https://github.com/linkedin/data-integration-library.git`
+    - `git remote -v`
 - Change, test, commit, and push to your fork
->- `git status`
->- `git add .`
->- `git commit -m "comments"`
->- `git push origin master`
+    - `git status`
+    - `git add .`
+    - `git commit -m "comments"`
+    - `git push origin master`
 - Create Pull Request on GitHub with the following details
->- Title 
->- Detailed description
->- Document the tests done
->- Links to the updated documents
+    - Title 
+    - Detailed description
+    - Document the tests done
+    - Links to the updated documents
+- Publish to local Maven repository
+    - `./gradlew publishToMavenLocal`
 
 # Detailed Documents
 

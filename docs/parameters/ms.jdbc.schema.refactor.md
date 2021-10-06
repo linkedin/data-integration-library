@@ -1,7 +1,7 @@
 # ms.jdbc.schema.refactor
 
 **Tags**: 
-[schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#schema-properties)
+[schema](categories.md#schema-properties)
 
 **Type**: string
 
@@ -22,4 +22,4 @@ The following is a sample of MySQL SELECT statement.
 
 - `ms.jdbc.statement=select * from ${source.entity} limit {{limit}} offset {{offset}}`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msjdbcschemarefactor)
+[back to summary](summary.md#msjdbcschemarefactor)

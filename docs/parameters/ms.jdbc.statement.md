@@ -1,7 +1,7 @@
 # ms.jdbc.statement
 
 **Tags**:
-[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties) 
+[source](categories.md#source-properties) 
 
 **Type**: string
 
@@ -23,4 +23,4 @@ The following is a sample of MySQL SELECT statement.
 
 - `ms.jdbc.statement=select * from ${source.entity} limit {{limit}} offset {{offset}}`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msjdbcstatement)
+[back to summary](summary.md#msjdbcstatement)

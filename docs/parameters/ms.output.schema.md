@@ -1,8 +1,8 @@
 # ms.output.schema
 
 **Tags**: 
-[schema](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#schema-properties), 
-[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
+[schema](categories.md#schema-properties), 
+[conversion](categories.md#conversion-properties)
 
 **Type**: string
 
@@ -26,4 +26,4 @@ Then, you can copy and paste the schema(Avro-flavor schema) as the value here.
 
 `ms.output.schema=[{"columnName":"path","isNullable":"false","dataType":{"type":"string"}}]`
   
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msoutputschema)
+[back to summary](summary.md#msoutputschema)

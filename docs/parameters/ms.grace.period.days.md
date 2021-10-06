@@ -1,14 +1,14 @@
 # ms.grace.period.days
 
 **Tags**: 
-[watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#watermark-work-unit-properties)
+[watermark & work unit](categories.md#watermark-work-unit-properties)
 
 **Type**: integer
 
 **Default value**: 0
 
 **Related**:
-- [job property: ms.abstinent.period.days](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.abstinent.period.days.md)
+- [job property: ms.abstinent.period.days](ms.abstinent.period.days.md)
 
 ## Description
 
@@ -45,7 +45,7 @@ ETL time without grace period. With grace period, the cutoff time becomes
 
 That means the work unit watermark becomes [`last ETL time - 2 days`, `current time`). 
 
-If a variable "fromTime" is defined on the watermark (see [ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md)),
+If a variable "fromTime" is defined on the watermark (see [ms.parameters](ms.parameters.md)),
 it would have the value `last ETL time - 2 days`. 
 
 If the variable is used in request like `http://domain/path?updateDate>={{fromTime}}`,
@@ -54,4 +54,4 @@ then the extraction will include data that was updated since `last ETL time - 2 
 With grace period, the extraction would only include data that was updated 
 since `last ETL time`, and it would potentially miss late arrivals.
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msgraceperioddays)
+[back to summary](summary.md#msgraceperioddays)

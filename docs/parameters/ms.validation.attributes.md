@@ -1,7 +1,7 @@
 # ms.validation.attributes
 
 **Tags**: 
-[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
+[conversion](categories.md#conversion-properties)
 
 **Type**: string
 
@@ -55,4 +55,4 @@ Failed records cannot be more than 30% of total records:
 
 `ms.validation.attributes={"threshold": "30", "criteria" : "fail"}`
        
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msvalidationattributes)   
+[back to summary](summary.md#msvalidationattributes)   

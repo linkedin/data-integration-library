@@ -1,8 +1,8 @@
 # ms.source.s3.parameters
 
 **Tags**:
-[connection](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#connection-properties),
-[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties)
+[connection](categories.md#connection-properties),
+[source](categories.md#source-properties)
 
 **Type**: string
 
@@ -28,4 +28,4 @@ It can have the following attributes:
 
 `ms.source.s3.parameters={"region" : "us-east-1"}`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mssources3parameters)      
+[back to summary](summary.md#mssources3parameters)      

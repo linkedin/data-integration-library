@@ -6,7 +6,16 @@ package com.linkedin.cdi.connection;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.configuration.MultistageProperties;
+import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.factory.ConnectionClientFactory;
+import com.linkedin.cdi.keys.ExtractorKeys;
+import com.linkedin.cdi.keys.JdbcKeys;
+import com.linkedin.cdi.keys.JobKeys;
+import com.linkedin.cdi.util.JdbcUtils;
+import com.linkedin.cdi.util.ParameterTypes;
+import com.linkedin.cdi.util.SchemaBuilder;
+import com.linkedin.cdi.util.WorkUnitStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
@@ -18,22 +27,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.exception.RetriableAuthenticationException;
-import com.linkedin.cdi.keys.ExtractorKeys;
-import com.linkedin.cdi.keys.JdbcKeys;
-import com.linkedin.cdi.keys.JobKeys;
-import com.linkedin.cdi.util.JdbcUtils;
-import com.linkedin.cdi.util.ParameterTypes;
-import com.linkedin.cdi.util.SchemaBuilder;
-import com.linkedin.cdi.util.WorkUnitStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * JdbcConnection creates transmission channel with JDBC data provider or JDBC data receiver,
@@ -41,13 +39,26 @@ import com.linkedin.cdi.util.WorkUnitStatus;
  *
  * @author Chris Li
  */
-@Slf4j
 public class JdbcConnection extends MultistageConnection {
-  @Getter(AccessLevel.PACKAGE)
-  @Setter(AccessLevel.PACKAGE)
+  private static final Logger LOG = LoggerFactory.getLogger(JdbcConnection.class);
   private JdbcKeys jdbcSourceKeys;
-  @Getter(AccessLevel.PACKAGE)
-  @Setter(AccessLevel.PACKAGE)
+
+  public JdbcKeys getJdbcSourceKeys() {
+    return jdbcSourceKeys;
+  }
+
+  public void setJdbcSourceKeys(JdbcKeys jdbcSourceKeys) {
+    this.jdbcSourceKeys = jdbcSourceKeys;
+  }
+
+  public Connection getJdbcConnection() {
+    return jdbcConnection;
+  }
+
+  public void setJdbcConnection(Connection jdbcConnection) {
+    this.jdbcConnection = jdbcConnection;
+  }
+
   private Connection jdbcConnection;
 
   public JdbcConnection(State state, JobKeys jobKeys, ExtractorKeys extractorKeys) {
@@ -63,7 +74,7 @@ public class JdbcConnection extends MultistageConnection {
         getWorkUnitSpecificString(jdbcSourceKeys.getJdbcStatement(), getExtractorKeys().getDynamicParameters()),
         status);
     } catch (Exception e) {
-      log.error(e.getMessage(), e);
+      LOG.error(e.getMessage(), e);
       return null;
     }
   }
@@ -76,7 +87,7 @@ public class JdbcConnection extends MultistageConnection {
         jdbcConnection = null;
       }
     } catch (Exception e) {
-      log.error("Error closing the input stream", e);
+      LOG.error("Error closing the input stream", e);
       return false;
     }
     return true;
@@ -110,7 +121,7 @@ public class JdbcConnection extends MultistageConnection {
           MultistageProperties.SOURCE_CONN_PASSWORD.getValidNonblankWithDefault(state),
           state);
     } catch (Exception e) {
-      log.error("Error creating Jdbc connection: {}", e.getMessage());
+      LOG.error("Error creating Jdbc connection: {}", e.getMessage());
     }
     return null;
   }
@@ -145,14 +156,14 @@ public class JdbcConnection extends MultistageConnection {
       String query,
       WorkUnitStatus wuStatus) throws SQLException {
 
-    log.info("Executing SQL statement: {}", query);
+    LOG.info("Executing SQL statement: {}", query);
     Statement stmt = jdbcConnection.createStatement();
 
     if (jdbcSourceKeys.isPaginationEnabled()) {
       try {
         stmt.setFetchSize(jdbcSourceKeys.getPaginationInitValues().get(ParameterTypes.PAGESIZE).intValue());
       } catch (SQLException e) {
-        log.warn("not able to set fetch size");
+        LOG.warn("not able to set fetch size");
       }
     }
 
@@ -212,7 +223,6 @@ public class JdbcConnection extends MultistageConnection {
    * @return a 2-dimensional string matrix representing a CSV file
    * @throws SQLException SQL Exception from processing ResultSet
    */
-  @NonNull
   private String toCsv(final ResultSet resultSet, final ResultSetMetaData resultSetMetadata) throws SQLException {
     StringBuilder builder = new StringBuilder();
 

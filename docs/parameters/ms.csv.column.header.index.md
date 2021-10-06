@@ -1,22 +1,22 @@
 # ms.csv.column.header.index
 
 **Tags**: 
-[csv extractor](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#csv-extractor-properties)
+[csv extractor](categories.md#csv-extractor-properties)
 
 **Type**: integer
 
 **Default** value: 0
 
 ## Related 
-- [job property: ms.csv.column.header](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.column.header.md)
-- [job property: ms.csv.skip.lines](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.skip.lines.md)
+- [job property: ms.csv.column.header](ms.csv.column.header.md)
+- [job property: ms.csv.skip.lines](ms.csv.skip.lines.md)
 
 ## Description
 
 ms.csv.column.header.index specifies the 0-based row index of the header columns if they are available.
 
 CSV files may have 1 or more descriptive lines before the actual data. These descriptive lines, 
-including the column header line, should be skipped. see [ms.csv.skip.lines](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.skip.lines.md)
+including the column header line, should be skipped. see [ms.csv.skip.lines](ms.csv.skip.lines.md)
 
 Note the column header line can be in any place of the skipped lines 
 
@@ -48,4 +48,4 @@ Job configuration would be:
 
 `ms.csv.skip.lines = 3`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mscsvcolumnheaderindex)
+[back to summary](summary.md#mscsvcolumnheaderindex)

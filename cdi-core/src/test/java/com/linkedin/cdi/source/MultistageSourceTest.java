@@ -263,7 +263,7 @@ public class MultistageSourceTest {
   }
 
   @Test
-  public void testReadSecondaryAuthentication() {
+  public void testReadSecondaryAuthentication() throws InterruptedException {
     JsonArray secondaryInput = gson.fromJson("[{\"fields\": [\"access_token\"], \"category\": \"authentication\"}]", JsonArray.class);
     JobKeys jobKeys = Mockito.mock(JobKeys.class);
     State state = Mockito.mock(State.class);

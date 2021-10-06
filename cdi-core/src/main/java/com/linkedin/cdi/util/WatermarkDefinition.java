@@ -10,15 +10,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.util.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
@@ -30,9 +29,61 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
  *
  * @author chrli
  */
-@Slf4j @Getter @Setter
 public class WatermarkDefinition {
+  private static final Logger LOG = LoggerFactory.getLogger(WatermarkDefinition.class);
   final private static String DEFAULT_TIMEZONE = "America/Los_Angeles";
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public WatermarkTypes getType() {
+    return type;
+  }
+
+  public void setType(WatermarkTypes type) {
+    this.type = type;
+  }
+
+  public Pair<String, String> getRange() {
+    return range;
+  }
+
+  public void setRange(Pair<String, String> range) {
+    this.range = range;
+  }
+
+  public Boolean getIsPartialPartition() {
+    return isPartialPartition;
+  }
+
+  public void setIsPartialPartition(Boolean partialPartition) {
+    isPartialPartition = partialPartition;
+  }
+
+  public WorkUnitPartitionTypes getWorkUnitPartitionType() {
+    return workUnitPartitionType;
+  }
+
+  public void setWorkUnitPartitionType(WorkUnitPartitionTypes workUnitPartitionType) {
+    this.workUnitPartitionType = workUnitPartitionType;
+  }
+
+  public void setUnits(String units) {
+    this.units = units;
+  }
+
+  public String getTimezone() {
+    return timezone;
+  }
+
+  public void setTimezone(String timezone) {
+    this.timezone = timezone;
+  }
 
   public enum WatermarkTypes {
     DATETIME("datetime"),
@@ -101,8 +152,8 @@ public class WatermarkDefinition {
     try {
         GSON.fromJson(commaSeparatedUnits, JsonArray.class);
     } catch (Exception e) {
-      log.info("Assuming simple Unit Watermark definition as the unit watermark cannot be converted to JsonArray");
-      log.info("Origin unit watermark definition: {} : {}", name, commaSeparatedUnits);
+      LOG.info("Assuming simple Unit Watermark definition as the unit watermark cannot be converted to JsonArray");
+      LOG.info("Origin unit watermark definition: {} : {}", name, commaSeparatedUnits);
       isJsonArrayUnits = false;
     }
 

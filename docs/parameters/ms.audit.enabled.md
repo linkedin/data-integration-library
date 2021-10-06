@@ -1,7 +1,7 @@
 # ms.audit.enabled
 
 **Tags**: 
-[auditing](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#auditing-properties)
+[auditing](categories.md#auditing-properties)
 
 **Type**: boolean
 
@@ -10,10 +10,10 @@
 **Default value**: false
 
 ## Related 
-- [ms.kafka.brokers](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.kafka.brokers.md)
-- [ms.kafka.clientId](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.kafka.clientId.md)
-- [ms.kafka.schema.registry.url](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.kafka.schema.registry.url.md)
-- [ms.kafka.audit.topic.name](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.kafka.audit.topic.name.md)
+- [ms.kafka.brokers](ms.kafka.brokers.md)
+- [ms.kafka.clientId](ms.kafka.clientId.md)
+- [ms.kafka.schema.registry.url](ms.kafka.schema.registry.url.md)
+- [ms.kafka.audit.topic.name](ms.kafka.audit.topic.name.md)
 
 ## Description 
 
@@ -22,5 +22,5 @@ including parameters and payloads to data lake through Kafka.
 
 Auditing is an important part of egression, but ingestion requests can also be audited.
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msauditenabled)
+[back to summary](summary.md#msauditenabled)
  

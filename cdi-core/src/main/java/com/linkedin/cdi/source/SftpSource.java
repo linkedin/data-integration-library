@@ -11,26 +11,30 @@ import com.linkedin.cdi.keys.SftpKeys;
 import com.linkedin.cdi.util.VariableUtils;
 import java.net.URI;
 import java.net.URISyntaxException;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.gobblin.configuration.ConfigurationKeys;
 import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.source.extractor.Extractor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Source class to handle sftp protocol
  */
-@Slf4j
 public class SftpSource extends MultistageSource<Schema, GenericRecord> {
-  @Getter(AccessLevel.PUBLIC)
-  @Setter
+  private static final Logger LOG = LoggerFactory.getLogger(SftpSource.class);
   SftpKeys sftpSourceKeys;
+
+  public SftpKeys getSftpSourceKeys() {
+    return sftpSourceKeys;
+  }
+
+  public void setSftpSourceKeys(SftpKeys sftpSourceKeys) {
+    this.sftpSourceKeys = sftpSourceKeys;
+  }
 
   public SftpSource() {
     sftpSourceKeys = new SftpKeys();
@@ -83,7 +87,7 @@ public class SftpSource extends MultistageSource<Schema, GenericRecord> {
         }
         sftpSourceKeys.setFilesPath(uri.getPath());
       } catch (URISyntaxException e) {
-        log.warn("Invalid URI format in ms.source.uri", e);
+        LOG.warn("Invalid URI format in ms.source.uri", e);
       }
     }
   }

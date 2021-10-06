@@ -8,10 +8,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
@@ -20,6 +24,9 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -45,7 +52,6 @@ import org.apache.http.entity.StringEntity;
  * @author chrli
  */
 
-@Slf4j
 public enum HttpRequestMethod {
   GET("GET") {
     @Override
@@ -80,8 +86,7 @@ public enum HttpRequestMethod {
     protected HttpUriRequest getHttpRequestContentUrlEncoded(String uriTemplate, JsonObject parameters)
         throws UnsupportedEncodingException {
       Pair<String, JsonObject> replaced = replaceVariables(uriTemplate, parameters);
-      String urlEncoded = jsonToUrlEncoded(replaced.getValue());
-      return setEntity(new HttpPost(replaced.getKey()), urlEncoded);
+      return setEntity(new HttpPost(replaced.getKey()), jsonToUrlEncodedEntity(replaced.getValue()));
     }
   },
 
@@ -101,7 +106,7 @@ public enum HttpRequestMethod {
     protected HttpUriRequest getHttpRequestContentUrlEncoded(String uriTemplate, JsonObject parameters)
         throws UnsupportedEncodingException {
       Pair<String, JsonObject> replaced = replaceVariables(uriTemplate, parameters);
-      return setEntity(new HttpPut(replaced.getKey()), jsonToUrlEncoded(replaced.getValue()));
+      return setEntity(new HttpPut(replaced.getKey()), jsonToUrlEncodedEntity(replaced.getValue()));
     }
   },
 
@@ -125,6 +130,7 @@ public enum HttpRequestMethod {
     }
   };
 
+  private static final Logger LOG = LoggerFactory.getLogger(HttpRequestMethod.class);
   private final String name;
 
   HttpRequestMethod(String name) {
@@ -171,13 +177,13 @@ public enum HttpRequestMethod {
       if (!replaced.getLeft().equals(entry.getValue())) {
         parametersCopy = JsonUtils.deepCopy(replaced.getRight()).getAsJsonObject();
         headersCopy.put(entry.getKey(), replaced.getLeft());
-        log.info("Substituted header string: {} = {}", entry.getKey(), replaced.getLeft());
+        LOG.info("Substituted header string: {} = {}", entry.getKey(), replaced.getLeft());
       } else {
         headersCopy.put(entry.getKey(), entry.getValue());
       }
     }
 
-    log.info("Final parameters for HttpRequest: {}", parametersCopy.toString());
+    LOG.info("Final parameters for HttpRequest: {}", parametersCopy.toString());
     if (headersCopy.containsKey("Content-Type")
         && headersCopy.get("Content-Type").equals("application/x-www-form-urlencoded")) {
       request = getHttpRequestContentUrlEncoded(uriTemplate, parametersCopy);
@@ -220,8 +226,7 @@ public enum HttpRequestMethod {
     try {
       URIBuilder builder = new URIBuilder(new URI(uri));
       for (Map.Entry<String, JsonElement> entry : parameters.entrySet()) {
-        String key = entry.getKey();
-        builder.addParameter(key, parameters.get(key).getAsString());
+        builder.addParameter(entry.getKey(), entry.getValue().getAsString());
       }
       return builder.build().toString();
     } catch (Exception e) {
@@ -230,7 +235,7 @@ public enum HttpRequestMethod {
   }
 
   /**
-   * Convert Json formatted parameter set to Url Encoded format as requested by
+   * Convert Json formatted parameter set to Url Encoded Entity as requested by
    * Content-Type: application/x-www-form-urlencoded
    * Json Example:
    *    {"param1": "value1", "param2": "value2"}
@@ -239,16 +244,15 @@ public enum HttpRequestMethod {
    *   param1=value1&param2=value2
    *
    * @param parameters Json structured parameters
-   * @return URL encoded parameters
+   * @return URL encoded entity
    */
-  protected String jsonToUrlEncoded(JsonObject parameters) {
+  protected UrlEncodedFormEntity jsonToUrlEncodedEntity(JsonObject parameters) {
     try {
-      URIBuilder builder = new URIBuilder("https://www.dummy.com");
+      List<NameValuePair> nameValuePairs = new ArrayList<>();
       for (Map.Entry<String, JsonElement> entry : parameters.entrySet()) {
-        String key = entry.getKey();
-        builder.addParameter(key, parameters.get(key).getAsString());
+        nameValuePairs.add(new BasicNameValuePair(entry.getKey(),entry.getValue().getAsString()));
       }
-      return EndecoUtils.getEncodedUtf8(builder.build().getQuery());
+      return new UrlEncodedFormEntity(nameValuePairs, StandardCharsets.UTF_8);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -256,7 +260,11 @@ public enum HttpRequestMethod {
 
   protected HttpUriRequest setEntity(HttpEntityEnclosingRequestBase requestBase, String stringEntity)
       throws UnsupportedEncodingException {
-    requestBase.setEntity(new StringEntity(stringEntity));
+    return setEntity(requestBase, new StringEntity(stringEntity));
+  }
+
+  protected HttpUriRequest setEntity(HttpEntityEnclosingRequestBase requestBase, StringEntity stringEntity) {
+    requestBase.setEntity(stringEntity);
     return requestBase;
   }
 }

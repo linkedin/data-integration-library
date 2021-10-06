@@ -7,7 +7,6 @@ package com.linkedin.cdi.util;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import java.util.List;
-import lombok.SneakyThrows;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.gobblin.configuration.WorkUnitState;
@@ -27,9 +26,8 @@ public class AvroSchemaUtilsTest {
   JsonArray schemaArray = new Gson().fromJson(schemaString, JsonArray.class);
   Schema schema;
 
-  @SneakyThrows
   @BeforeMethod
-  public void beforeMethod() {
+  public void beforeMethod() throws UnsupportedDateTypeException {
     state = mock(WorkUnitState.class);
     Extract extract = new Extract(Extract.TableType.SNAPSHOT_ONLY, "com.linkedin.test", "test");
     when(state.getExtract()).thenReturn(extract);
