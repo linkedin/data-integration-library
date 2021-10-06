@@ -24,12 +24,16 @@ public interface AvroSchemaUtils {
    * @return avro schema
    * @throws UnsupportedDateTypeException unsupported type
    */
-  static Schema fromJsonSchema(JsonArray schema, WorkUnitState state) throws UnsupportedDateTypeException {
+  static Schema fromJsonSchema(JsonArray schema, WorkUnitState state) {
     JsonSchema jsonSchema = new JsonSchema(schema);
     jsonSchema.setColumnName(state.getExtract().getTable());
-    JsonElementConversionFactory.RecordConverter recordConverter =
-        new JsonElementConversionFactory.RecordConverter(jsonSchema, state, state.getExtract().getNamespace());
-    return recordConverter.schema();
+    try {
+      JsonElementConversionFactory.RecordConverter recordConverter =
+          new JsonElementConversionFactory.RecordConverter(jsonSchema, state, state.getExtract().getNamespace());
+      return recordConverter.schema();
+    } catch (Exception e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
   }
 
   /**
@@ -62,12 +66,7 @@ public interface AvroSchemaUtils {
     JsonArray eofSchema = new Gson()
         .fromJson("[{\"columnName\":\"EOF\",\"isNullable\":\"false\",\"dataType\":{\"type\":\"string\"}}]",
             JsonArray.class);
-    Schema schema = null;
-    try {
-      schema = fromJsonSchema(eofSchema, state);
-    } catch (UnsupportedDateTypeException e) {
-      // impossible, since the schema is fixed here and string type is supported
-    }
+    Schema schema = fromJsonSchema(eofSchema, state);
     assert (schema != null);
     GenericRecord eofRecord = new GenericData.Record(schema);
     eofRecord.put("EOF", "EOF");

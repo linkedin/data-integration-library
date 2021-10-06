@@ -12,7 +12,6 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.gobblin.configuration.WorkUnitState;
-import org.apache.gobblin.converter.avro.UnsupportedDateTypeException;
 import org.apache.gobblin.util.AvroUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,7 @@ public class AvroSchemaBasedFilter extends MultistageSchemaBasedFilter<GenericRe
   }
 
   @Override
-  public GenericRecord filter(GenericRecord input) throws UnsupportedDateTypeException {
+  public GenericRecord filter(GenericRecord input) {
     Schema outputSchema = AvroSchemaUtils.fromJsonSchema(schema.toJson(), state);
     GenericRecord filteredRow = new GenericData.Record(outputSchema);
     for (String fieldName : AvroSchemaUtils.getSchemaFieldNames(outputSchema)) {

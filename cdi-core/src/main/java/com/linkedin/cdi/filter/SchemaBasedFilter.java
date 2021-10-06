@@ -4,13 +4,10 @@
 
 package com.linkedin.cdi.filter;
 
-import org.apache.gobblin.converter.avro.UnsupportedDateTypeException;
-
-
 /**
  * Base filter interface
  *
  */
 public interface SchemaBasedFilter<T> {
-  T filter(T input) throws UnsupportedDateTypeException;
+  T filter(T input);
 }

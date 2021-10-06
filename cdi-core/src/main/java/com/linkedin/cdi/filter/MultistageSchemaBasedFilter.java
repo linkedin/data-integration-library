@@ -5,7 +5,6 @@
 package com.linkedin.cdi.filter;
 
 import com.linkedin.cdi.util.JsonIntermediateSchema;
-import org.apache.gobblin.converter.avro.UnsupportedDateTypeException;
 
 
 /**
@@ -21,7 +20,7 @@ public class MultistageSchemaBasedFilter<T> implements SchemaBasedFilter<T> {
   }
 
   @Override
-  public T filter(T input) throws UnsupportedDateTypeException {
+  public T filter(T input) {
     return null;
   }
 }
