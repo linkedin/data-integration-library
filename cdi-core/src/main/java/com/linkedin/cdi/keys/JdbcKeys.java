@@ -6,13 +6,9 @@ package com.linkedin.cdi.keys;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
-import java.util.List;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.gobblin.configuration.State;
 import com.linkedin.cdi.configuration.MultistageProperties;
+import java.util.List;
+import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

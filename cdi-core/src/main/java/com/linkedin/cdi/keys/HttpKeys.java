@@ -6,16 +6,12 @@ package com.linkedin.cdi.keys;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.configuration.MultistageProperties;
+import com.linkedin.cdi.util.HttpRequestMethod;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.util.HttpRequestMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

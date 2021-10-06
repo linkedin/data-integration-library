@@ -4,11 +4,9 @@
 
 package com.linkedin.cdi.util;
 
-import com.linkedin.cdi.keys.JdbcKeys;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

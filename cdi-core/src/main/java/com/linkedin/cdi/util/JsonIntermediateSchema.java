@@ -12,9 +12,6 @@ import com.google.gson.JsonObject;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 

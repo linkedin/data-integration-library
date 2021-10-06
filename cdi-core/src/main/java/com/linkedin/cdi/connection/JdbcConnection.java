@@ -6,7 +6,16 @@ package com.linkedin.cdi.connection;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.configuration.MultistageProperties;
+import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.factory.ConnectionClientFactory;
+import com.linkedin.cdi.keys.ExtractorKeys;
+import com.linkedin.cdi.keys.JdbcKeys;
+import com.linkedin.cdi.keys.JobKeys;
+import com.linkedin.cdi.util.JdbcUtils;
+import com.linkedin.cdi.util.ParameterTypes;
+import com.linkedin.cdi.util.SchemaBuilder;
+import com.linkedin.cdi.util.WorkUnitStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
@@ -18,22 +27,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.exception.RetriableAuthenticationException;
-import com.linkedin.cdi.keys.ExtractorKeys;
-import com.linkedin.cdi.keys.JdbcKeys;
-import com.linkedin.cdi.keys.JobKeys;
-import com.linkedin.cdi.util.JdbcUtils;
-import com.linkedin.cdi.util.ParameterTypes;
-import com.linkedin.cdi.util.SchemaBuilder;
-import com.linkedin.cdi.util.WorkUnitStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -228,7 +223,6 @@ public class JdbcConnection extends MultistageConnection {
    * @return a 2-dimensional string matrix representing a CSV file
    * @throws SQLException SQL Exception from processing ResultSet
    */
-  @NonNull
   private String toCsv(final ResultSet resultSet, final ResultSetMetaData resultSetMetadata) throws SQLException {
     StringBuilder builder = new StringBuilder();
 

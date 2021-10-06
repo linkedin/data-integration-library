@@ -5,13 +5,11 @@
 package com.linkedin.cdi.preprocessor;
 
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.util.EncryptionUtils;
 import java.io.IOException;
 import java.io.OutputStream;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.gobblin.codec.StreamCodec;
-import com.linkedin.cdi.util.EncryptionUtils;
 
 
 /**

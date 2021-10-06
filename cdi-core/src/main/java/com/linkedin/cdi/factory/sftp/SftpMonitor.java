@@ -6,8 +6,6 @@ package com.linkedin.cdi.factory.sftp;
 
 import com.jcraft.jsch.SftpProgressMonitor;
 import com.linkedin.cdi.factory.DefaultConnectionClientFactory;
-import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

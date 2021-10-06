@@ -5,6 +5,7 @@
 package com.linkedin.cdi.keys;
 
 import com.google.common.collect.Lists;
+import com.linkedin.cdi.configuration.MultistageProperties;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
@@ -13,13 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import org.apache.gobblin.source.workunit.WorkUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

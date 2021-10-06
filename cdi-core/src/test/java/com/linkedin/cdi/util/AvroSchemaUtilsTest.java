@@ -7,7 +7,6 @@ package com.linkedin.cdi.util;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import java.util.List;
-import lombok.SneakyThrows;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.gobblin.configuration.WorkUnitState;
