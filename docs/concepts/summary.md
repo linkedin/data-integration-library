@@ -6,29 +6,39 @@
 
 ## [ISO Duration](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/iso-date-interval.md)
 
-## [Json Path](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/json-path.md)
+## [Job Type](job-type.md)
 
-## [Pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md)
+We have the following logical types of Azkaban jobs in 
+data integration workflows. These job types are not differentiated by
+any particular parameter; **they are configured the same way, and
+they look alike**; only they serve different **purposes**. 
+They are differentiated here because each of 
+them follow certain **patterns**. Understanding these logical types 
+of jobs can help configure them quicker. 
+
+## [Json Path](json-path.md)
+
+## [Pagination](pagination.md)
 
 Pagination is typically used to fetch a large dataset from cloud over HTTP, where
 one fetch can only optimally get a limited chunk of data. In such case,
 the data is fetched through a series of pages. 
 
-## [Schema](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/schema.md)
+## [Schema](schema.md)
 
-## [Secondary Input](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/secondary-input.md)
+## [Secondary Input](secondary-input.md)
 
-## [Secret Encryption](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/secret-encryption.md)
+## [Secret Encryption](secret-encryption.md)
 
-## [Session Control](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/session-control.md)
+## [Session Control](session-control.md)
 
-## [Single Flow](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/single-flow.md)
+## [Single Flow](single-flow.md)
 
-## [Variable](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variables.md)
+## [Variable](variables.md)
 
 A variable provides dynamic input through substitution to parameters. 
 
-## [Watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/watermark.md)
+## [Watermark](watermark.md)
 
 There are two types of watermarks:
 
@@ -40,7 +50,7 @@ Time watermark defines a time range, with a `from` datetime and a
 
 A "Unit" watermark holds individual values, like ids. It is a list of string values.
 
-## [Work Unit](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/work-unit.md)
+## [Work Unit](work-unit.md)
 
 "Time" watermarks can generate partitions, and "unit" watermarks have units. 
 
