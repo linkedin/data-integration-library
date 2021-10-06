@@ -10,6 +10,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.linkedin.cdi.configuration.MultistageProperties;
+import com.linkedin.cdi.connection.MultistageConnection;
+import com.linkedin.cdi.exception.RetriableAuthenticationException;
+import com.linkedin.cdi.filter.JsonSchemaBasedFilter;
+import com.linkedin.cdi.keys.CsvExtractorKeys;
+import com.linkedin.cdi.keys.JobKeys;
+import com.linkedin.cdi.source.HttpSource;
+import com.linkedin.cdi.source.MultistageSource;
+import com.linkedin.cdi.util.WorkUnitStatus;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -25,19 +34,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.SourceState;
 import org.apache.gobblin.configuration.WorkUnitState;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.connection.MultistageConnection;
-import com.linkedin.cdi.exception.RetriableAuthenticationException;
-import com.linkedin.cdi.filter.JsonSchemaBasedFilter;
-import com.linkedin.cdi.keys.CsvExtractorKeys;
-import com.linkedin.cdi.keys.JobKeys;
-import com.linkedin.cdi.source.HttpSource;
-import com.linkedin.cdi.source.MultistageSource;
-import com.linkedin.cdi.util.WorkUnitStatus;
 import org.apache.gobblin.source.extractor.utils.InputStreamCSVReader;
 import org.apache.gobblin.source.workunit.WorkUnit;
 import org.joda.time.DateTime;
@@ -48,6 +47,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.reflect.Whitebox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
@@ -58,9 +59,8 @@ import static org.mockito.Mockito.*;
 
 
 @Test
-@Slf4j
 public class CsvExtractorTest {
-
+  private static final Logger LOG = LoggerFactory.getLogger(CsvExtractorTest.class);
   private final static String DATA_SET_URN_KEY = "com.linkedin.somecase.SeriesCollection";
   private final static String ACTIVATION_PROP = "{\"name\": \"survey\", \"type\": \"unit\", \"units\": \"id1,id2\"}";
   private final static String DATA_FINAL_DIR = "/jobs/testUser/gobblin/useCaseRoot";

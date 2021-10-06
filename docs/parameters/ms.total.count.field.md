@@ -1,8 +1,8 @@
 # ms.total.count.field
 
 **Tags**:
-[pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#pagination-properties),
-[source](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#source-properties)
+[pagination](categories.md#pagination-properties),
+[source](categories.md#source-properties)
 
 **Type**: string
 
@@ -12,7 +12,7 @@
 
 ## Related 
 
-- [Concept: pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md)
+- [key concept: pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md)
 
 Total Count field directs DIL how to retrieve the expected total row counts. This is important when there are large
 volume of data and [pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md) 
@@ -31,7 +31,7 @@ Example 1: if the response from the source is like this: `{..."total_records" : 
 Example 2: if the response from the source is like this `{..."records": {..."totalRecords": 9999...}...}`, then
 the configuration can be `ms.total.count.field = records.totalRecords`. 
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mstotalcountfield)
+[back to summary](summary.md#mstotalcountfield)
 
 
 

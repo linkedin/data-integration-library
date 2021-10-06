@@ -1,7 +1,7 @@
 # ms.http.request.method
 
 **Tags**: 
-[http](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#http-properties)
+[http](categories.md#http-properties)
 
 **Type**: string
 
@@ -22,5 +22,5 @@ The expected HTTP method to send the requests, decided by the API.
 
 **Note**: URL parameters are URL encoded.
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mshttprequestmethod)
+[back to summary](summary.md#mshttprequestmethod)
 

@@ -31,7 +31,6 @@ dependencies {
   compile externalDependency.'awsUtils'
   compile externalDependency.'commonsValidator'
   compile externalDependency.'guava'
-  compile externalDependency.'lombok'
   compile externalDependency.'commonsLang3'
   compile externalDependency.'testng'
   compile externalDependency.'jhyde'

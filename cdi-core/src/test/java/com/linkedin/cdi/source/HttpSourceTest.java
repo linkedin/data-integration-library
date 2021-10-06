@@ -8,22 +8,21 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
-import org.apache.gobblin.configuration.ConfigurationKeys;
-import org.apache.gobblin.configuration.SourceState;
-import org.apache.gobblin.configuration.WorkUnitState;
 import com.linkedin.cdi.extractor.JsonExtractor;
 import com.linkedin.cdi.helpers.GobblinMultiStageTestHelpers;
 import com.linkedin.cdi.keys.HttpKeys;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.util.EncryptionUtils;
 import com.linkedin.cdi.util.ParameterTypes;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang.StringUtils;
+import org.apache.gobblin.configuration.ConfigurationKeys;
+import org.apache.gobblin.configuration.SourceState;
+import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.runtime.embedded.EmbeddedGobblin;
 import org.apache.gobblin.source.workunit.WorkUnit;
 import org.mockito.Mockito;
@@ -31,6 +30,8 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.powermock.reflect.Whitebox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -40,10 +41,9 @@ import static com.linkedin.cdi.source.HttpSource.*;
 import static org.mockito.Mockito.*;
 
 
-@Slf4j
 @PrepareForTest({EncryptionUtils.class})
 public class HttpSourceTest extends PowerMockTestCase {
-
+  private static final Logger LOG = LoggerFactory.getLogger(HttpSourceTest.class);
   private Gson gson;
   private WorkUnitState state;
   private HttpSource source;

@@ -1,7 +1,7 @@
 # ms.http.statuses
 
 **Tags**: 
-[http](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#http-properties)
+[http](categories.md#http-properties)
 
 **Type**: string
 
@@ -41,4 +41,4 @@ In following configuration, we make 404 an warning, and make 206 a failure indic
 that partial content is not acceptable:
 - `ms.http.statuses={"success": [200], "warning": [404], "error": [206]}`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mshttpstatuses)
+[back to summary](summary.md#mshttpstatuses)

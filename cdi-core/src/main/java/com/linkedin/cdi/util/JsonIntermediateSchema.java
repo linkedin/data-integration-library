@@ -12,9 +12,6 @@ import com.google.gson.JsonObject;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
@@ -44,22 +41,54 @@ public class JsonIntermediateSchema {
   public static final String CHILD_RECORD_COLUMN_NAME = "child";
 
   // LinkedHashMap maintains insertion order, so the key set will be in the same order as the output schema
-  @Getter
   Map<String, JisColumn> columns = new LinkedHashMap<>();
-
-  @Getter @Setter
   String schemaName;
+
+  public Map<String, JisColumn> getColumns() {
+    return columns;
+  }
+
+  public void setColumns(Map<String, JisColumn> columns) {
+    this.columns = columns;
+  }
+
+  public String getSchemaName() {
+    return schemaName;
+  }
+
+  public void setSchemaName(String schemaName) {
+    this.schemaName = schemaName;
+  }
 
   // a JIS schema contains JIS columns
   public class JisColumn {
-    @NonNull @Getter @Setter
     String columnName;
-
-    @Getter @Setter
     Boolean isNullable;
-
-    @Getter @Setter
     JisDataType dataType;
+
+    public String getColumnName() {
+      return columnName;
+    }
+
+    public void setColumnName(String columnName) {
+      this.columnName = columnName;
+    }
+
+    public Boolean getIsNullable() {
+      return isNullable;
+    }
+
+    public void setIsNullable(Boolean nullable) {
+      isNullable = nullable;
+    }
+
+    public JisDataType getDataType() {
+      return dataType;
+    }
+
+    public void setDataType(JisDataType dataType) {
+      this.dataType = dataType;
+    }
 
     // define a simple column
     JisColumn(String name, Boolean isNullable, String type) {
@@ -107,27 +136,69 @@ public class JsonIntermediateSchema {
 
   // a JIS Column has a JIS Data Type
   public class JisDataType {
-    @NonNull @Getter @Setter
     JsonElementTypes type;
 
     // data type name is optional
-    @Getter @Setter
     String name;
 
     // values have the array of field definitions when the type is record
-    @Getter @Setter
     JsonIntermediateSchema childRecord;
 
     // items have the item definition
-    @Getter @Setter
     JisDataType itemType;
 
     // unions have item types
-    @Getter @Setter
     List<JisDataType> itemTypes = Lists.newArrayList();
 
-    @Getter @Setter
     JsonArray symbols;
+
+    public JsonElementTypes getType() {
+      return type;
+    }
+
+    public void setType(JsonElementTypes type) {
+      this.type = type;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public JsonIntermediateSchema getChildRecord() {
+      return childRecord;
+    }
+
+    public void setChildRecord(JsonIntermediateSchema childRecord) {
+      this.childRecord = childRecord;
+    }
+
+    public JisDataType getItemType() {
+      return itemType;
+    }
+
+    public void setItemType(JisDataType itemType) {
+      this.itemType = itemType;
+    }
+
+    public List<JisDataType> getItemTypes() {
+      return itemTypes;
+    }
+
+    public void setItemTypes(List<JisDataType> itemTypes) {
+      this.itemTypes = itemTypes;
+    }
+
+    public JsonArray getSymbols() {
+      return symbols;
+    }
+
+    public void setSymbols(JsonArray symbols) {
+      this.symbols = symbols;
+    }
 
     // this defines primitive data type
     JisDataType(String type) {

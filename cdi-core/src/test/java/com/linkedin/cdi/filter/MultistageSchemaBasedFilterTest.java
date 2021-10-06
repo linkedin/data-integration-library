@@ -5,6 +5,7 @@
 package com.linkedin.cdi.filter;
 
 import com.linkedin.cdi.util.JsonIntermediateSchema;
+import org.apache.gobblin.converter.avro.UnsupportedDateTypeException;
 import org.mockito.Mockito;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -13,7 +14,7 @@ import org.testng.annotations.Test;
 public class MultistageSchemaBasedFilterTest {
 
   @Test
-  public void testFilter() {
+  public void testFilter() throws UnsupportedDateTypeException {
     JsonIntermediateSchema schema = Mockito.mock(JsonIntermediateSchema.class);
     MultistageSchemaBasedFilter filter = new MultistageSchemaBasedFilter(schema);
     Assert.assertEquals(filter.filter("input"), null);

@@ -9,22 +9,21 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.configuration.StaticConstants;
+import com.linkedin.cdi.util.HdfsReader;
 import com.linkedin.cdi.util.JsonUtils;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.converter.Converter;
-import com.linkedin.cdi.util.HdfsReader;
 import org.apache.gobblin.util.AvroUtils;
 import org.apache.gobblin.util.EmptyIterable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
@@ -48,8 +47,8 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
  *    Job succeeds when the row count in validation set / row count in base set >= threshold
  *    Job fails when the row count in validation set / row count in base set < threshold
  */
-@Slf4j
 public class InFlowValidationConverter extends Converter<Schema, Schema, GenericRecord, GenericRecord> {
+  private static final Logger LOG = LoggerFactory.getLogger(InFlowValidationConverter.class);
   int expectedRecordsCount;
   int actualRecordsCount;
   private String field;
@@ -164,7 +163,7 @@ public class InFlowValidationConverter extends Converter<Schema, Schema, Generic
   private void validateRule() {
     // check the threshold and throw new Runtime Exception
     float actualPercentage = ((float) actualRecordsCount / expectedRecordsCount) * 100;
-    log.info("base row count: {}, actual row count: {}", expectedRecordsCount, actualRecordsCount);
+    LOG.info("base row count: {}, actual row count: {}", expectedRecordsCount, actualRecordsCount);
 
     boolean failJob = criteria.equalsIgnoreCase(KEY_WORD_FAIL) && actualPercentage >= threshold
         || criteria.equalsIgnoreCase(KEY_WORD_SUCCESS) && actualPercentage < threshold;
@@ -173,7 +172,7 @@ public class InFlowValidationConverter extends Converter<Schema, Schema, Generic
       // Fail the validation by throwing runtime exception
       throw new RuntimeException("Failure Threshold exceeds more than " + threshold + "%");
     } else {
-      log.info("Validation passed with {} rate {}% {} {}%",
+      LOG.info("Validation passed with {} rate {}% {} {}%",
           criteria.equalsIgnoreCase(KEY_WORD_FAIL) ? "failure" : "success",
           new DecimalFormat("##.##").format(actualPercentage),
           criteria.equalsIgnoreCase(KEY_WORD_FAIL) ? "less than" : "greater than or equal",

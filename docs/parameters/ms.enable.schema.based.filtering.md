@@ -1,7 +1,7 @@
 # ms.enable.schema.based.filtering
 
 **Tags**: 
-[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
+[conversion](categories.md#conversion-properties)
 
 **Type**: boolean
 
@@ -25,5 +25,5 @@ Whe a flow uses a normalizer converter, this generally should be disabled.
 
 `ms.enable.schema.based.filtering=false`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msenableschemabasedfiltering)
+[back to summary](summary.md#msenableschemabasedfiltering)
 

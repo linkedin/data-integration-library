@@ -1,14 +1,14 @@
 # ms.extractor.target.file.permission
 
 **Tags**: 
-[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
+[conversion](categories.md#conversion-properties)
 
 **Type**: string
 
 **Default value**: "755"
 
 **Related**:
-- [ms.extractor.target.file.name](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extractor.target.file.name.md)
+- [ms.extractor.target.file.name](ms.extractor.target.file.name.md)
 
 ## Description
 
@@ -23,4 +23,4 @@ without going through converters or writers.
 
 `ms.extractor.target.file.permission=750`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msextractortargetfilepermission)
+[back to summary](summary.md#msextractortargetfilepermission)

@@ -1,6 +1,6 @@
 # ms.work.unit.parallelism.max
 
-**Tags**: [watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#watermark-work-unit-properties)
+**Tags**: [watermark & work unit](categories.md#watermark-work-unit-properties)
 
 **Type**: integer
 
@@ -8,7 +8,7 @@
 
 **Related**:
  
-- [job property: ms.work.unit.partition](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.work.unit.partition.md)
+- [job property: ms.work.unit.partition](ms.work.unit.partition.md)
 
 ## Description
 
@@ -71,4 +71,4 @@ Total work units is 56,000
 Each job execution takes about 1 hour, repeating the job hourly for about 10 days, 
 until all work units processed.
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+[back to summary](summary.md)

@@ -1,14 +1,14 @@
 # ms.extract.preprocessor.parameters
 
 **Tags**: 
-[conversion](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#conversion-properties)
+[conversion](categories.md#conversion-properties)
 
 **Type**: string
 
 **Format**: A JsonObject
 
 **Related**:
-- [job property: ms.extract.preprocessors](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.extract.preprocessors.md)
+- [job property: ms.extract.preprocessors](ms.extract.preprocessors.md)
 
 ## Description
 
@@ -28,4 +28,4 @@ For GPG based decryption/encryption, parameters needed are:
 The following provides key and password to GPG decryption:
 - `ms.extract.preprocessor.parameters={"com.linkedin.cdi.preprocessor.GpgDecryptProcessor": {"keystore_path" :"/some path/secret.gpg", "keystore_password" : "ENC(some password)"}}`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#msextractpreprocessorparameters)
+[back to summary](summary.md#msextractpreprocessorparameters)

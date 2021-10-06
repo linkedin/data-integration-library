@@ -1,20 +1,20 @@
 # ms.csv.quote.character
 
 **Tags**:
-[csv extractor](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#csv-extractor-properties)
+[csv extractor](categories.md#csv-extractor-properties)
 
 **Type**: string
 
 **Default value**: " (double-quote)
 
 ## Related 
-- [ms.csv.column.header](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.column.header.md)
-- [ms.csv.column.header.index](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.column.header.index.md)
-- [ms.csv.column.projection](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.column.projection.md)
-- [ms.csv.default.field.type](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.default.field.type.md)
-- [ms.csv.escape.character](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.escape.character.md)
-- [ms.csv.separator](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/)
-- [ms.csv.skip.lines](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.csv.skip.lines.md)
+- [ms.csv.column.header](ms.csv.column.header.md)
+- [ms.csv.column.header.index](ms.csv.column.header.index.md)
+- [ms.csv.column.projection](ms.csv.column.projection.md)
+- [ms.csv.default.field.type](ms.csv.default.field.type.md)
+- [ms.csv.escape.character](ms.csv.escape.character.md)
+- [ms.csv.separator](ms.csv.separator.md)
+- [ms.csv.skip.lines](ms.csv.skip.lines.md)
 
 ## Description
 
@@ -27,4 +27,4 @@ specified as "u007C". Note: in order to keep this form throughout the job execut
 being used by DIL, there should be no backslash before 'u', otherwise, GaaS may not be able to
 handle the configuration.
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mscsvquotecharacter)
+[back to summary](summary.md#mscsvquotecharacter)

@@ -1,6 +1,6 @@
 # ms.work.unit.partial.partition
 
-**Tags**: [watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#watermark-work-unit-properties)
+**Tags**: [watermark & work unit](categories.md#watermark-work-unit-properties)
 
 **Type**: boolean
 
@@ -9,8 +9,8 @@
 **Default value**: true
 
 **Related**: 
-- [job property: ms.watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.watermark.md)
-- [job property: ms.work.unit.partition](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.work.unit.partition.md)
+- [job property: ms.watermark](ms.watermark.md)
+- [job property: ms.work.unit.partition](ms.work.unit.partition.md)
 
 ## Description
 
@@ -21,4 +21,4 @@ For example, if you watermark date range 01/01-01/16, and set ms.work.unit.parti
 then the third partition of the data will be partial from 01/15-01/16. If you want this 
 partition of the data to be dropped, set this value to `false`.
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+[back to summary](summary.md)

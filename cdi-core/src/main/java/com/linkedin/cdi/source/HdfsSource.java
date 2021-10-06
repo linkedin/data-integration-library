@@ -7,23 +7,30 @@ package com.linkedin.cdi.source;
 import com.linkedin.cdi.connection.HdfsConnection;
 import com.linkedin.cdi.extractor.MultistageExtractor;
 import com.linkedin.cdi.keys.HdfsKeys;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.source.extractor.Extractor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * This class supports HDFS as just another protocol. The main function
  * of it is to launch a proper extractor with a HdfsConnection
  */
-@Slf4j
 public class HdfsSource extends MultistageSource<Schema, GenericRecord> {
-  @Getter @Setter
+  private static final Logger LOG = LoggerFactory.getLogger(HdfsSource.class);
+
+  public HdfsKeys getHdfsKeys() {
+    return hdfsKeys;
+  }
+
+  public void setHdfsKeys(HdfsKeys hdfsKeys) {
+    this.hdfsKeys = hdfsKeys;
+  }
+
   private HdfsKeys hdfsKeys;
 
   public HdfsSource() {

@@ -19,7 +19,7 @@ import org.slf4j.Logger;
  * @author chrli
  */
 public class WorkUnitStatus {
-  private static final Logger log = org.slf4j.LoggerFactory.getLogger(WorkUnitStatus.class);
+  private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(WorkUnitStatus.class);
   private long totalCount;
   private long setCount;
   private long pageNumber = 0;
@@ -38,7 +38,7 @@ public class WorkUnitStatus {
     this.pageStart = pageStart;
     this.pageSize = pageSize;
     this.buffer = buffer;
-    this.messages = messages;
+    this.messages = messages == null ? new HashMap<>() : messages;
     this.sessionKey = sessionKey;
   }
 
@@ -56,18 +56,19 @@ public class WorkUnitStatus {
       try {
         return new Gson().fromJson(messages.get("schema"), JsonArray.class);
       } catch (Exception e) {
-        log.warn("Error reading source schema", e);
+        LOG.warn("Error reading source schema", e);
       }
     }
     return new JsonArray();
   }
 
   public void logDebugAll() {
-    log.debug("These are values in WorkUnitStatus");
-    log.debug("Total count: {}", totalCount);
-    log.debug("Chunk count: {}", setCount);
-    log.debug("Pagination: {},{},{}", pageStart, pageSize, pageNumber);
-    log.debug("Session Status: {}", sessionKey);
+    LOG.debug("These are values in WorkUnitStatus");
+    LOG.debug("Total count: {}", totalCount);
+    LOG.debug("Chunk count: {}", setCount);
+    LOG.debug("Pagination: {},{},{}", pageStart, pageSize, pageNumber);
+    LOG.debug("Session Status: {}", sessionKey);
+    LOG.debug("Messages: {}", messages.toString());
   }
 
   public long getTotalCount() {
@@ -95,7 +96,7 @@ public class WorkUnitStatus {
   }
 
   public Map<String, String> getMessages() {
-    return this.messages == null ? new HashMap<>() : messages;
+    return messages;
   }
 
   public String getSessionKey() {
@@ -133,7 +134,7 @@ public class WorkUnitStatus {
   }
 
   public WorkUnitStatus setMessages(Map<String, String> messages) {
-    this.messages = messages;
+    this.messages = messages == null ? new HashMap<>() : messages;
     return this;
   }
 
@@ -203,7 +204,7 @@ public class WorkUnitStatus {
     }
 
     public WorkUnitStatus.WorkUnitStatusBuilder messages(Map<String, String> messages) {
-      this.messages = messages;
+      this.messages = messages == null ? new HashMap<>() : messages;
       return this;
     }
 

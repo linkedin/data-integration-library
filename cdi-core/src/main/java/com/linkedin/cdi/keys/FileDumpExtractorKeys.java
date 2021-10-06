@@ -4,22 +4,48 @@
 
 package com.linkedin.cdi.keys;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.gobblin.source.workunit.WorkUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-@Slf4j
-@Getter(AccessLevel.PUBLIC)
-@Setter
 public class FileDumpExtractorKeys extends ExtractorKeys {
+  private static final Logger LOG = LoggerFactory.getLogger(FileDumpExtractorKeys.class);
   String fileName;
   String fileWritePermissions;
   String fileDumpLocation;
-  @Getter
   private long currentFileNumber = 0;
+
+  public String getFileName() {
+    return fileName;
+  }
+
+  public void setFileName(String fileName) {
+    this.fileName = fileName;
+  }
+
+  public String getFileWritePermissions() {
+    return fileWritePermissions;
+  }
+
+  public void setFileWritePermissions(String fileWritePermissions) {
+    this.fileWritePermissions = fileWritePermissions;
+  }
+
+  public String getFileDumpLocation() {
+    return fileDumpLocation;
+  }
+
+  public void setFileDumpLocation(String fileDumpLocation) {
+    this.fileDumpLocation = fileDumpLocation;
+  }
+
+  public long getCurrentFileNumber() {
+    return currentFileNumber;
+  }
+
+  public void setCurrentFileNumber(long currentFileNumber) {
+    this.currentFileNumber = currentFileNumber;
+  }
 
   public long incrCurrentFileNumber() {
     return currentFileNumber++;
@@ -28,10 +54,10 @@ public class FileDumpExtractorKeys extends ExtractorKeys {
   @Override
   public void logDebugAll(WorkUnit workUnit) {
     super.logDebugAll(workUnit);
-    log.debug("These are values in FileDumpExtractor:");
-    log.debug("Dumping data with file name - " + fileName);
-    log.debug("Dumping data with permissions - " + fileWritePermissions);
-    log.debug("Dumping data at location - " + fileDumpLocation);
-    log.debug("Current file number - {}", currentFileNumber);
+    LOG.debug("These are values in FileDumpExtractor:");
+    LOG.debug("Dumping data with file name - " + fileName);
+    LOG.debug("Dumping data with permissions - " + fileWritePermissions);
+    LOG.debug("Dumping data at location - " + fileDumpLocation);
+    LOG.debug("Current file number - {}", currentFileNumber);
   }
 }

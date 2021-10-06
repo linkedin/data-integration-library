@@ -1,7 +1,7 @@
 # ms.http.response.type
 
 **Tags**: 
-[http](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#http-properties)
+[http](categories.md#http-properties)
 
 **Type**: string
 
@@ -28,4 +28,4 @@ The following accepts "application/x-gzip" in addition to "text/csv"
 in a CsvExtractor
 - `ms.http.response.type={"Content-Type":"application/x-gzip"}`
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mshttpresponsetype)
+[back to summary](summary.md#mshttpresponsetype)

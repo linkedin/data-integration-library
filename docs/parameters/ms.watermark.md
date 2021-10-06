@@ -1,7 +1,7 @@
 # ms.watermark
 
 **Tags**: 
-[watermark & work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md#watermark-work-unit-properties)
+[watermark & work unit](categories.md#watermark-work-unit-properties)
 
 **Type**: string
 
@@ -11,10 +11,11 @@
 
 **Related**:
 
-- [job property: ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md).
-- [job property: ms.work.unit.partition](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.work.unit.partition.md)
-- [concept: variable](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variable.md) 
-- [concept: work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/work-unit.md)
+- [job property: ms.parameters](ms.parameters.md).
+- [job property: ms.work.unit.partition](ms.work.unit.partition.md)
+- [key concept: variable](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variable.md) 
+- [key concept: work unit](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/work-unit.md)
+- [key concept: watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/watermark.md)
 
 ## Description
 
@@ -35,11 +36,11 @@ A datetime watermark is a reference. It doesn't directly effect or control
 job execution. The watermark name and boundaries, low watermark 
 and high watermark, can be referenced in [variables](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variable.md),
 which can control execution. 
-See [ms.parameters](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.parameters.md).
+See [ms.parameters](ms.parameters.md).
 
 A datetime watermark is a range, defined by its `from` and `to` field. The range
 can be further partitioned per other configurations. 
-See [ms.work.unit.partition](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.work.unit.partition.md) 
+See [ms.work.unit.partition](ms.work.unit.partition.md) 
 
 Therefore, a datetime watermark could generate 1 or more mini-watermarks when 
 partitioned, and each mini-watermark is mapped to a work unit. Therefore, 
@@ -139,4 +140,4 @@ directly.
 {"name": "siteName", "type": "unit", "units": "https://siteA/,https://SiteB/...siteZ"}]
 `
 
-[back to summary](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md#mswatermark) 
+[back to summary](summary.md#mswatermark) 

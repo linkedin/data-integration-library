@@ -13,7 +13,16 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.configuration.StaticConstants;
+import com.linkedin.cdi.filter.JsonSchemaBasedFilter;
+import com.linkedin.cdi.keys.ExtractorKeys;
+import com.linkedin.cdi.keys.JobKeys;
+import com.linkedin.cdi.keys.JsonExtractorKeys;
+import com.linkedin.cdi.util.EncryptionUtils;
+import com.linkedin.cdi.util.JsonUtils;
+import com.linkedin.cdi.util.ParameterTypes;
+import com.linkedin.cdi.util.SchemaBuilder;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -25,19 +34,10 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import javax.annotation.Nullable;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.WorkUnitState;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.filter.JsonSchemaBasedFilter;
-import com.linkedin.cdi.keys.ExtractorKeys;
-import com.linkedin.cdi.keys.JobKeys;
-import com.linkedin.cdi.keys.JsonExtractorKeys;
-import com.linkedin.cdi.util.EncryptionUtils;
-import com.linkedin.cdi.util.JsonUtils;
-import com.linkedin.cdi.util.ParameterTypes;
-import com.linkedin.cdi.util.SchemaBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
@@ -56,15 +56,17 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
  *
  * @author chrli
  */
-@Slf4j
 public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
+  private static final Logger LOG = LoggerFactory.getLogger(JsonExtractor.class);
   final private static JsonObject EOF = new Gson().fromJson("{\"EOF\": \"EOF\"}", JsonObject.class);
 
   private final static String JSON_MEMBER_SEPARATOR = ".";
   private final static Long SCHEMA_INFER_MAX_SAMPLE_SIZE = 100L;
-
-  @Getter
   private JsonExtractorKeys jsonExtractorKeys = new JsonExtractorKeys();
+
+  public JsonExtractorKeys getJsonExtractorKeys() {
+    return jsonExtractorKeys;
+  }
 
   public JsonExtractor(WorkUnitState state, JobKeys jobKeys) {
     super(state, jobKeys);
@@ -142,7 +144,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
    */
   @Override
   public JsonArray getSchema() {
-    log.debug("Retrieving schema definition");
+    LOG.debug("Retrieving schema definition");
     JsonArray schemaArray = super.getOrInferSchema();
     Assert.assertNotNull(schemaArray);
     if (jobKeys.getDerivedFields().size() > 0 && JsonUtils.get(StaticConstants.KEY_WORD_COLUMN_NAME,
@@ -218,19 +220,19 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
         return false;
       }
     } catch (Exception e) {
-      log.error("Source Error: {}", e.getMessage());
+      LOG.error("Source Error: {}", e.getMessage());
       state.setWorkingState(WorkUnitState.WorkingState.FAILED);
       return false;
     }
 
-    log.debug("Checking parsed Json object");
+    LOG.debug("Checking parsed Json object");
 
     JsonArray coreData = new JsonArray();
     JsonElement payload;
     if (StringUtils.isNotBlank(jobKeys.getDataField())) {
       payload = JsonUtils.get(data.getAsJsonObject(), jobKeys.getDataField());
       if (payload.isJsonNull()) {
-        log.info("Terminate the ingestion because no actual payload in the response");
+        LOG.info("Terminate the ingestion because no actual payload in the response");
         return false;
       }
     } else {
@@ -240,7 +242,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
     if (payload.isJsonArray()) {
       coreData = payload.getAsJsonArray();
     } else {
-      log.info("Payload is not a Json Array, therefore add the whole payload a one single entry");
+      LOG.info("Payload is not a Json Array, therefore add the whole payload a one single entry");
       coreData.add(payload);
     }
 
@@ -443,7 +445,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
         if (StringUtils.isNotBlank(jobKeys.getDataField())) {
           JsonElement payload = JsonUtils.get(data.getAsJsonObject(), jobKeys.getDataField());
           if (payload.isJsonNull()) {
-            log.info("Expected payload at JsonPath={} doesn't exist", jobKeys.getDataField());
+            LOG.info("Expected payload at JsonPath={} doesn't exist", jobKeys.getDataField());
             return jsonExtractorKeys.getTotalCount();
           } else if (payload.isJsonArray()) {
             return jsonExtractorKeys.getTotalCount() + payload.getAsJsonArray().size();
@@ -568,7 +570,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
       String source = entry.getValue().get("source");
       if (JsonUtils.has(data, source)) {
         pushDowns.addProperty(entry.getKey(), data.get(source).getAsString());
-        log.info("Identified push down value: {}", pushDowns);
+        LOG.info("Identified push down value: {}", pushDowns);
       }
     }
     return pushDowns;
@@ -580,7 +582,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
    * @return a Json object of type JsonElement
    */
   private JsonElement extractJson(InputStream input) throws UnsupportedCharsetException {
-    log.debug("Parsing response InputStream as Json");
+    LOG.debug("Parsing response InputStream as Json");
     JsonElement data = null;
     if (input != null) {
       data = new JsonParser().parse(new InputStreamReader(input,
