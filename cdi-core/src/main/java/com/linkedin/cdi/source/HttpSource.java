@@ -14,6 +14,7 @@ import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.connection.HttpConnection;
 import com.linkedin.cdi.extractor.MultistageExtractor;
 import com.linkedin.cdi.keys.HttpKeys;
+import com.linkedin.cdi.keys.JdbcKeys;
 import com.linkedin.cdi.util.EncryptionUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -28,6 +29,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.source.extractor.Extractor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -37,18 +40,23 @@ import org.apache.gobblin.source.extractor.Extractor;
  *
  * @author chrli
  */
-@Slf4j
 @SuppressWarnings("unchecked")
 public class HttpSource extends MultistageSource<Schema, GenericRecord> {
+  private static final Logger LOG = LoggerFactory.getLogger(HttpSource.class);
   private final static Gson GSON = new Gson();
   private final static String BASIC_TOKEN_PREFIX = "Basic";
   private final static String BEARER_TOKEN_PREFIX = "Bearer";
   final static String OAUTH_TOKEN_PREFIX = "OAuth";
   final static String TOKEN_PREFIX_SEPARATOR = " ";
-  @VisibleForTesting
-
-  @Getter @Setter
   private HttpKeys httpSourceKeys;
+
+  public HttpKeys getHttpSourceKeys() {
+    return httpSourceKeys;
+  }
+
+  public void setHttpSourceKeys(HttpKeys httpSourceKeys) {
+    this.httpSourceKeys = httpSourceKeys;
+  }
 
   public HttpSource() {
     httpSourceKeys = new HttpKeys();
@@ -101,7 +109,7 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
 
     String authMethod = httpSourceKeys.getAuthentication().get("method").getAsString();
     if (!authMethod.toLowerCase().matches("basic|bearer|oauth|custom")) {
-      log.warn("Unsupported authentication type: " + authMethod);
+      LOG.warn("Unsupported authentication type: " + authMethod);
       return new HashMap<>();
     }
 

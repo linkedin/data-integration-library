@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.keys.JdbcKeys;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +32,8 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.powermock.reflect.Whitebox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -40,10 +43,9 @@ import static com.linkedin.cdi.source.HttpSource.*;
 import static org.mockito.Mockito.*;
 
 
-@Slf4j
 @PrepareForTest({EncryptionUtils.class})
 public class HttpSourceTest extends PowerMockTestCase {
-
+  private static final Logger LOG = LoggerFactory.getLogger(HttpSourceTest.class);
   private Gson gson;
   private WorkUnitState state;
   private HttpSource source;

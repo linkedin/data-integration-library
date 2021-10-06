@@ -5,6 +5,7 @@
 package com.linkedin.cdi.filter;
 
 import com.google.common.base.Optional;
+import com.linkedin.cdi.extractor.MultistageExtractor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
@@ -14,11 +15,13 @@ import org.apache.gobblin.configuration.WorkUnitState;
 import com.linkedin.cdi.keys.AvroExtractorKeys;
 import com.linkedin.cdi.util.AvroSchemaUtils;
 import com.linkedin.cdi.util.JsonIntermediateSchema;
+import org.apache.gobblin.converter.avro.UnsupportedDateTypeException;
 import org.apache.gobblin.util.AvroUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-@Slf4j
 public class AvroSchemaBasedFilter extends MultistageSchemaBasedFilter<GenericRecord> {
+  private static final Logger LOG = LoggerFactory.getLogger(AvroSchemaBasedFilter.class);
   private AvroExtractorKeys avroExtractorKeys;
   private WorkUnitState state;
 
@@ -29,9 +32,8 @@ public class AvroSchemaBasedFilter extends MultistageSchemaBasedFilter<GenericRe
     this.state = state;
   }
 
-  @SneakyThrows
   @Override
-  public GenericRecord filter(GenericRecord input) {
+  public GenericRecord filter(GenericRecord input) throws UnsupportedDateTypeException {
     Schema outputSchema = AvroSchemaUtils.fromJsonSchema(schema.toJson(), state);
     GenericRecord filteredRow = new GenericData.Record(outputSchema);
     for (String fieldName : AvroSchemaUtils.getSchemaFieldNames(outputSchema)) {

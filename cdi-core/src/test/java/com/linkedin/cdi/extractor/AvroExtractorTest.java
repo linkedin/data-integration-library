@@ -8,6 +8,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.keys.JdbcKeys;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +40,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.mockito.Mockito;
 import org.powermock.reflect.Whitebox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
@@ -50,9 +53,8 @@ import static org.mockito.Mockito.*;
 
 
 @Test
-@Slf4j
 public class AvroExtractorTest {
-
+  private static final Logger LOG = LoggerFactory.getLogger(AvroExtractorTest.class);
   private final static String DATA_SET_URN_KEY = "com.linkedin.somecase.SeriesCollection";
   private final static String ACTIVATION_PROP = "{\"name\": \"survey\", \"type\": \"unit\", \"units\": \"id1,id2\"}";
   private final static String DATA_FINAL_DIR = "/jobs/testUser/gobblin/useCaseRoot";

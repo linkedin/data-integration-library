@@ -34,9 +34,8 @@ public class AvroNormalizerConverterTest {
   Schema outputSchema;
   WorkUnitState state;
 
-  @SneakyThrows
   @BeforeMethod
-  public void beforeMethod() {
+  public void beforeMethod() throws UnsupportedDateTypeException {
     _avroNormalizerConverter = new AvroNormalizerConverter();
     state = mock(WorkUnitState.class);
     Extract extract = new Extract(Extract.TableType.SNAPSHOT_ONLY, "com.linkedin.test", "test");

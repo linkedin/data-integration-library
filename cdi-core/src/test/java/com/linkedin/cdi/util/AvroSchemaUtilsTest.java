@@ -27,9 +27,8 @@ public class AvroSchemaUtilsTest {
   JsonArray schemaArray = new Gson().fromJson(schemaString, JsonArray.class);
   Schema schema;
 
-  @SneakyThrows
   @BeforeMethod
-  public void beforeMethod() {
+  public void beforeMethod() throws UnsupportedDateTypeException {
     state = mock(WorkUnitState.class);
     Extract extract = new Extract(Extract.TableType.SNAPSHOT_ONLY, "com.linkedin.test", "test");
     when(state.getExtract()).thenReturn(extract);

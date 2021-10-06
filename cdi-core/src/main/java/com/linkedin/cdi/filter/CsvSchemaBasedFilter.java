@@ -4,11 +4,14 @@
 
 package com.linkedin.cdi.filter;
 
+import com.linkedin.cdi.converter.InFlowValidationConverter;
 import java.util.Arrays;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import com.linkedin.cdi.keys.CsvExtractorKeys;
 import com.linkedin.cdi.util.JsonIntermediateSchema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -17,8 +20,8 @@ import com.linkedin.cdi.util.JsonIntermediateSchema;
  * @author esong
  *
  */
-@Slf4j
 public class CsvSchemaBasedFilter extends MultistageSchemaBasedFilter<String[]> {
+  private static final Logger LOG = LoggerFactory.getLogger(CsvSchemaBasedFilter.class);
   private CsvExtractorKeys csvExtractorKeys;
 
   public CsvSchemaBasedFilter(JsonIntermediateSchema schema, CsvExtractorKeys csvExtractorKeys) {
@@ -43,7 +46,7 @@ public class CsvSchemaBasedFilter extends MultistageSchemaBasedFilter<String[]> 
       csvExtractorKeys.setColumnProjection(columnProjection);
       return filter(input, columnProjection);
     } else {
-      log.debug("Defaulting to project first N columns");
+      LOG.debug("Defaulting to project first N columns");
       // take first N column, where N is the number of columns in the schema
       // if the schema's size larger than input, then the extra columns will be padded with null
       return Arrays.copyOf(input, schema.getColumns().size());

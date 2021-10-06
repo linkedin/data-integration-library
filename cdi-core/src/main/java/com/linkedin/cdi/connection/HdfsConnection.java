@@ -7,6 +7,7 @@ package com.linkedin.cdi.connection;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.linkedin.cdi.util.Database;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
@@ -25,6 +26,8 @@ import com.linkedin.cdi.util.WorkUnitStatus;
 import org.apache.gobblin.source.extractor.filebased.FileBasedHelperException;
 import org.apache.gobblin.source.extractor.filebased.TimestampAwareFileBasedHelper;
 import org.apache.gobblin.source.extractor.hadoop.HadoopFsHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -33,12 +36,23 @@ import org.apache.gobblin.source.extractor.hadoop.HadoopFsHelper;
  *
  * @author Chris Li
  */
-@Slf4j
 public class HdfsConnection extends MultistageConnection {
+  private static final Logger LOG = LoggerFactory.getLogger(HdfsConnection.class);
+
+  public HdfsKeys getHdfsKeys() {
+    return hdfsKeys;
+  }
+
+  public TimestampAwareFileBasedHelper getFsHelper() {
+    return fsHelper;
+  }
+
+  public void setFsHelper(TimestampAwareFileBasedHelper fsHelper) {
+    this.fsHelper = fsHelper;
+  }
+
   private final static String URI_REGEXP_PATTERN = "RE=";
-  @Getter
   final private HdfsKeys hdfsKeys;
-  @Setter (AccessLevel.PACKAGE)
   private TimestampAwareFileBasedHelper fsHelper;
 
   public HdfsConnection(State state, JobKeys jobKeys, ExtractorKeys extractorKeys) {
@@ -99,7 +113,7 @@ public class HdfsConnection extends MultistageConnection {
       fsHelper = null;
       return true;
     } catch (Exception e) {
-      log.error("Error closing file system connection", e);
+      LOG.error("Error closing file system connection", e);
       return false;
     }
   }
@@ -132,7 +146,7 @@ public class HdfsConnection extends MultistageConnection {
           .filter(fileName -> fileName.matches(pattern))
           .collect(Collectors.toList());
     } catch (FileBasedHelperException e) {
-      log.error("Not able to run ls command due to " + e.getMessage(), e);
+      LOG.error("Not able to run ls command due to " + e.getMessage(), e);
     }
     return Lists.newArrayList();
   }
@@ -143,11 +157,11 @@ public class HdfsConnection extends MultistageConnection {
    * @return the file content in an InputStream
    */
   private InputStream readSingleFile(final String path) {
-    log.info("Processing file: {}", path);
+    LOG.info("Processing file: {}", path);
     try {
       return fsHelper.getFileStream(path);
     } catch (FileBasedHelperException e) {
-      log.error("Not able to run getFileStream command due to " + e.getMessage(), e);
+      LOG.error("Not able to run getFileStream command due to " + e.getMessage(), e);
       return null;
     }
   }
@@ -159,7 +173,7 @@ public class HdfsConnection extends MultistageConnection {
       fsHelper.connect();
       return fsHelper;
     } catch (Exception e) {
-      log.error("Failed to initialize HdfsSource", e);
+      LOG.error("Failed to initialize HdfsSource", e);
       return null;
     }
   }

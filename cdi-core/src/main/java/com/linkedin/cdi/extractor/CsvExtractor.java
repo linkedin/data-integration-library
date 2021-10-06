@@ -52,6 +52,8 @@ import com.linkedin.cdi.util.VariableUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
@@ -65,11 +67,14 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
  *
  * @author chrli, esong
  */
-@Slf4j
 public class CsvExtractor extends MultistageExtractor<String, String[]> {
+  private static final Logger LOG = LoggerFactory.getLogger(CsvExtractor.class);
   private final static Long SCHEMA_INFER_MAX_SAMPLE_SIZE = 100L;
-  @Getter
   private CsvExtractorKeys csvExtractorKeys = new CsvExtractorKeys();
+
+  public CsvExtractorKeys getCsvExtractorKeys() {
+    return csvExtractorKeys;
+  }
 
   public CsvExtractor(WorkUnitState state, JobKeys jobKeys) {
     super(state, jobKeys);
@@ -137,7 +142,7 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
    */
   @Override
   public String getSchema() {
-    log.debug("Retrieving schema definition");
+    LOG.debug("Retrieving schema definition");
     JsonArray schemaArray = super.getOrInferSchema();
     Assert.assertNotNull(schemaArray);
     if (jobKeys.getDerivedFields().size() > 0 && JsonUtils.get(StaticConstants.KEY_WORD_COLUMN_NAME,
@@ -260,7 +265,7 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
         }
         csvExtractorKeys.setCsvIterator(readerIterator);
       } catch (Exception e) {
-        log.error("Error reading the input stream: {}", e.getMessage());
+        LOG.error("Error reading the input stream: {}", e.getMessage());
         return false;
       }
     }

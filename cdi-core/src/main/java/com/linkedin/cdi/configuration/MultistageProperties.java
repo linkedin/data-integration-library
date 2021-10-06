@@ -8,10 +8,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.linkedin.cdi.factory.DefaultConnectionClientFactory;
+import com.linkedin.cdi.util.Database;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.State;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -37,8 +40,6 @@ import org.apache.gobblin.configuration.State;
  *
  * @author chrli
  */
-@Slf4j
-@Getter
 @SuppressWarnings("unchecked")
 public enum MultistageProperties {
   /**
@@ -865,12 +866,21 @@ public enum MultistageProperties {
   },
   DATA_PUBLISHER_FINAL_DIR("data.publisher.final.dir", String.class);
 
+  private static final Logger LOG = LoggerFactory.getLogger(MultistageProperties.class);
   final static private Gson GSON = new Gson();
   final static private String PROPERTY_SEPARATOR = ".";
 
   private final String config;
   private final Class<?> className;
   private final Object defaultValue;
+
+  public String getConfig() {
+    return config;
+  }
+
+  public Class<?> getClassName() {
+    return className;
+  }
 
   MultistageProperties(String config, Class<?> className) {
     this.config = config;

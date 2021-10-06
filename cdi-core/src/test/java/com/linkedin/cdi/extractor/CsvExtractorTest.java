@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.linkedin.cdi.keys.JdbcKeys;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -48,6 +49,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.reflect.Whitebox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
@@ -58,9 +61,8 @@ import static org.mockito.Mockito.*;
 
 
 @Test
-@Slf4j
 public class CsvExtractorTest {
-
+  private static final Logger LOG = LoggerFactory.getLogger(CsvExtractorTest.class);
   private final static String DATA_SET_URN_KEY = "com.linkedin.somecase.SeriesCollection";
   private final static String ACTIVATION_PROP = "{\"name\": \"survey\", \"type\": \"unit\", \"units\": \"id1,id2\"}";
   private final static String DATA_FINAL_DIR = "/jobs/testUser/gobblin/useCaseRoot";
