@@ -97,7 +97,7 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
       try {
         avroSchema = fromJsonSchema(schemaArray);
       } catch (Exception e) {
-        LOG.error("Error converting Json schema to Avro schema", e);
+        throw new RuntimeException("Error converting Json schema to Avro schema", e);
       }
     } else {
       avroSchema = processInputStream(0) ? avroExtractorKeys.getAvroOutputSchema()
@@ -152,7 +152,7 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
         try {
           row = avroSchemaBasedFilter.filter(row);
         } catch (Exception e) {
-          LOG.error("Error filtering row", e);
+          throw new RuntimeException("Error filtering row", e);
         }
       }
       return addDerivedFields(row);

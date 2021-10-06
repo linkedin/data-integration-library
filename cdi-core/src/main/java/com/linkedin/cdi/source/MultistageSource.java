@@ -187,7 +187,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
       try {
         TimeUnit.SECONDS.sleep(jobKeys.getRetryDelayInSec());
       } catch (Exception e) {
-        LOG.info("Sleep() interrupted", e);
+        throw new RuntimeException("Sleep() interrupted", e);
       }
       return readSecondaryInputs(state, retries - 1);
     }
