@@ -1,14 +1,14 @@
 # Key Concepts
 
-## [Authentication Methods](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/authentication-method.md)
+## [Authentication Methods](authentication-method.md)
 
-## [Encryption Method](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/encryption-method.md)
+## [Encryption Method](encryption-method.md)
 
-## [ISO Duration](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/iso-date-interval.md)
+## [ISO Duration](iso-date-interval.md)
 
-## [Job Type](job-type.md)
+## [Job Pattern](job-type.md)
 
-We have the following logical types of Azkaban jobs in 
+There are several logical types of Azkaban jobs in 
 data integration workflows. These job types are not differentiated by
 any particular parameter; **they are configured the same way, and
 they look alike**; only they serve different **purposes**. 

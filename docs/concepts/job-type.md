@@ -1,4 +1,4 @@
-# Job Type
+# Job Patterns
 
 DIL has a multistage architecture,
 and a data integration job may be divided into multiple stages,
@@ -36,9 +36,9 @@ to start an export process, and the return is an export id.
 ## Status Checking Job
 
 A status checking job ensures the data is
-ready on the third party system read for consumption. This can be
-used in asynchronous data ingestion and file downloads. In the asynchronous
-ingestion scenario, this job will keep checking status with the 3P system
+ready for consumption on the third party system.
+This can be used in asynchronous data ingestion and file downloads. 
+In the asynchronous ingestion scenario, this job will keep checking status with the 3P system
 every once a while (e.g. every 15 minutes) until the status turns to 
 ready or timeout. In the file downloading scenario, the status checking
 job can keep checking the availability of source data until they are 
@@ -75,4 +75,4 @@ A validation job can compare data from the primary input and
 from the secondary input. The comparison normally happens in a converter. A `validation`
 job fails when validation fails.
 
-[Back to Summary](summary.md#job-type) 
+[Back to Summary](summary.md#job-pattern) 

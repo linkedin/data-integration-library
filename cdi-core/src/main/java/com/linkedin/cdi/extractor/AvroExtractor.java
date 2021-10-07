@@ -27,7 +27,6 @@ import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.WorkUnitState;
-import org.apache.gobblin.converter.avro.UnsupportedDateTypeException;
 import org.apache.gobblin.util.AvroUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,7 +133,7 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
 
     if (avroExtractorKeys.getAvroRecordIterator() == null
         && !processInputStream(0)) {
-      return null;
+      return (GenericRecord) endProcessingAndValidateCount();
     }
 
     if (hasNext()) {
@@ -154,7 +153,7 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
       eof = true;
       return AvroSchemaUtils.createEOF(state);
     }
-    return null;
+    return (GenericRecord) endProcessingAndValidateCount();
   }
 
   /**

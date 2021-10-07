@@ -160,7 +160,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
     super.readRecord(reuse);
 
     if (jsonExtractorKeys.getJsonElementIterator() == null && !processInputStream(0)) {
-      return null;
+      return (JsonObject) endProcessingAndValidateCount();
     }
 
     if (jsonExtractorKeys.getJsonElementIterator().hasNext()) {
@@ -184,7 +184,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
       eof = true;
       return EOF;
     }
-    return null;
+    return (JsonObject) endProcessingAndValidateCount();
   }
 
   /**

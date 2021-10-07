@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.validator.routines.LongValidator;
@@ -217,12 +218,6 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   @Override
   public void close() {
     LOG.info("Closing the work unit: {}", this.extractorKeys.getSignature());
-
-    if (extractorKeys.getProcessedCount() < jobKeys.getMinWorkUnitRecords()) {
-      throw new RuntimeException(String.format(EXCEPTION_RECORD_MINIMUM,
-          jobKeys.getMinWorkUnitRecords(),
-          jobKeys.getMinWorkUnitRecords()));
-    }
 
     Preconditions.checkNotNull(state.getWorkunit(), MSG_WORK_UNIT_ALWAYS);
     Preconditions.checkNotNull(state.getWorkunit().getLowWatermark(), MSG_LOW_WATER_MARK_ALWAYS);
@@ -964,5 +959,18 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
       records.addAll(new HdfsReader(state).readSecondary(entry.getAsJsonObject()));
     }
     return records;
+  }
+
+  /**
+   * Validate the minimum work unit records threshold is met, otherwise raise
+   * exception, which will faile the task
+   */
+  protected Object endProcessingAndValidateCount() {
+    if (extractorKeys.getProcessedCount() < jobKeys.getMinWorkUnitRecords()) {
+      throw new RuntimeException(String.format(EXCEPTION_RECORD_MINIMUM,
+          jobKeys.getMinWorkUnitRecords(),
+          jobKeys.getMinWorkUnitRecords()));
+    }
+    return null;
   }
 }

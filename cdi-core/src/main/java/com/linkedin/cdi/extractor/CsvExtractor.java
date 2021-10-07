@@ -162,7 +162,7 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
     super.readRecord(reuse);
 
     if (csvExtractorKeys.getCsvIterator() == null && !processInputStream(0)) {
-      return null;
+      return (String[]) endProcessingAndValidateCount();
     }
 
     Iterator<String[]> readerIterator = csvExtractorKeys.getCsvIterator();
@@ -196,7 +196,7 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
         return readRecord(reuse);
       }
     }
-    return null;
+    return (String[]) endProcessingAndValidateCount();
   }
 
   /**
