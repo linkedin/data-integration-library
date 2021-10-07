@@ -1,5 +1,17 @@
 # Config a Status Checking Job
 
+A status checking job ensures the data is
+ready for consumption on the third party system.
+This can be used in asynchronous data ingestion and file downloads. 
+
+In the asynchronous ingestion scenario, this job will keep checking status with the 3P system
+every once a while (e.g. every 15 minutes) until the status turns to 
+ready or timeout. 
+
+In the file downloading scenario, the status checking
+job can keep checking the availability of source data until they are 
+present or timeout.  
+
 A status checking job tries to read a small piece of information 
 from the third party system, and it then verifies per the given criteria
 for success or failure. 
