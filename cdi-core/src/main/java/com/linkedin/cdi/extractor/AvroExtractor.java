@@ -7,7 +7,6 @@ package com.linkedin.cdi.extractor;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.gson.JsonArray;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.filter.AvroSchemaBasedFilter;
 import com.linkedin.cdi.keys.AvroExtractorKeys;
 import com.linkedin.cdi.keys.ExtractorKeys;
@@ -32,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 import static org.apache.avro.Schema.Type.*;
 
@@ -109,7 +109,7 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
   @Override
   protected void setRowFilter(JsonArray schemaArray) {
     if (rowFilter == null) {
-      if (MultistageProperties.MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.getValidNonblankWithDefault(state)) {
+      if (MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.getValidNonblankWithDefault(state)) {
         rowFilter = new AvroSchemaBasedFilter(new JsonIntermediateSchema(jobKeys.getOutputSchema()),
             avroExtractorKeys, state);
       }

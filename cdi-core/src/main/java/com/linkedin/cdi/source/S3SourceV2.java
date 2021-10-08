@@ -8,7 +8,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.connection.S3Connection;
 import com.linkedin.cdi.extractor.MultistageExtractor;
 import com.linkedin.cdi.keys.S3Keys;
@@ -24,6 +23,8 @@ import org.apache.gobblin.source.extractor.Extractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
+
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 
 
 public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
@@ -52,7 +53,7 @@ public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
 
     URL url = null;
     try {
-      String sourceUri = MultistageProperties.MSTAGE_SOURCE_URI.getValidNonblankWithDefault(state);
+      String sourceUri = MSTAGE_SOURCE_URI.getValidNonblankWithDefault(state);
       url = new URL(sourceUri.replaceAll("(s3|S3)://", "https://"));
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -60,12 +61,12 @@ public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
 
     if (url == null || url.getHost().isEmpty()) {
       throw new RuntimeException("Incorrect configuration in " +
-          MultistageProperties.MSTAGE_SOURCE_URI.toString());
+          MSTAGE_SOURCE_URI.toString());
     }
 
     // set region, note that aws SDK won't raise an error here if region is invalid,
     // later on, an exception will be raised when the actual request is issued
-    JsonObject parameters = MultistageProperties.MSTAGE_SOURCE_S3_PARAMETERS.getValidNonblankWithDefault(state);
+    JsonObject parameters = MSTAGE_SOURCE_S3_PARAMETERS.getValidNonblankWithDefault(state);
     if (parameters.has(KEY_REGION)) {
       String region = parameters.get(KEY_REGION).getAsString();
       if (!S3_REGIONS_SET.contains(region)) {
@@ -93,12 +94,12 @@ public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
     // separate the bucket name from URI domain name
     s3SourceV2Keys.setBucket(url.getHost().split("\\.")[0]);
 
-    s3SourceV2Keys.setFilesPattern(MultistageProperties.MSTAGE_SOURCE_FILES_PATTERN.getProp(state));
-    s3SourceV2Keys.setMaxKeys(MultistageProperties.MSTAGE_S3_LIST_MAX_KEYS.getValidNonblankWithDefault(state));
-    s3SourceV2Keys.setAccessKey(MultistageProperties.SOURCE_CONN_USERNAME.getValidNonblankWithDefault(state));
-    s3SourceV2Keys.setSecretId(MultistageProperties.SOURCE_CONN_PASSWORD.getValidNonblankWithDefault(state));
+    s3SourceV2Keys.setFilesPattern(MSTAGE_SOURCE_FILES_PATTERN.getProp(state));
+    s3SourceV2Keys.setMaxKeys(MSTAGE_S3_LIST_MAX_KEYS.getValidNonblankWithDefault(state));
+    s3SourceV2Keys.setAccessKey(SOURCE_CONN_USERNAME.getValidNonblankWithDefault(state));
+    s3SourceV2Keys.setSecretId(SOURCE_CONN_PASSWORD.getValidNonblankWithDefault(state));
     s3SourceV2Keys.setTargetFilePattern(
-        MultistageProperties.MSTAGE_EXTRACTOR_TARGET_FILE_NAME.getValidNonblankWithDefault(state));
+        MSTAGE_EXTRACTOR_TARGET_FILE_NAME.getValidNonblankWithDefault(state));
     s3SourceV2Keys.logDebugAll();
   }
 

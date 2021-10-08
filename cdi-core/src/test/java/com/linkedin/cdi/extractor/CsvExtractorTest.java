@@ -10,7 +10,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.connection.MultistageConnection;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.filter.JsonSchemaBasedFilter;
@@ -91,7 +90,7 @@ public class CsvExtractorTest {
 
     List<WorkUnit> wus = new MultistageSource().getWorkunits(new SourceState());
     workUnit = wus.get(0);
-    workUnit.setProp(MultistageProperties.DATASET_URN_KEY.getConfig(), DATA_SET_URN_KEY);
+    workUnit.setProp(DATASET_URN_KEY.getConfig(), DATA_SET_URN_KEY);
 
     jobKeys = mock(JobKeys.class);
     workUnitStatus = mock(WorkUnitStatus.class);
@@ -194,7 +193,7 @@ public class CsvExtractorTest {
     WorkUnitStatus status = WorkUnitStatus.builder().buffer(inputStream).build();
 
     when(sourceState.getProp("ms.output.schema", "" )).thenReturn("");
-    when(MultistageProperties.MSTAGE_CSV_SEPARATOR.getValidNonblankWithDefault(state)).thenReturn("u002c");
+    when(MSTAGE_CSV_SEPARATOR.getValidNonblankWithDefault(state)).thenReturn("u002c");
 
     realHttpSource.getWorkunits(sourceState);
     CsvExtractor extractor = new CsvExtractor(state, realHttpSource.getHttpSourceKeys());
@@ -251,7 +250,7 @@ public class CsvExtractorTest {
     when(state.getProp(MSTAGE_ENABLE_CLEANSING.getConfig(), StringUtils.EMPTY)).thenReturn("");
     when(state.getProp("ms.csv.column.header", StringUtils.EMPTY)).thenReturn("true");
     when(state.getPropAsBoolean("ms.csv.column.header")).thenReturn(true);
-    when(sourceState.getProp(MultistageProperties.MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
+    when(sourceState.getProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
 
     realHttpSource.getWorkunits(sourceState);
     CsvExtractor extractor = new CsvExtractor(state, realHttpSource.getHttpSourceKeys());
@@ -701,7 +700,7 @@ public class CsvExtractorTest {
       when(state.getPropAsInt("ms.csv.skip.lines", 0)).thenReturn(explicitRowsToSkip);
     }
     when(state.getPropAsInt("ms.csv.column.header.index", 0)).thenReturn(headerIndex);
-    when(MultistageProperties.MSTAGE_CSV_SEPARATOR.getValidNonblankWithDefault(state)).thenReturn("u002c");
+    when(MSTAGE_CSV_SEPARATOR.getValidNonblankWithDefault(state)).thenReturn("u002c");
 
     realHttpSource.getWorkunits(sourceState);
     CsvExtractor extractor = new CsvExtractor(state, realHttpSource.getHttpSourceKeys());
@@ -766,7 +765,7 @@ public class CsvExtractorTest {
     csvExtractor.setRowFilter(schema);
 
     csvExtractor.rowFilter = null;
-    when(state.getProp(MultistageProperties.MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.getConfig(), StringUtils.EMPTY)).thenReturn("false");
+    when(state.getProp(MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.getConfig(), StringUtils.EMPTY)).thenReturn("false");
     csvExtractor.setRowFilter(new JsonArray());
     Assert.assertNull(csvExtractor.rowFilter);
   }

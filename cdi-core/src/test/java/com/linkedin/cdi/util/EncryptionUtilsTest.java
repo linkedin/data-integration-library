@@ -7,7 +7,6 @@ package com.linkedin.cdi.util;
 import com.google.gson.JsonObject;
 import gobblin.configuration.SourceState;
 import org.apache.gobblin.codec.StreamCodec;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import org.apache.gobblin.password.PasswordManager;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
@@ -17,6 +16,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 import static org.mockito.Mockito.*;
 
 
@@ -32,7 +32,7 @@ public class EncryptionUtilsTest extends PowerMockTestCase {
   public void setUp() {
     String masterKeyLoc = this.getClass().getResource("/key/master.key").toString();
     state = new SourceState();
-    state.setProp(MultistageProperties.ENCRYPT_KEY_LOC.toString(), masterKeyLoc);
+    state.setProp(ENCRYPT_KEY_LOC.toString(), masterKeyLoc);
     PowerMockito.mockStatic(PasswordManager.class);
     PowerMockito.when(PasswordManager.getInstance(state)).thenReturn(passwordManager);
   }

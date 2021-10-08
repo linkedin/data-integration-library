@@ -8,7 +8,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.connection.MultistageConnection;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.keys.AvroExtractorKeys;
@@ -82,7 +81,7 @@ public class AvroExtractorTest {
 
     List<WorkUnit> wus = new MultistageSource().getWorkunits(new SourceState());
     workUnit = wus.get(0);
-    workUnit.setProp(MultistageProperties.DATASET_URN_KEY.getConfig(), DATA_SET_URN_KEY);
+    workUnit.setProp(DATASET_URN_KEY.getConfig(), DATA_SET_URN_KEY);
 
     jobKeys = mock(JobKeys.class);
     workUnitStatus = mock(WorkUnitStatus.class);

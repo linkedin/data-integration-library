@@ -8,16 +8,16 @@ import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.util.JsonUtils;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.converter.Converter;
 import org.apache.gobblin.converter.SingleRecordIterable;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.util.JsonUtils;
 import org.apache.gobblin.util.EmptyIterable;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -50,8 +50,8 @@ public class JsonNormalizerConverter extends Converter<JsonArray, JsonArray, Jso
 
   @Override
   public Converter<JsonArray, JsonArray, JsonObject, JsonObject> init(WorkUnitState workUnit) {
-    maxRecordsPerBatch = MultistageProperties.MSTAGE_NORMALIZER_BATCH_SIZE.getValidNonblankWithDefault(workUnit);
-    targetSchema = MultistageProperties.MSTAGE_TARGET_SCHEMA.getValidNonblankWithDefault(workUnit);
+    maxRecordsPerBatch = MSTAGE_NORMALIZER_BATCH_SIZE.getValidNonblankWithDefault(workUnit);
+    targetSchema = MSTAGE_TARGET_SCHEMA.getValidNonblankWithDefault(workUnit);
     return this;
   }
 

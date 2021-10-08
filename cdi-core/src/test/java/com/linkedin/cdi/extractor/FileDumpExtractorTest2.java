@@ -6,6 +6,13 @@ package com.linkedin.cdi.extractor;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.connection.MultistageConnection;
+import com.linkedin.cdi.exception.RetriableAuthenticationException;
+import com.linkedin.cdi.keys.FileDumpExtractorKeys;
+import com.linkedin.cdi.keys.JobKeys;
+import com.linkedin.cdi.source.MultistageSource;
+import com.linkedin.cdi.util.VariableUtils;
+import com.linkedin.cdi.util.WorkUnitStatus;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,14 +26,6 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.gobblin.configuration.SourceState;
 import org.apache.gobblin.configuration.WorkUnitState;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.connection.MultistageConnection;
-import com.linkedin.cdi.exception.RetriableAuthenticationException;
-import com.linkedin.cdi.keys.FileDumpExtractorKeys;
-import com.linkedin.cdi.keys.JobKeys;
-import com.linkedin.cdi.source.MultistageSource;
-import com.linkedin.cdi.util.VariableUtils;
-import com.linkedin.cdi.util.WorkUnitStatus;
 import org.apache.gobblin.source.workunit.WorkUnit;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -72,7 +71,7 @@ public class FileDumpExtractorTest2 extends PowerMockTestCase {
 
     List<WorkUnit> wus = new MultistageSource().getWorkunits(new SourceState());
     workUnit = wus.get(0);
-    workUnit.setProp(MultistageProperties.DATASET_URN_KEY.getConfig(), DATA_SET_URN_KEY);
+    workUnit.setProp(DATASET_URN_KEY.getConfig(), DATA_SET_URN_KEY);
 
     fileDumpExtractorKeys = Mockito.mock(FileDumpExtractorKeys.class);
     workUnitStatus = Mockito.mock(WorkUnitStatus.class);

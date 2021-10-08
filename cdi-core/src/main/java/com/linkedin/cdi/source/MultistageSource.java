@@ -11,7 +11,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.extractor.MultistageExtractor;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.util.EndecoUtils;
@@ -43,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -158,12 +158,12 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
 
     if (authentications != null && authentications.size() == 1) {
       for (WorkUnit wu : wuList) {
-        wu.setProp(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.toString(),
+        wu.setProp(MSTAGE_ACTIVATION_PROPERTY.toString(),
             getUpdatedWorkUnitActivation(wu, authentications.get(0).getAsJsonObject()));
 
         // unlike activation secondary inputs, payloads will be processed in each work unit
         // and payloads will not be loaded until the Connection executes the command
-        wu.setProp(MultistageProperties.MSTAGE_PAYLOAD_PROPERTY.toString(), payloads);
+        wu.setProp(MSTAGE_PAYLOAD_PROPERTY.toString(), payloads);
       }
     }
     return wuList;
@@ -204,7 +204,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
   public Extractor<S, D> getExtractor(WorkUnitState state) {
     try {
       ClassLoader loader = this.getClass().getClassLoader();
-      Class<?> extractorClass = loader.loadClass(MultistageProperties.MSTAGE_EXTRACTOR_CLASS.getValidNonblankWithDefault(state));
+      Class<?> extractorClass = loader.loadClass(MSTAGE_EXTRACTOR_CLASS.getValidNonblankWithDefault(state));
       Constructor<MultistageExtractor<?, ?>> constructor = (Constructor<MultistageExtractor<?, ?>>)
           extractorClass.getConstructor(WorkUnitState.class, JobKeys.class);
       MultistageExtractor<S, D> extractor = (MultistageExtractor<S, D>) constructor.newInstance(state, this.jobKeys);
@@ -281,7 +281,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
     // cutoff time is moved backward by GRACE_PERIOD
     // cutoff time is moved forward by ABSTINENT_PERIOD
     Long cutoffTime = previousHighWatermarks.size() == 0 ? -1 : Collections.max(previousHighWatermarks.values())
-        - MultistageProperties.MSTAGE_GRACE_PERIOD_DAYS.getMillis(sourceState);
+        - MSTAGE_GRACE_PERIOD_DAYS.getMillis(sourceState);
     LOG.debug("Overall cutoff time: {}", cutoffTime);
 
     for (ImmutablePair<Long, Long> dtPartition : datetimePartitions) {
@@ -292,8 +292,8 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
         // it reaches ms.work.unit.parallelism.max. a combination is not added if its prior
         // watermark doesn't require a rerun.
         // a work unit signature is a date time partition and unit partition combination.
-        if (MultistageProperties.MSTAGE_WORK_UNIT_PARALLELISM_MAX.validateNonblank(sourceState)
-            && workUnits.size() >= (Integer) MultistageProperties.MSTAGE_WORK_UNIT_PARALLELISM_MAX.getProp(sourceState)) {
+        if (MSTAGE_WORK_UNIT_PARALLELISM_MAX.validateNonblank(sourceState)
+            && workUnits.size() >= (Integer) MSTAGE_WORK_UNIT_PARALLELISM_MAX.getProp(sourceState)) {
           break;
         }
 
@@ -308,8 +308,8 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
         long unitCutoffTime = -1L;
         if (previousHighWatermarks.containsKey(wuSignature)) {
           unitCutoffTime = previousHighWatermarks.get(wuSignature)
-              - MultistageProperties.MSTAGE_GRACE_PERIOD_DAYS.getMillis(sourceState)
-              + MultistageProperties.MSTAGE_ABSTINENT_PERIOD_DAYS.getMillis(sourceState);
+              - MSTAGE_GRACE_PERIOD_DAYS.getMillis(sourceState)
+              + MSTAGE_ABSTINENT_PERIOD_DAYS.getMillis(sourceState);
         }
         LOG.debug(String.format("previousHighWatermarks.get(wuSignature): %s, unitCutoffTime: %s",
             previousHighWatermarks.get(wuSignature), unitCutoffTime));
@@ -334,33 +334,33 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
 
           // save work unit signature for identification
           // because each dataset URN key will have a state file on Hadoop, it cannot contain path separator
-          workUnit.setProp(MultistageProperties.MSTAGE_WATERMARK_GROUPS.toString(),
+          workUnit.setProp(MSTAGE_WATERMARK_GROUPS.toString(),
               watermarkGroups.toString());
-          workUnit.setProp(MultistageProperties.DATASET_URN_KEY.toString(), EndecoUtils.getHadoopFsEncoded(wuSignature));
+          workUnit.setProp(DATASET_URN_KEY.toString(), EndecoUtils.getHadoopFsEncoded(wuSignature));
 
           // save the lower number of datetime watermark partition and the unit watermark partition
           workUnit.setProp(datetimeWatermarkName, dtPartition.getLeft());
           workUnit.setProp(unitWatermarkName, unitPartition);
 
-          workUnit.setProp(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.toString(), unitPartition);
-          workUnit.setProp(MultistageProperties.MSTAGE_WORKUNIT_STARTTIME_KEY.toString(),
+          workUnit.setProp(MSTAGE_ACTIVATION_PROPERTY.toString(), unitPartition);
+          workUnit.setProp(MSTAGE_WORKUNIT_STARTTIME_KEY.toString(),
               DateTime.now().getMillis()
-                  + workUnits.size() * MultistageProperties.MSTAGE_WORK_UNIT_PACING_SECONDS.getMillis(sourceState));
+                  + workUnits.size() * MSTAGE_WORK_UNIT_PACING_SECONDS.getMillis(sourceState));
 
-          if (!MultistageProperties.MSTAGE_OUTPUT_SCHEMA.validateNonblank(sourceState)
+          if (!MSTAGE_OUTPUT_SCHEMA.validateNonblank(sourceState)
             && this.jobKeys.hasOutputSchema()) {
             // populate the output schema read from URN reader to sub tasks
             // so that the URN reader will not be called again
             LOG.info("Populating output schema to work units:");
             LOG.info("Output schema: {}", this.jobKeys.getOutputSchema().toString());
-            workUnit.setProp(MultistageProperties.MSTAGE_OUTPUT_SCHEMA.getConfig(),
+            workUnit.setProp(MSTAGE_OUTPUT_SCHEMA.getConfig(),
                 this.jobKeys.getOutputSchema().toString());
 
             // populate the target schema read from URN reader to sub tasks
             // so that the URN reader will not be called again
             LOG.info("Populating target schema to work units:");
             LOG.info("Target schema: {}", jobKeys.getTargetSchema().toString());
-            workUnit.setProp(MultistageProperties.MSTAGE_TARGET_SCHEMA.getConfig(),
+            workUnit.setProp(MSTAGE_TARGET_SCHEMA.getConfig(),
                 jobKeys.getTargetSchema().toString());
           }
           workUnits.add(workUnit);
@@ -380,7 +380,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
     List<ImmutablePair<Long, Long>> partitions = Lists.newArrayList();
     if (jobKeys.getWorkUnitPartitionType() != null) {
       partitions = jobKeys.getWorkUnitPartitionType().getRanges(datetimeRange,
-          MultistageProperties.MSTAGE_WORK_UNIT_PARTIAL_PARTITION.getValidNonblankWithDefault(sourceState));
+          MSTAGE_WORK_UNIT_PARTIAL_PARTITION.getValidNonblankWithDefault(sourceState));
     } else {
       partitions.add(new ImmutablePair<>(datetimeRange.getLeft().getMillis(), datetimeRange.getRight().getMillis()));
     }
@@ -457,9 +457,9 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
 
   Extract createExtractObject(final boolean isFull) {
     Extract extract = createExtract(
-        Extract.TableType.valueOf(MultistageProperties.EXTRACT_TABLE_TYPE_KEY.getValidNonblankWithDefault(sourceState)),
-        MultistageProperties.EXTRACT_NAMESPACE_NAME_KEY.getProp(sourceState),
-        MultistageProperties.EXTRACT_TABLE_NAME_KEY.getProp(sourceState));
+        Extract.TableType.valueOf(EXTRACT_TABLE_TYPE_KEY.getValidNonblankWithDefault(sourceState)),
+        EXTRACT_NAMESPACE_NAME_KEY.getProp(sourceState),
+        EXTRACT_TABLE_NAME_KEY.getProp(sourceState));
     extract.setProp(ConfigurationKeys.EXTRACT_IS_FULL_KEY, isFull);
     return extract;
   }
@@ -498,9 +498,9 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
    * @return the updated work unit configuration
    */
   protected String getUpdatedWorkUnitActivation(WorkUnit wu, JsonObject authentication) {
-    LOG.debug("Activation property (origin): {}", wu.getProp(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.toString(), ""));
-    if (!wu.getProp(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.toString(), StringUtils.EMPTY).isEmpty()) {
-      JsonObject existing = GSON.fromJson(wu.getProp(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.toString()), JsonObject.class);
+    LOG.debug("Activation property (origin): {}", wu.getProp(MSTAGE_ACTIVATION_PROPERTY.toString(), ""));
+    if (!wu.getProp(MSTAGE_ACTIVATION_PROPERTY.toString(), StringUtils.EMPTY).isEmpty()) {
+      JsonObject existing = GSON.fromJson(wu.getProp(MSTAGE_ACTIVATION_PROPERTY.toString()), JsonObject.class);
       for (Map.Entry<String, JsonElement> entry: authentication.entrySet()) {
         existing.remove(entry.getKey());
         existing.addProperty(entry.getKey(), entry.getValue().getAsString());
@@ -519,12 +519,12 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
    * @return true if all conditions met for a full extract, otherwise false
    */
   private boolean checkFullExtractState(final State state, final Map<String, Long> previousHighWatermarks) {
-    if (MultistageProperties.EXTRACT_TABLE_TYPE_KEY.getValidNonblankWithDefault(state).toString()
+    if (EXTRACT_TABLE_TYPE_KEY.getValidNonblankWithDefault(state).toString()
         .equalsIgnoreCase(KEY_WORD_SNAPSHOT_ONLY)) {
       return true;
     }
 
-    if (MultistageProperties.MSTAGE_ENABLE_DYNAMIC_FULL_LOAD.getValidNonblankWithDefault(state)) {
+    if (MSTAGE_ENABLE_DYNAMIC_FULL_LOAD.getValidNonblankWithDefault(state)) {
       if (previousHighWatermarks.isEmpty()) {
         return true;
       }

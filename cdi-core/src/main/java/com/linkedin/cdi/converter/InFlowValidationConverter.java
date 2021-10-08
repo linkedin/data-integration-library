@@ -8,7 +8,6 @@ import com.google.common.base.Optional;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.util.HdfsReader;
 import com.linkedin.cdi.util.JsonUtils;
 import java.text.DecimalFormat;
@@ -25,6 +24,7 @@ import org.apache.gobblin.util.EmptyIterable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -97,7 +97,7 @@ public class InFlowValidationConverter extends Converter<Schema, Schema, Generic
 
   private void fillValidationAttributes(WorkUnitState workUnitState) {
     JsonObject validationAttributes =
-        MultistageProperties.MSTAGE_VALIDATION_ATTRIBUTES.getValidNonblankWithDefault(workUnitState);
+        MSTAGE_VALIDATION_ATTRIBUTES.getValidNonblankWithDefault(workUnitState);
     if (validationAttributes.has(KEY_WORD_THRESHOLD)) {
       threshold = validationAttributes.get(KEY_WORD_THRESHOLD).getAsInt();
     }
@@ -119,7 +119,7 @@ public class InFlowValidationConverter extends Converter<Schema, Schema, Generic
    */
   private int getBaseRowCount(WorkUnitState workUnitState) {
     JsonArray payloads = JsonUtils.filter(KEY_WORD_CATEGORY, KEY_WORD_PAYLOAD,
-        MultistageProperties.MSTAGE_SECONDARY_INPUT.getValidNonblankWithDefault(workUnitState));
+        MSTAGE_SECONDARY_INPUT.getValidNonblankWithDefault(workUnitState));
 
     // by default, we expect 1 record
     if (payloads.size() == 0) {

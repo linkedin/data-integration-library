@@ -9,7 +9,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.gobblin.configuration.State;
@@ -19,6 +18,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 
 
 /**
@@ -289,7 +290,7 @@ public class JsonParameter {
     if (listValue.isJsonPrimitive()) {
       listValueString = listValue.getAsString();
     } else if (listValue.isJsonArray() && listValue.getAsJsonArray().size() > 0) {
-      if (MultistageProperties.EXTRACT_IS_FULL.getValidNonblankWithDefault(state)) {
+      if (EXTRACT_IS_FULL.getValidNonblankWithDefault(state)) {
         listValueString = listValue.getAsJsonArray().get(0).getAsString();
       } else {
         listValueString = listValue.getAsJsonArray().size() > 1

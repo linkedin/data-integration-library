@@ -12,6 +12,8 @@ import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
+
 
 /**
  * This structure holds static Source parameters that are commonly used in JDBC Sources.
@@ -21,16 +23,16 @@ import org.slf4j.LoggerFactory;
 public class JdbcKeys extends JobKeys {
   private static final Logger LOG = LoggerFactory.getLogger(JdbcKeys.class);
   final private static List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      MultistageProperties.MSTAGE_JDBC_STATEMENT,
-      MultistageProperties.SOURCE_CONN_USERNAME,
-      MultistageProperties.SOURCE_CONN_PASSWORD);
+      MSTAGE_JDBC_STATEMENT,
+      SOURCE_CONN_USERNAME,
+      SOURCE_CONN_PASSWORD);
 
   private String jdbcStatement = null;
   private JsonObject initialParameterValues = new JsonObject();
-  private String separator = MultistageProperties.MSTAGE_CSV_SEPARATOR.getDefaultValue();
-  private String quoteCharacter = MultistageProperties.MSTAGE_CSV_QUOTE_CHARACTER.getDefaultValue();
-  private String escapeCharacter = MultistageProperties.MSTAGE_CSV_ESCAPE_CHARACTER.getDefaultValue();
-  private String schemaRefactorFunction = MultistageProperties.MSTAGE_JDBC_SCHEMA_REFACTOR.getDefaultValue();
+  private String separator = MSTAGE_CSV_SEPARATOR.getDefaultValue();
+  private String quoteCharacter = MSTAGE_CSV_QUOTE_CHARACTER.getDefaultValue();
+  private String escapeCharacter = MSTAGE_CSV_ESCAPE_CHARACTER.getDefaultValue();
+  private String schemaRefactorFunction = MSTAGE_JDBC_SCHEMA_REFACTOR.getDefaultValue();
 
   @Override
   public void logDebugAll() {

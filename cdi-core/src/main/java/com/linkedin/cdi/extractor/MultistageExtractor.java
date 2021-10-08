@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.validator.routines.LongValidator;
@@ -57,6 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -179,10 +179,10 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
 
   protected void initialize(ExtractorKeys keys) {
     extractorKeys = keys;
-    extractorKeys.setActivationParameters(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.getValidNonblankWithDefault(state));
-    extractorKeys.setDelayStartTime(MultistageProperties.MSTAGE_WORKUNIT_STARTTIME_KEY.getProp(state));
-    extractorKeys.setExplictEof(MultistageProperties.MSTAGE_DATA_EXPLICIT_EOF.getValidNonblankWithDefault(state));
-    extractorKeys.setSignature(MultistageProperties.DATASET_URN_KEY.getProp(state));
+    extractorKeys.setActivationParameters(MSTAGE_ACTIVATION_PROPERTY.getValidNonblankWithDefault(state));
+    extractorKeys.setDelayStartTime(MSTAGE_WORKUNIT_STARTTIME_KEY.getProp(state));
+    extractorKeys.setExplictEof(MSTAGE_DATA_EXPLICIT_EOF.getValidNonblankWithDefault(state));
+    extractorKeys.setSignature(DATASET_URN_KEY.getProp(state));
     extractorKeys.setPreprocessors(getPreprocessors(state));
     extractorKeys.setPayloads(getPayloads(state));
     payloadIterator = extractorKeys.getPayloads().iterator();
@@ -292,7 +292,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
    */
   protected void setRowFilter(JsonArray schemaArray) {
     if (rowFilter == null) {
-      if (MultistageProperties.MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.getValidNonblankWithDefault(state)) {
+      if (MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.getValidNonblankWithDefault(state)) {
         rowFilter = new JsonSchemaBasedFilter(new JsonIntermediateSchema(schemaArray));
       }
     }
@@ -372,8 +372,8 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   List<StreamProcessor<?>> getPreprocessors(State state) {
     ImmutableList.Builder<StreamProcessor<?>> builder = ImmutableList.builder();
     JsonObject preprocessorsParams =
-        MultistageProperties.MSTAGE_EXTRACT_PREPROCESSORS_PARAMETERS.getValidNonblankWithDefault(state);
-    String preprocessors = MultistageProperties.MSTAGE_EXTRACT_PREPROCESSORS.getValidNonblankWithDefault(state);
+        MSTAGE_EXTRACT_PREPROCESSORS_PARAMETERS.getValidNonblankWithDefault(state);
+    String preprocessors = MSTAGE_EXTRACT_PREPROCESSORS.getValidNonblankWithDefault(state);
     JsonObject preprocessorParams;
     for (String preprocessor : preprocessors.split(COMMA_STR)) {
       String p = preprocessor.trim();
@@ -563,7 +563,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
     if (input != null) {
       try {
         data = InputStreamUtils.extractText(input,
-            MultistageProperties.MSTAGE_SOURCE_DATA_CHARACTER_SET.getValidNonblankWithDefault(state));
+            MSTAGE_SOURCE_DATA_CHARACTER_SET.getValidNonblankWithDefault(state));
       } catch (Exception e) {
         LOG.debug(e.toString());
       }
@@ -953,7 +953,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
    * @return the payload records
    */
   protected JsonArray getPayloads(State state) {
-    JsonArray payloads = MultistageProperties.MSTAGE_PAYLOAD_PROPERTY.getValidNonblankWithDefault(state);
+    JsonArray payloads = MSTAGE_PAYLOAD_PROPERTY.getValidNonblankWithDefault(state);
     JsonArray records = new JsonArray();
     for (JsonElement entry : payloads) {
       records.addAll(new HdfsReader(state).readSecondary(entry.getAsJsonObject()));

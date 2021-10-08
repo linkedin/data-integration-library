@@ -7,17 +7,16 @@ package com.linkedin.cdi.keys;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.util.JsonUtils;
+import com.linkedin.cdi.util.ParameterTypes;
+import com.linkedin.cdi.util.SchemaBuilder;
+import com.linkedin.cdi.util.WorkUnitPartitionTypes;
 import gobblin.configuration.SourceState;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.util.JsonUtils;
-import com.linkedin.cdi.util.ParameterTypes;
-import com.linkedin.cdi.util.SchemaBuilder;
-import com.linkedin.cdi.util.WorkUnitPartitionTypes;
 import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
@@ -25,6 +24,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 import static org.mockito.Mockito.*;
 
 
@@ -115,29 +115,29 @@ public class JobKeysTest extends PowerMockTestCase {
     Assert.assertTrue(jobKeys.validate(state));
 
     // test output schema validation with a wrong type
-    state.setProp(MultistageProperties.MSTAGE_OUTPUT_SCHEMA.getConfig(), "{}");
+    state.setProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "{}");
     Assert.assertFalse(jobKeys.validate(state));
 
     // test output schema validation with an empty array
-    state.setProp(MultistageProperties.MSTAGE_OUTPUT_SCHEMA.getConfig(), "[{}]");
+    state.setProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "[{}]");
     Assert.assertFalse(jobKeys.validate(state));
 
     // test output schema validation with an incorrect structure
     String schema = "[{\"columnName\":\"test\",\"isNullable\":\"true\",\"dataType\":{\"type\":\"string\"}]";
-    state.setProp(MultistageProperties.MSTAGE_OUTPUT_SCHEMA.getConfig(), schema);
+    state.setProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), schema);
     jobKeys.initialize(state);
     Assert.assertFalse(jobKeys.validate(state));
 
     schema = "[{\"columnName\":\"test\",\"isNullable\":\"true\",\"dataType\":{\"type\":\"string\"}}]";
-    state.setProp(MultistageProperties.MSTAGE_OUTPUT_SCHEMA.getConfig(), schema);
+    state.setProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), schema);
     jobKeys.setOutputSchema(jobKeys.parseOutputSchema(state));
     Assert.assertTrue(jobKeys.validate(state));
 
-    state.setProp(MultistageProperties.MSTAGE_WORK_UNIT_PARTITION.getConfig(), "lovely");
+    state.setProp(MSTAGE_WORK_UNIT_PARTITION.getConfig(), "lovely");
     jobKeys.setWorkUnitPartitionType(null);
     Assert.assertFalse(jobKeys.validate(state));
 
-    state.setProp(MultistageProperties.MSTAGE_WORK_UNIT_PARTITION.getConfig(), "{\"weekly\": [\"2020-01-01\", \"2020-02-1\"]}");
+    state.setProp(MSTAGE_WORK_UNIT_PARTITION.getConfig(), "{\"weekly\": [\"2020-01-01\", \"2020-02-1\"]}");
     jobKeys.setWorkUnitPartitionType(WorkUnitPartitionTypes.COMPOSITE);
     Assert.assertFalse(jobKeys.validate(state));
   }
@@ -149,7 +149,7 @@ public class JobKeysTest extends PowerMockTestCase {
     method.setAccessible(true);
 
     State state = Mockito.mock(State.class);
-    when(state.getProp(MultistageProperties.MSTAGE_DATA_DEFAULT_TYPE.getConfig(), new JsonObject().toString())).thenReturn("{\"testField\":100}");
+    when(state.getProp(MSTAGE_DATA_DEFAULT_TYPE.getConfig(), new JsonObject().toString())).thenReturn("{\"testField\":100}");
     Assert.assertEquals(method.invoke(jobkeys, state).toString(), "{testField=100}");
   }
 
@@ -176,7 +176,7 @@ public class JobKeysTest extends PowerMockTestCase {
     method.setAccessible(true);
 
     State state = Mockito.mock(State.class);
-    when(state.getProp(MultistageProperties.MSTAGE_PAGINATION.getConfig(), new JsonObject().toString()))
+    when(state.getProp(MSTAGE_PAGINATION.getConfig(), new JsonObject().toString()))
         .thenReturn("{\"fields\": [\"offset\", \"limit\"], \"initialvalues\": [0, 5000]}");
     method.invoke(jobkeys, state);
     Map<ParameterTypes, Long> paginationInitValues = jobkeys.getPaginationInitValues();
@@ -188,14 +188,14 @@ public class JobKeysTest extends PowerMockTestCase {
   public void testGetPaginationFields() throws Exception {
     JobKeys jobkeys = new JobKeys();
     State state = Mockito.mock(State.class);
-    when(state.getProp(MultistageProperties.MSTAGE_PAGINATION.getConfig(), new JsonObject().toString()))
+    when(state.getProp(MSTAGE_PAGINATION.getConfig(), new JsonObject().toString()))
         .thenReturn("{\"fields\": [\"\", \"\"], \"initialvalues\": [0, 5000]}");
     Method method = JobKeys.class.getDeclaredMethod("parsePaginationFields", State.class);
     method.setAccessible(true);
     method.invoke(jobkeys, state);
     Assert.assertEquals(jobkeys.getPaginationInitValues().size(), 0);
 
-    when(state.getProp(MultistageProperties.MSTAGE_PAGINATION.getConfig(), new JsonObject().toString()))
+    when(state.getProp(MSTAGE_PAGINATION.getConfig(), new JsonObject().toString()))
         .thenReturn("{\"initialvalues\": [0, 5000]}");
     method.invoke(jobkeys, state);
     Assert.assertEquals(jobkeys.getPaginationInitValues().size(), 0);

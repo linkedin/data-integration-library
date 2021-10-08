@@ -11,10 +11,11 @@ import gobblin.configuration.SourceState;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 
 
 /**
@@ -48,7 +49,7 @@ public class JsonParameterTest {
     String encrypted = "ENC(M6nV+j0lhqZ36RgvuF5TQMyNvBtXmkPl)";
     String masterKeyLoc = this.getClass().getResource("/key/master.key").toString();
     SourceState state = new SourceState();
-    state.setProp(MultistageProperties.ENCRYPT_KEY_LOC.toString(), masterKeyLoc);
+    state.setProp(ENCRYPT_KEY_LOC.toString(), masterKeyLoc);
     JsonArray jsonArray = gson.fromJson(new InputStreamReader(this.getClass().getResourceAsStream("/json/parameter-encryption.json")), JsonArray.class);
     Assert.assertEquals(expected, JsonParameter.getParametersAsJsonString(jsonArray.toString(), new JsonObject(), state));
   }
@@ -162,23 +163,23 @@ public class JsonParameterTest {
     SourceState state = new SourceState();
 
     String expected = "{\"column\":\"createdDate\"}";
-    state.setProp(MultistageProperties.EXTRACT_IS_FULL.toString(), true);
+    state.setProp(EXTRACT_IS_FULL.toString(), true);
     Assert.assertEquals(expected, JsonParameter.getParametersAsJsonString(msParameters.toString(), new JsonObject(), state));
 
     expected = "{\"column\":\"updatedDate\"}";
-    state.setProp(MultistageProperties.EXTRACT_IS_FULL.toString(), false);
+    state.setProp(EXTRACT_IS_FULL.toString(), false);
     Assert.assertEquals(expected, JsonParameter.getParametersAsJsonString(msParameters.toString(), new JsonObject(), state));
 
     expected = "{\"column\":\"createdDate\"}";
-    state.setProp(MultistageProperties.EXTRACT_IS_FULL.toString(), false);
+    state.setProp(EXTRACT_IS_FULL.toString(), false);
     Assert.assertEquals(expected, JsonParameter.getParametersAsJsonString(msParameters2.toString(), new JsonObject(), state));
 
     expected = "{\"column\":\"createdDate\"}";
-    state.setProp(MultistageProperties.EXTRACT_IS_FULL.toString(), false);
+    state.setProp(EXTRACT_IS_FULL.toString(), false);
     Assert.assertEquals(expected, JsonParameter.getParametersAsJsonString(msParameters3.toString(), new JsonObject(), state));
 
     expected = "{\"column\":\"\"}";
-    state.setProp(MultistageProperties.EXTRACT_IS_FULL.toString(), false);
+    state.setProp(EXTRACT_IS_FULL.toString(), false);
     Assert.assertEquals(expected, JsonParameter.getParametersAsJsonString(msParameters4.toString(), new JsonObject(), state));
   }
 }

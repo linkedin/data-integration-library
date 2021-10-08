@@ -4,7 +4,6 @@
 
 package com.linkedin.cdi.source;
 
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.connection.JdbcConnection;
 import com.linkedin.cdi.extractor.MultistageExtractor;
 import com.linkedin.cdi.keys.JdbcKeys;
@@ -19,6 +18,8 @@ import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.source.extractor.Extractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 
 
 /***
@@ -55,14 +56,14 @@ public class JdbcSource extends MultistageSource<Schema, GenericRecord> {
   protected void initialize(State state) {
     super.initialize(state);
     jdbcSourceKeys.logUsage(state);
-    jdbcSourceKeys.setJdbcStatement(MultistageProperties.MSTAGE_JDBC_STATEMENT.getValidNonblankWithDefault(state));
-    jdbcSourceKeys.setSeparator(CsvUtils.unescape(MultistageProperties.MSTAGE_CSV_SEPARATOR
+    jdbcSourceKeys.setJdbcStatement(MSTAGE_JDBC_STATEMENT.getValidNonblankWithDefault(state));
+    jdbcSourceKeys.setSeparator(CsvUtils.unescape(MSTAGE_CSV_SEPARATOR
         .getValidNonblankWithDefault(state)));
-    jdbcSourceKeys.setQuoteCharacter(CsvUtils.unescape(MultistageProperties.MSTAGE_CSV_QUOTE_CHARACTER
+    jdbcSourceKeys.setQuoteCharacter(CsvUtils.unescape(MSTAGE_CSV_QUOTE_CHARACTER
         .getValidNonblankWithDefault(state)));
-    jdbcSourceKeys.setEscapeCharacter(CsvUtils.unescape(MultistageProperties.MSTAGE_CSV_ESCAPE_CHARACTER
+    jdbcSourceKeys.setEscapeCharacter(CsvUtils.unescape(MSTAGE_CSV_ESCAPE_CHARACTER
         .getValidNonblankWithDefault(state)));
-    jdbcSourceKeys.setSchemaRefactorFunction(MultistageProperties.MSTAGE_JDBC_SCHEMA_REFACTOR
+    jdbcSourceKeys.setSchemaRefactorFunction(MSTAGE_JDBC_SCHEMA_REFACTOR
         .getValidNonblankWithDefault(state));
     jdbcSourceKeys.logDebugAll();
   }

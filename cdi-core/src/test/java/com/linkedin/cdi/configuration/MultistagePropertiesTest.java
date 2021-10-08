@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 import static org.mockito.Mockito.*;
 
 
@@ -24,20 +25,20 @@ public class MultistagePropertiesTest {
   @Test
   void validateNonblankWithDefault() {
     SourceState state = new SourceState();
-    Assert.assertEquals(MultistageProperties.MSTAGE_PARAMETERS.getValidNonblankWithDefault(state), new JsonArray());
-    Assert.assertEquals(MultistageProperties.MSTAGE_DATA_FIELD.getValidNonblankWithDefault(state), "");
-    Assert.assertEquals(MultistageProperties.MSTAGE_ABSTINENT_PERIOD_DAYS.getValidNonblankWithDefault(state), new Integer(0));
-    Assert.assertEquals(MultistageProperties.MSTAGE_AUTHENTICATION.getValidNonblankWithDefault(state), new JsonObject());
-    Assert.assertEquals(MultistageProperties.MSTAGE_HTTP_STATUSES.getValidNonblankWithDefault(state).toString(),
+    Assert.assertEquals(MSTAGE_PARAMETERS.getValidNonblankWithDefault(state), new JsonArray());
+    Assert.assertEquals(MSTAGE_DATA_FIELD.getValidNonblankWithDefault(state), "");
+    Assert.assertEquals(MSTAGE_ABSTINENT_PERIOD_DAYS.getValidNonblankWithDefault(state), new Integer(0));
+    Assert.assertEquals(MSTAGE_AUTHENTICATION.getValidNonblankWithDefault(state), new JsonObject());
+    Assert.assertEquals(MSTAGE_HTTP_STATUSES.getValidNonblankWithDefault(state).toString(),
         "{\"success\":[200,201,202],\"pagination_error\":[401]}");
-    Assert.assertEquals(MultistageProperties.MSTAGE_PAGINATION.getValidNonblankWithDefault(state), new JsonObject());
-    Assert.assertFalse(MultistageProperties.MSTAGE_PAGINATION.validateNonblank(state));
-    state.setProp(MultistageProperties.MSTAGE_PAGINATION.getConfig(), "[]");
-    Assert.assertFalse(MultistageProperties.MSTAGE_PAGINATION.validateNonblank(state));
-    state.setProp(MultistageProperties.MSTAGE_PAGINATION.getConfig(), "{}");
-    Assert.assertFalse(MultistageProperties.MSTAGE_PAGINATION.validateNonblank(state));
-    state.setProp(MultistageProperties.MSTAGE_PAGINATION.getConfig(), "{null}}");
-    Assert.assertFalse(MultistageProperties.MSTAGE_PAGINATION.validateNonblank(state));
+    Assert.assertEquals(MSTAGE_PAGINATION.getValidNonblankWithDefault(state), new JsonObject());
+    Assert.assertFalse(MSTAGE_PAGINATION.validateNonblank(state));
+    state.setProp(MSTAGE_PAGINATION.getConfig(), "[]");
+    Assert.assertFalse(MSTAGE_PAGINATION.validateNonblank(state));
+    state.setProp(MSTAGE_PAGINATION.getConfig(), "{}");
+    Assert.assertFalse(MSTAGE_PAGINATION.validateNonblank(state));
+    state.setProp(MSTAGE_PAGINATION.getConfig(), "{null}}");
+    Assert.assertFalse(MSTAGE_PAGINATION.validateNonblank(state));
   }
 
   /**
@@ -54,14 +55,14 @@ public class MultistagePropertiesTest {
     // Input: State object without setting ms.wait.time.seconds
     // Output: 600 seconds, or 10 minutes, or 600,000 milli-seconds
 
-    Assert.assertEquals(MultistageProperties.MSTAGE_WAIT_TIMEOUT_SECONDS.getMillis(state).longValue(), 600000L);
+    Assert.assertEquals(MSTAGE_WAIT_TIMEOUT_SECONDS.getMillis(state).longValue(), 600000L);
 
     // Scenario 2: test user defined value
     //
     // Input: State object by setting ms.wait.time.seconds = 1000
     // Output: 1000 seconds, or 1,000,000 milli-seconds
-    state.setProp(MultistageProperties.MSTAGE_WAIT_TIMEOUT_SECONDS.toString(), 1000);
-    Assert.assertEquals(MultistageProperties.MSTAGE_WAIT_TIMEOUT_SECONDS.getMillis(state).longValue(), 1000000L);
+    state.setProp(MSTAGE_WAIT_TIMEOUT_SECONDS.toString(), 1000);
+    Assert.assertEquals(MSTAGE_WAIT_TIMEOUT_SECONDS.getMillis(state).longValue(), 1000000L);
   }
 
   /**
@@ -70,7 +71,7 @@ public class MultistagePropertiesTest {
   @Test
   public void testGetDefaultValue1() {
     JsonObject expected = gson.fromJson("{\"state.store\":\"P90D\",\"publish.dir\":\"P731D\",\"log\":\"P30D\"}", JsonObject.class);
-    Assert.assertEquals(MultistageProperties.MSTAGE_RETENTION.getDefaultValue(), expected);
+    Assert.assertEquals(MSTAGE_RETENTION.getDefaultValue(), expected);
   }
 
   /**
@@ -78,7 +79,7 @@ public class MultistagePropertiesTest {
    */
   @Test
   public void testGetDefaultValue2() {
-    Assert.assertEquals(MultistageProperties.MSTAGE_ENABLE_DYNAMIC_FULL_LOAD.getDefaultValue(), Boolean.TRUE);
+    Assert.assertEquals(MSTAGE_ENABLE_DYNAMIC_FULL_LOAD.getDefaultValue(), Boolean.TRUE);
   }
 
   /**
@@ -86,7 +87,7 @@ public class MultistagePropertiesTest {
    */
   @Test
   public void testGetDefaultValue3() {
-    Assert.assertEquals(MultistageProperties.MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.getDefaultValue(), Boolean.TRUE);
+    Assert.assertEquals(MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.getDefaultValue(), Boolean.TRUE);
   }
 
   /**
@@ -94,7 +95,7 @@ public class MultistagePropertiesTest {
    */
   @Test
   public void testGetDefaultValue4() {
-    Assert.assertEquals(MultistageProperties.MSTAGE_SOURCE_FILES_PATTERN.getDefaultValue(), ".*");
+    Assert.assertEquals(MSTAGE_SOURCE_FILES_PATTERN.getDefaultValue(), ".*");
   }
 
   /**
@@ -102,7 +103,7 @@ public class MultistagePropertiesTest {
    */
   @Test
   public void testGetDefaultValue5() {
-    Assert.assertEquals(MultistageProperties.EXTRACT_IS_FULL.getDefaultValue(), (Boolean) false);
+    Assert.assertEquals(EXTRACT_IS_FULL.getDefaultValue(), (Boolean) false);
   }
 
   /**
@@ -110,7 +111,7 @@ public class MultistagePropertiesTest {
    */
   @Test
   public void testGetDefaultValue7() {
-    Assert.assertEquals(MultistageProperties.MSTAGE_WORKUNIT_STARTTIME_KEY.getDefaultValue(), new Long(0L));
+    Assert.assertEquals(MSTAGE_WORKUNIT_STARTTIME_KEY.getDefaultValue(), new Long(0L));
   }
 
   /**
@@ -119,11 +120,11 @@ public class MultistagePropertiesTest {
   @Test
   public void testGetValidNonblankWithDefault1() {
     State state = Mockito.mock(State.class);
-    when(state.getPropAsInt(MultistageProperties.MSTAGE_ABSTINENT_PERIOD_DAYS.getConfig(), 0)).thenReturn(0);
-    Assert.assertEquals(MultistageProperties.MSTAGE_ABSTINENT_PERIOD_DAYS.getValidNonblankWithDefault(state), new Integer(0));
+    when(state.getPropAsInt(MSTAGE_ABSTINENT_PERIOD_DAYS.getConfig(), 0)).thenReturn(0);
+    Assert.assertEquals(MSTAGE_ABSTINENT_PERIOD_DAYS.getValidNonblankWithDefault(state), new Integer(0));
 
-    when(state.getPropAsInt(MultistageProperties.MSTAGE_ABSTINENT_PERIOD_DAYS.getConfig(), 0)).thenReturn(1);
-    Assert.assertEquals(MultistageProperties.MSTAGE_ABSTINENT_PERIOD_DAYS.getValidNonblankWithDefault(state), new Integer(1));
+    when(state.getPropAsInt(MSTAGE_ABSTINENT_PERIOD_DAYS.getConfig(), 0)).thenReturn(1);
+    Assert.assertEquals(MSTAGE_ABSTINENT_PERIOD_DAYS.getValidNonblankWithDefault(state), new Integer(1));
   }
 
   /**
@@ -133,11 +134,11 @@ public class MultistagePropertiesTest {
   public void testGetValidNonblankWithDefault2() {
     State state = Mockito.mock(State.class);
     String expected = "input";
-    when(state.getProp(MultistageProperties.MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.getConfig(), StringUtils.EMPTY)).thenReturn(expected);
-    Assert.assertEquals(MultistageProperties.MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.getValidNonblankWithDefault(state), expected.toUpperCase());
+    when(state.getProp(MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.getConfig(), StringUtils.EMPTY)).thenReturn(expected);
+    Assert.assertEquals(MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.getValidNonblankWithDefault(state), expected.toUpperCase());
 
-    when(state.getProp(MultistageProperties.MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.getConfig(), StringUtils.EMPTY)).thenReturn("");
-    Assert.assertEquals(MultistageProperties.MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.getValidNonblankWithDefault(state), "755");
+    when(state.getProp(MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.getConfig(), StringUtils.EMPTY)).thenReturn("");
+    Assert.assertEquals(MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.getValidNonblankWithDefault(state), "755");
   }
 
   /**
@@ -146,10 +147,10 @@ public class MultistagePropertiesTest {
   @Test
   public void testGetMillis1() {
     State state = new State();
-    Long expected = 24L * 3600L * 1000L * (Integer) MultistageProperties.MSTAGE_GRACE_PERIOD_DAYS.getProp(state);
-    Assert.assertEquals(MultistageProperties.MSTAGE_GRACE_PERIOD_DAYS.getMillis(state), expected);
+    Long expected = 24L * 3600L * 1000L * (Integer) MSTAGE_GRACE_PERIOD_DAYS.getProp(state);
+    Assert.assertEquals(MSTAGE_GRACE_PERIOD_DAYS.getMillis(state), expected);
 
-    Assert.assertEquals(MultistageProperties.MSTAGE_SOURCE_FILES_PATTERN.getMillis(state), (Long) 0L);
+    Assert.assertEquals(MSTAGE_SOURCE_FILES_PATTERN.getMillis(state), (Long) 0L);
   }
 
   /**
@@ -158,8 +159,8 @@ public class MultistagePropertiesTest {
   @Test
   public void testGetMillis2() {
     State state = new State();
-    Long expected = 24L * 3600L * 1000L * (Integer) MultistageProperties.MSTAGE_ABSTINENT_PERIOD_DAYS.getProp(new State());
-    Assert.assertEquals(MultistageProperties.MSTAGE_ABSTINENT_PERIOD_DAYS.getMillis(state), expected);
+    Long expected = 24L * 3600L * 1000L * (Integer) MSTAGE_ABSTINENT_PERIOD_DAYS.getProp(new State());
+    Assert.assertEquals(MSTAGE_ABSTINENT_PERIOD_DAYS.getMillis(state), expected);
   }
 
   /**
@@ -168,11 +169,11 @@ public class MultistagePropertiesTest {
   @Test
   public void testValidate1() {
     State state = Mockito.mock(State.class);
-    when(state.getProp(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.getConfig(), new JsonObject().toString())).thenReturn("");
-    Assert.assertTrue(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.validate(state));
+    when(state.getProp(MSTAGE_ACTIVATION_PROPERTY.getConfig(), new JsonObject().toString())).thenReturn("");
+    Assert.assertTrue(MSTAGE_ACTIVATION_PROPERTY.validate(state));
 
-    when(state.getProp(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.getConfig(), new JsonObject().toString())).thenReturn("{\"state.store\":\"P90D\"}");
-    Assert.assertTrue(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.validate(state));
+    when(state.getProp(MSTAGE_ACTIVATION_PROPERTY.getConfig(), new JsonObject().toString())).thenReturn("{\"state.store\":\"P90D\"}");
+    Assert.assertTrue(MSTAGE_ACTIVATION_PROPERTY.validate(state));
   }
 
   /**
@@ -181,20 +182,20 @@ public class MultistagePropertiesTest {
   @Test
   public void testValidate2() {
     State state = Mockito.mock(State.class);
-    when(state.getProp(MultistageProperties.MSTAGE_DERIVED_FIELDS.getConfig(), new JsonArray().toString())).thenReturn("");
-    Assert.assertTrue(MultistageProperties.MSTAGE_DERIVED_FIELDS.validate(state));
+    when(state.getProp(MSTAGE_DERIVED_FIELDS.getConfig(), new JsonArray().toString())).thenReturn("");
+    Assert.assertTrue(MSTAGE_DERIVED_FIELDS.validate(state));
 
-    when(state.getProp(MultistageProperties.MSTAGE_DERIVED_FIELDS.getConfig(), new JsonArray().toString())).thenReturn("[]");
-    Assert.assertTrue(MultistageProperties.MSTAGE_DERIVED_FIELDS.validate(state));
+    when(state.getProp(MSTAGE_DERIVED_FIELDS.getConfig(), new JsonArray().toString())).thenReturn("[]");
+    Assert.assertTrue(MSTAGE_DERIVED_FIELDS.validate(state));
 
-    when(state.getProp(MultistageProperties.MSTAGE_DERIVED_FIELDS.getConfig(), new JsonArray().toString())).thenReturn("[{\"random\":\"value\"}]");
-    Assert.assertFalse(MultistageProperties.MSTAGE_DERIVED_FIELDS.validate(state));
+    when(state.getProp(MSTAGE_DERIVED_FIELDS.getConfig(), new JsonArray().toString())).thenReturn("[{\"random\":\"value\"}]");
+    Assert.assertFalse(MSTAGE_DERIVED_FIELDS.validate(state));
 
-    when(state.getProp(MultistageProperties.MSTAGE_DERIVED_FIELDS.getConfig(), new JsonArray().toString())).thenReturn("[{\"name\":\"value\"}]");
-    Assert.assertFalse(MultistageProperties.MSTAGE_DERIVED_FIELDS.validate(state));
+    when(state.getProp(MSTAGE_DERIVED_FIELDS.getConfig(), new JsonArray().toString())).thenReturn("[{\"name\":\"value\"}]");
+    Assert.assertFalse(MSTAGE_DERIVED_FIELDS.validate(state));
 
-    when(state.getProp(MultistageProperties.MSTAGE_DERIVED_FIELDS.getConfig(), new JsonArray().toString())).thenReturn("[{\"name\":\"value\", \"formula\":\"formulaValue\"}]");
-    Assert.assertTrue(MultistageProperties.MSTAGE_DERIVED_FIELDS.validate(state));
+    when(state.getProp(MSTAGE_DERIVED_FIELDS.getConfig(), new JsonArray().toString())).thenReturn("[{\"name\":\"value\", \"formula\":\"formulaValue\"}]");
+    Assert.assertTrue(MSTAGE_DERIVED_FIELDS.validate(state));
   }
 
   /**
@@ -203,11 +204,11 @@ public class MultistagePropertiesTest {
   @Test
   public void testValidate3() {
     State state = Mockito.mock(State.class);
-    when(state.getProp(MultistageProperties.MSTAGE_SECONDARY_INPUT.getConfig(), new JsonArray().toString())).thenReturn(null);
-    Assert.assertFalse(MultistageProperties.MSTAGE_SECONDARY_INPUT.validate(state));
+    when(state.getProp(MSTAGE_SECONDARY_INPUT.getConfig(), new JsonArray().toString())).thenReturn(null);
+    Assert.assertFalse(MSTAGE_SECONDARY_INPUT.validate(state));
 
-    when(state.getProp(MultistageProperties.MSTAGE_SECONDARY_INPUT.getConfig(), new JsonArray().toString())).thenReturn("[{\"name\":\"value\"}]");
-    Assert.assertTrue(MultistageProperties.MSTAGE_SECONDARY_INPUT.validate(state));
+    when(state.getProp(MSTAGE_SECONDARY_INPUT.getConfig(), new JsonArray().toString())).thenReturn("[{\"name\":\"value\"}]");
+    Assert.assertTrue(MSTAGE_SECONDARY_INPUT.validate(state));
   }
 
   /**
@@ -215,7 +216,7 @@ public class MultistagePropertiesTest {
    */
   @Test
   public void testValidate4() {
-    Assert.assertTrue(MultistageProperties.MSTAGE_ABSTINENT_PERIOD_DAYS.validate(new State()));
+    Assert.assertTrue(MSTAGE_ABSTINENT_PERIOD_DAYS.validate(new State()));
   }
 
   /**
@@ -225,20 +226,20 @@ public class MultistagePropertiesTest {
   public void testValidateNonblank1() {
     State state = Mockito.mock(State.class);
     JsonObject obj = new JsonObject();
-    when(state.getProp(MultistageProperties.MSTAGE_AUTHENTICATION.getConfig(), new JsonObject().toString())).thenReturn(obj.toString());
-    Assert.assertFalse(MultistageProperties.MSTAGE_AUTHENTICATION.validateNonblank(state));
+    when(state.getProp(MSTAGE_AUTHENTICATION.getConfig(), new JsonObject().toString())).thenReturn(obj.toString());
+    Assert.assertFalse(MSTAGE_AUTHENTICATION.validateNonblank(state));
 
     obj.addProperty("test", "testValue");
-    when(state.getProp(MultistageProperties.MSTAGE_AUTHENTICATION.getConfig(), new JsonObject().toString())).thenReturn(obj.toString());
-    Assert.assertFalse(MultistageProperties.MSTAGE_AUTHENTICATION.validateNonblank(state));
+    when(state.getProp(MSTAGE_AUTHENTICATION.getConfig(), new JsonObject().toString())).thenReturn(obj.toString());
+    Assert.assertFalse(MSTAGE_AUTHENTICATION.validateNonblank(state));
 
     obj.addProperty("method", "testMethodValue");
-    when(state.getProp(MultistageProperties.MSTAGE_AUTHENTICATION.getConfig(), new JsonObject().toString())).thenReturn(obj.toString());
-    Assert.assertFalse(MultistageProperties.MSTAGE_AUTHENTICATION.validateNonblank(state));
+    when(state.getProp(MSTAGE_AUTHENTICATION.getConfig(), new JsonObject().toString())).thenReturn(obj.toString());
+    Assert.assertFalse(MSTAGE_AUTHENTICATION.validateNonblank(state));
 
     obj.addProperty("encryption", "testEncryptionValue");
-    when(state.getProp(MultistageProperties.MSTAGE_AUTHENTICATION.getConfig(), new JsonObject().toString())).thenReturn(obj.toString());
-    Assert.assertTrue(MultistageProperties.MSTAGE_AUTHENTICATION.validateNonblank(state));
+    when(state.getProp(MSTAGE_AUTHENTICATION.getConfig(), new JsonObject().toString())).thenReturn(obj.toString());
+    Assert.assertTrue(MSTAGE_AUTHENTICATION.validateNonblank(state));
   }
 
   /**
@@ -247,14 +248,14 @@ public class MultistagePropertiesTest {
   @Test
   public void testValidateNonblank2() {
     State state = Mockito.mock(State.class);
-    when(state.getProp(MultistageProperties.MSTAGE_CSV_COLUMN_PROJECTION.getConfig(), StringUtils.EMPTY)).thenReturn(null);
-    Assert.assertFalse(MultistageProperties.MSTAGE_CSV_COLUMN_PROJECTION.validateNonblank(state));
+    when(state.getProp(MSTAGE_CSV_COLUMN_PROJECTION.getConfig(), StringUtils.EMPTY)).thenReturn(null);
+    Assert.assertFalse(MSTAGE_CSV_COLUMN_PROJECTION.validateNonblank(state));
 
-    when(state.getProp(MultistageProperties.MSTAGE_CSV_COLUMN_PROJECTION.getConfig(), StringUtils.EMPTY)).thenReturn("test");
-    Assert.assertTrue(MultistageProperties.MSTAGE_CSV_COLUMN_PROJECTION.validateNonblank(state));
+    when(state.getProp(MSTAGE_CSV_COLUMN_PROJECTION.getConfig(), StringUtils.EMPTY)).thenReturn("test");
+    Assert.assertTrue(MSTAGE_CSV_COLUMN_PROJECTION.validateNonblank(state));
 
-    when(state.getProp(MultistageProperties.MSTAGE_CSV_COLUMN_PROJECTION.getConfig(), StringUtils.EMPTY)).thenReturn("test1,test2");
-    Assert.assertTrue(MultistageProperties.MSTAGE_CSV_COLUMN_PROJECTION.validateNonblank(state));
+    when(state.getProp(MSTAGE_CSV_COLUMN_PROJECTION.getConfig(), StringUtils.EMPTY)).thenReturn("test1,test2");
+    Assert.assertTrue(MSTAGE_CSV_COLUMN_PROJECTION.validateNonblank(state));
   }
 
   /**
@@ -263,13 +264,13 @@ public class MultistagePropertiesTest {
   @Test
   public void testValidateNonblank3() {
     State state = Mockito.mock(State.class);
-    when(state.getProp(MultistageProperties.MSTAGE_BACKFILL.getConfig(), StringUtils.EMPTY)).thenReturn("non-validate");
-    Assert.assertFalse(MultistageProperties.MSTAGE_BACKFILL.validateNonblank(state));
+    when(state.getProp(MSTAGE_BACKFILL.getConfig(), StringUtils.EMPTY)).thenReturn("non-validate");
+    Assert.assertFalse(MSTAGE_BACKFILL.validateNonblank(state));
 
-    when(state.getProp(MultistageProperties.MSTAGE_BACKFILL.getConfig(), StringUtils.EMPTY)).thenReturn("false");
-    Assert.assertTrue(MultistageProperties.MSTAGE_BACKFILL.validateNonblank(state));
+    when(state.getProp(MSTAGE_BACKFILL.getConfig(), StringUtils.EMPTY)).thenReturn("false");
+    Assert.assertTrue(MSTAGE_BACKFILL.validateNonblank(state));
 
-    when(state.getProp(MultistageProperties.MSTAGE_BACKFILL.getConfig(), StringUtils.EMPTY)).thenReturn("true");
-    Assert.assertTrue(MultistageProperties.MSTAGE_BACKFILL.validateNonblank(state));
+    when(state.getProp(MSTAGE_BACKFILL.getConfig(), StringUtils.EMPTY)).thenReturn("true");
+    Assert.assertTrue(MSTAGE_BACKFILL.validateNonblank(state));
   }
 }

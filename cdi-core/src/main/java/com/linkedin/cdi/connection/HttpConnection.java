@@ -9,7 +9,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.factory.ConnectionClientFactory;
 import com.linkedin.cdi.keys.ExtractorKeys;
@@ -36,6 +35,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -92,7 +92,7 @@ public class HttpConnection extends MultistageConnection {
     if (httpClient == null) {
       try {
         Class<?> factoryClass = Class.forName(
-            MultistageProperties.MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
+            MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
         ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.newInstance();
         httpClient = factory.getHttpClient(state);
       } catch (Exception e) {

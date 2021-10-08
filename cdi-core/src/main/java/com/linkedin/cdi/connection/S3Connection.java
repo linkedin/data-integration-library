@@ -5,7 +5,6 @@
 package com.linkedin.cdi.connection;
 
 import com.google.common.collect.Lists;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.factory.ConnectionClientFactory;
 import com.linkedin.cdi.keys.ExtractorKeys;
@@ -36,6 +35,7 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.utils.AttributeMap;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 import static software.amazon.awssdk.http.SdkHttpConfigurationOption.*;
 
 /**
@@ -146,7 +146,7 @@ public class S3Connection extends MultistageConnection {
   synchronized S3Client getS3HttpClient(State state) {
     if (s3Client == null) {
       try {
-        Class<?> factoryClass = Class.forName(MultistageProperties.MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
+        Class<?> factoryClass = Class.forName(MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
         ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.getDeclaredConstructor().newInstance();
 
         Integer connectionTimeout = s3SourceV2Keys.getConnectionTimeout();

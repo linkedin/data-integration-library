@@ -15,6 +15,8 @@ import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
+
 
 /**
  * This structure holds static parameters that are commonly used in HTTP protocol.
@@ -24,12 +26,12 @@ import org.slf4j.LoggerFactory;
 public class HttpKeys extends JobKeys {
   private static final Logger LOG = LoggerFactory.getLogger(HttpKeys.class);
   final private static List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      MultistageProperties.SOURCE_CONN_USERNAME,
-      MultistageProperties.SOURCE_CONN_PASSWORD,
-      MultistageProperties.MSTAGE_AUTHENTICATION,
-      MultistageProperties.MSTAGE_HTTP_REQUEST_METHOD,
-      MultistageProperties.MSTAGE_HTTP_REQUEST_HEADERS,
-      MultistageProperties.MSTAGE_SESSION_KEY_FIELD);
+      SOURCE_CONN_USERNAME,
+      SOURCE_CONN_PASSWORD,
+      MSTAGE_AUTHENTICATION,
+      MSTAGE_HTTP_REQUEST_METHOD,
+      MSTAGE_HTTP_REQUEST_HEADERS,
+      MSTAGE_SESSION_KEY_FIELD);
 
   private JsonObject authentication = new JsonObject();
   private JsonObject httpRequestHeaders = new JsonObject();

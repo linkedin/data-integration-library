@@ -15,6 +15,8 @@ import org.apache.gobblin.source.workunit.WorkUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
+
 
 /**
  * These attributes are defined and maintained in JsonExtractor
@@ -24,8 +26,8 @@ import org.slf4j.LoggerFactory;
 public class JsonExtractorKeys extends ExtractorKeys {
   private static final Logger LOG = LoggerFactory.getLogger(JsonExtractorKeys.class);
   final private static List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      MultistageProperties.MSTAGE_DATA_FIELD,
-      MultistageProperties.MSTAGE_TOTAL_COUNT_FIELD);
+      MSTAGE_DATA_FIELD,
+      MSTAGE_TOTAL_COUNT_FIELD);
 
   private Iterator<JsonElement> jsonElementIterator = null;
   private long totalCount;
@@ -36,7 +38,7 @@ public class JsonExtractorKeys extends ExtractorKeys {
   public void logDebugAll(WorkUnit workUnit) {
     super.logDebugAll(workUnit);
     LOG.debug("These are values of JsonExtractor regarding to Work Unit: {}",
-        workUnit == null ? "testing" : workUnit.getProp(MultistageProperties.DATASET_URN_KEY.toString()));
+        workUnit == null ? "testing" : workUnit.getProp(DATASET_URN_KEY.toString()));
     LOG.debug("Total rows expected or processed: {}", totalCount);
   }
 

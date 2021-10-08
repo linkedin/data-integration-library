@@ -13,7 +13,6 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.configuration.StaticConstants;
 import com.linkedin.cdi.filter.JsonSchemaBasedFilter;
 import com.linkedin.cdi.keys.ExtractorKeys;
@@ -40,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -201,7 +201,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
 
     // if Content-Type is provided, but not application/json, the response can have
     // useful error information
-    JsonObject expectedContentType = MultistageProperties.MSTAGE_HTTP_RESPONSE_TYPE.getValidNonblankWithDefault(state);
+    JsonObject expectedContentType = MSTAGE_HTTP_RESPONSE_TYPE.getValidNonblankWithDefault(state);
     HashSet<String> expectedContentTypeSet = new LinkedHashSet<>(Collections.singletonList("application/json"));
     if (expectedContentType.has(CONTENT_TYPE_KEY)) {
       for (Map.Entry<String, JsonElement> entry: expectedContentType.entrySet()) {
@@ -586,7 +586,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
     JsonElement data = null;
     if (input != null) {
       data = new JsonParser().parse(new InputStreamReader(input,
-          Charset.forName(MultistageProperties.MSTAGE_SOURCE_DATA_CHARACTER_SET.getValidNonblankWithDefault(state))));
+          Charset.forName(MSTAGE_SOURCE_DATA_CHARACTER_SET.getValidNonblankWithDefault(state))));
       connection.closeStream();
     }
     return data;

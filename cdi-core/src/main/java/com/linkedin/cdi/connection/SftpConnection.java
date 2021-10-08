@@ -4,7 +4,6 @@
 
 package com.linkedin.cdi.connection;
 
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.factory.ConnectionClientFactory;
 import com.linkedin.cdi.factory.sftp.SftpClient;
@@ -22,6 +21,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 
 
 public class SftpConnection extends MultistageConnection {
@@ -124,7 +125,7 @@ public class SftpConnection extends MultistageConnection {
   private SftpClient getFsClient() {
     if (this.fsClient == null) {
       try {
-        Class<?> factoryClass = Class.forName(MultistageProperties.MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(this.getState()));
+        Class<?> factoryClass = Class.forName(MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(this.getState()));
         ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.getDeclaredConstructor().newInstance();
         this.fsClient = factory.getSftpChannelClient(this.getState());
       } catch (Exception e) {

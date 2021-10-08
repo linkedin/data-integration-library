@@ -9,7 +9,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.FileDumpExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
@@ -31,6 +30,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 
 
 /**
@@ -58,15 +59,15 @@ public class FileDumpExtractor extends MultistageExtractor<String, String> {
     // initialize FileDumpExtractor keys
     // Extractors follow the pattern of initializing in constructor to avoid forgetting initialization
     // in sub-classes
-    if (MultistageProperties.DATA_PUBLISHER_FINAL_DIR.validateNonblank(state)) {
-      fileDumpExtractorKeys.setFileDumpLocation(MultistageProperties.DATA_PUBLISHER_FINAL_DIR.getProp(state));
+    if (DATA_PUBLISHER_FINAL_DIR.validateNonblank(state)) {
+      fileDumpExtractorKeys.setFileDumpLocation(DATA_PUBLISHER_FINAL_DIR.getProp(state));
     } else {
       throw new RuntimeException("data publisher final dir is empty or null");
     }
 
     // file permission is required, but a default value is given in MultistageProperties
     fileDumpExtractorKeys.setFileWritePermissions(
-        MultistageProperties.MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.getValidNonblankWithDefault(state));
+        MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.getValidNonblankWithDefault(state));
 
     // work unit file name is based on a template that is defined by ms.extractor.target.file.name
     // and then substituted with activation parameters
@@ -216,7 +217,7 @@ public class FileDumpExtractor extends MultistageExtractor<String, String> {
    * @return the file name
    */
   private String getFileName(WorkUnitState state) {
-    String fileNameTemplate = MultistageProperties.MSTAGE_EXTRACTOR_TARGET_FILE_NAME.getValidNonblankWithDefault(state);
+    String fileNameTemplate = MSTAGE_EXTRACTOR_TARGET_FILE_NAME.getValidNonblankWithDefault(state);
     JsonObject activationParameters = extractorKeys.getActivationParameters();
     try {
       String filePath = VariableUtils.replaceWithTracking(fileNameTemplate, activationParameters).getKey();
@@ -230,7 +231,7 @@ public class FileDumpExtractor extends MultistageExtractor<String, String> {
       segments.add(fileName);
       return Joiner.on(Path.SEPARATOR_CHAR).join(segments);
     } catch (Exception e) {
-      LOG.error("Error resolving placeholders in {}", MultistageProperties.MSTAGE_EXTRACTOR_TARGET_FILE_NAME.toString());
+      LOG.error("Error resolving placeholders in {}", MSTAGE_EXTRACTOR_TARGET_FILE_NAME.toString());
       LOG.error("The value \"{}\" will be used as is", fileNameTemplate);
       return fileNameTemplate;
     }

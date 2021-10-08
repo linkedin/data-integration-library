@@ -20,6 +20,8 @@ import org.apache.gobblin.source.workunit.WorkUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
+
 
 /**
  * These attributes are defined and maintained in CsvExtractor
@@ -29,20 +31,20 @@ import org.slf4j.LoggerFactory;
 public class CsvExtractorKeys extends ExtractorKeys {
   private static final Logger LOG = LoggerFactory.getLogger(CsvExtractorKeys.class);
   final private static List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      MultistageProperties.MSTAGE_CSV_COLUMN_HEADER,
-      MultistageProperties.MSTAGE_CSV_SEPARATOR,
-      MultistageProperties.MSTAGE_CSV_SKIP_LINES,
-      MultistageProperties.MSTAGE_CSV_QUOTE_CHARACTER,
-      MultistageProperties.MSTAGE_CSV_ESCAPE_CHARACTER);
+      MSTAGE_CSV_COLUMN_HEADER,
+      MSTAGE_CSV_SEPARATOR,
+      MSTAGE_CSV_SKIP_LINES,
+      MSTAGE_CSV_QUOTE_CHARACTER,
+      MSTAGE_CSV_ESCAPE_CHARACTER);
 
   private Iterator<String[]> csvIterator = null;
   private long currentPageNumber = 0;
   private Boolean columnHeader = false;
   private int columnHeaderIndex = 0;
   private int rowsToSkip = 0;
-  private String separator = MultistageProperties.MSTAGE_CSV_SEPARATOR.getDefaultValue();
-  private String quoteCharacter = MultistageProperties.MSTAGE_CSV_QUOTE_CHARACTER.getDefaultValue();
-  private String escapeCharacter = MultistageProperties.MSTAGE_CSV_ESCAPE_CHARACTER.getDefaultValue();
+  private String separator = MSTAGE_CSV_SEPARATOR.getDefaultValue();
+  private String quoteCharacter = MSTAGE_CSV_QUOTE_CHARACTER.getDefaultValue();
+  private String escapeCharacter = MSTAGE_CSV_ESCAPE_CHARACTER.getDefaultValue();
   // column name --> index mapping created based on the output or inferred schema
   private Map<String, Integer> columnToIndexMap = new HashMap<>();
   // A queue that stores sample rows read in during schema inference
@@ -61,7 +63,7 @@ public class CsvExtractorKeys extends ExtractorKeys {
   public void logDebugAll(WorkUnit workUnit) {
     super.logDebugAll(workUnit);
     LOG.debug("These are values of CsvExtractor regarding to Work Unit: {}",
-        workUnit == null ? "testing" : workUnit.getProp(MultistageProperties.DATASET_URN_KEY.toString()));
+        workUnit == null ? "testing" : workUnit.getProp(DATASET_URN_KEY.toString()));
     LOG.debug("Is column header present: {}", columnHeader);
     LOG.debug("Total rows to skip: {}", rowsToSkip);
   }

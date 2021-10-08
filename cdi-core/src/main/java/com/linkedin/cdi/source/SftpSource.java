@@ -4,7 +4,6 @@
 
 package com.linkedin.cdi.source;
 
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.connection.SftpConnection;
 import com.linkedin.cdi.extractor.MultistageExtractor;
 import com.linkedin.cdi.keys.SftpKeys;
@@ -19,6 +18,8 @@ import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.source.extractor.Extractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 
 
 /**
@@ -45,9 +46,9 @@ public class SftpSource extends MultistageSource<Schema, GenericRecord> {
     super.initialize(state);
     sftpSourceKeys.logUsage(state);
     this.parseUri(state);
-    sftpSourceKeys.setFilesPattern(MultistageProperties.MSTAGE_SOURCE_FILES_PATTERN.getProp(state));
+    sftpSourceKeys.setFilesPattern(MSTAGE_SOURCE_FILES_PATTERN.getProp(state));
     sftpSourceKeys.setTargetFilePattern(
-        MultistageProperties.MSTAGE_EXTRACTOR_TARGET_FILE_NAME.getValidNonblankWithDefault(state));
+        MSTAGE_EXTRACTOR_TARGET_FILE_NAME.getValidNonblankWithDefault(state));
     sftpSourceKeys.logDebugAll();
   }
 
@@ -73,7 +74,7 @@ public class SftpSource extends MultistageSource<Schema, GenericRecord> {
    * Valid[Supported for backward compatibility] : /a/b/*c*.csv
    */
   private void parseUri(State state) {
-    String sourceUri = MultistageProperties.MSTAGE_SOURCE_URI.getValidNonblankWithDefault(state);
+    String sourceUri = MSTAGE_SOURCE_URI.getValidNonblankWithDefault(state);
     if (VariableUtils.hasVariable(sourceUri)) {
       sftpSourceKeys.setFilesPath(sourceUri);
     } else {

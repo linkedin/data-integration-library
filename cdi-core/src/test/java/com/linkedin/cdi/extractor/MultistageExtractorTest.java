@@ -8,6 +8,16 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.filter.JsonSchemaBasedFilter;
+import com.linkedin.cdi.keys.ExtractorKeys;
+import com.linkedin.cdi.keys.JobKeys;
+import com.linkedin.cdi.preprocessor.GpgDecryptProcessor;
+import com.linkedin.cdi.preprocessor.GunzipProcessor;
+import com.linkedin.cdi.preprocessor.InputStreamProcessor;
+import com.linkedin.cdi.source.HttpSource;
+import com.linkedin.cdi.source.MultistageSource;
+import com.linkedin.cdi.util.ParameterTypes;
+import com.linkedin.cdi.util.WorkUnitStatus;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,17 +34,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.ConfigurationKeys;
 import org.apache.gobblin.configuration.SourceState;
 import org.apache.gobblin.configuration.WorkUnitState;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.filter.JsonSchemaBasedFilter;
-import com.linkedin.cdi.keys.ExtractorKeys;
-import com.linkedin.cdi.keys.JobKeys;
-import com.linkedin.cdi.preprocessor.GpgDecryptProcessor;
-import com.linkedin.cdi.preprocessor.GunzipProcessor;
-import com.linkedin.cdi.preprocessor.InputStreamProcessor;
-import com.linkedin.cdi.source.HttpSource;
-import com.linkedin.cdi.source.MultistageSource;
-import com.linkedin.cdi.util.ParameterTypes;
-import com.linkedin.cdi.util.WorkUnitStatus;
 import org.apache.gobblin.runtime.JobState;
 import org.apache.gobblin.source.extractor.WatermarkInterval;
 import org.apache.gobblin.source.extractor.extract.LongWatermark;
@@ -48,6 +47,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 import static org.mockito.Mockito.*;
 
 
@@ -87,7 +87,7 @@ public class MultistageExtractorTest extends PowerMockTestCase {
 
     SourceState sourceState = mock(SourceState.class);
     when(sourceState.contains("source.conn.use.proxy.url")).thenReturn(true);
-    when(sourceState.getProp(MultistageProperties.MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
+    when(sourceState.getProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
     MultistageSource source = new HttpSource();
     source.getWorkunits(sourceState);
 
@@ -104,32 +104,32 @@ public class MultistageExtractorTest extends PowerMockTestCase {
     SourceState sourceState = mock(SourceState.class);
 
     when(state.getProp("ms.activation.property", new JsonObject().toString())).thenReturn("{\"a\":\"x\"}");
-    Assert.assertNotNull(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.getProp(state));
-    Assert.assertNotNull(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.getValidNonblankWithDefault(state));
-    Assert.assertTrue(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.validate(state));
-    Assert.assertTrue(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.validateNonblank(state));
+    Assert.assertNotNull(MSTAGE_ACTIVATION_PROPERTY.getProp(state));
+    Assert.assertNotNull(MSTAGE_ACTIVATION_PROPERTY.getValidNonblankWithDefault(state));
+    Assert.assertTrue(MSTAGE_ACTIVATION_PROPERTY.validate(state));
+    Assert.assertTrue(MSTAGE_ACTIVATION_PROPERTY.validateNonblank(state));
 
     when(state.getProp("ms.activation.property", new JsonObject().toString())).thenReturn("{\"a\"}");
-    Assert.assertFalse(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.validate(state));
-    Assert.assertFalse(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.validateNonblank(state));
-    Assert.assertNotNull(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.getValidNonblankWithDefault(state));
+    Assert.assertFalse(MSTAGE_ACTIVATION_PROPERTY.validate(state));
+    Assert.assertFalse(MSTAGE_ACTIVATION_PROPERTY.validateNonblank(state));
+    Assert.assertNotNull(MSTAGE_ACTIVATION_PROPERTY.getValidNonblankWithDefault(state));
 
     when(state.getProp("ms.activation.property", new JsonObject().toString())).thenReturn("{}");
-    Assert.assertTrue(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.validate(state));
-    Assert.assertFalse(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.validateNonblank(state));
-    Assert.assertNotNull(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.getValidNonblankWithDefault(state));
+    Assert.assertTrue(MSTAGE_ACTIVATION_PROPERTY.validate(state));
+    Assert.assertFalse(MSTAGE_ACTIVATION_PROPERTY.validateNonblank(state));
+    Assert.assertNotNull(MSTAGE_ACTIVATION_PROPERTY.getValidNonblankWithDefault(state));
 
     when(state.getProp("ms.activation.property", new JsonObject().toString())).thenReturn("");
-    Assert.assertTrue(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.validate(state));
-    Assert.assertFalse(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.validateNonblank(state));
-    Assert.assertNotNull(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.getValidNonblankWithDefault(state));
+    Assert.assertTrue(MSTAGE_ACTIVATION_PROPERTY.validate(state));
+    Assert.assertFalse(MSTAGE_ACTIVATION_PROPERTY.validateNonblank(state));
+    Assert.assertNotNull(MSTAGE_ACTIVATION_PROPERTY.getValidNonblankWithDefault(state));
   }
 
 
   @Test
   public void testWorkUnitWatermark(){
     SourceState state = mock(SourceState.class);
-    when(state.getProp(MultistageProperties.MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
+    when(state.getProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
     MultistageSource source = new MultistageSource();
     List<WorkUnit> workUnits = source.getWorkunits(state);
     WorkUnitState workUnitState = new WorkUnitState(workUnits.get(0));
@@ -155,7 +155,7 @@ public class MultistageExtractorTest extends PowerMockTestCase {
 
     SourceState sourceState = mock(SourceState.class);
     when(sourceState.contains("source.conn.use.proxy.url")).thenReturn(true);
-    when(sourceState.getProp(MultistageProperties.MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
+    when(sourceState.getProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
     MultistageSource source = new HttpSource();
     source.getWorkunits(sourceState);
 
@@ -183,7 +183,7 @@ public class MultistageExtractorTest extends PowerMockTestCase {
 
     SourceState sourceState = mock(SourceState.class);
     when(sourceState.contains("source.conn.use.proxy.url")).thenReturn(true);
-    when(sourceState.getProp(MultistageProperties.MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
+    when(sourceState.getProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
     MultistageSource source = new HttpSource();
     source.getWorkunits(sourceState);
 
@@ -241,7 +241,7 @@ public class MultistageExtractorTest extends PowerMockTestCase {
     multistageExtractor.setRowFilter(schema);
 
     multistageExtractor.rowFilter = null;
-    when(state.getProp(MultistageProperties.MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.getConfig(), StringUtils.EMPTY)).thenReturn("false");
+    when(state.getProp(MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.getConfig(), StringUtils.EMPTY)).thenReturn("false");
     multistageExtractor.setRowFilter(new JsonArray());
     Assert.assertNull(multistageExtractor.rowFilter);
   }
@@ -337,7 +337,7 @@ public class MultistageExtractorTest extends PowerMockTestCase {
 
     String expected = "test_string";
     InputStream input = new ByteArrayInputStream(expected.getBytes());
-    when(state.getProp(MultistageProperties.MSTAGE_SOURCE_DATA_CHARACTER_SET.getConfig(), StringUtils.EMPTY)).thenReturn("UTF-8");
+    when(state.getProp(MSTAGE_SOURCE_DATA_CHARACTER_SET.getConfig(), StringUtils.EMPTY)).thenReturn("UTF-8");
     Assert.assertEquals(multistageExtractor.extractText(input), expected);
 
     PowerMockito.mockStatic(IOUtils.class);

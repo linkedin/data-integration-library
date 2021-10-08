@@ -6,7 +6,6 @@ package com.linkedin.cdi.util;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import java.util.Comparator;
 import java.util.List;
 import java.util.SortedSet;
@@ -17,6 +16,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -85,7 +85,7 @@ public enum WorkUnitPartitionTypes {
     }
 
     /**
-     * Refer to the specifications and constraints for "ms.work.unit.partition" in MultistageProperties.
+     * Refer to the specifications and constraints for "ms.work.unit.partition" in
      * The ranges should be continuous with no gaps or overlaps.
      *
      */
@@ -155,7 +155,7 @@ public enum WorkUnitPartitionTypes {
       }
     } catch (Exception e) {
       LOG.error("Error parsing the partition type string, please check job property: "
-          + MultistageProperties.MSTAGE_WORK_UNIT_PARTITION.toString(), e);
+          + MSTAGE_WORK_UNIT_PARTITION.toString(), e);
     }
     return null;
   }

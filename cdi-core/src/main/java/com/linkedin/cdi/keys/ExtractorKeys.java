@@ -17,6 +17,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.linkedin.cdi.configuration.MultistageProperties.*;
+
 
 /**
  * each of these keys provide information how to populate corresponding values
@@ -29,9 +31,9 @@ import org.slf4j.LoggerFactory;
 public class ExtractorKeys {
   private static final Logger LOG = LoggerFactory.getLogger(ExtractorKeys.class);
   final static private List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      MultistageProperties.EXTRACT_TABLE_NAME_KEY,
-      MultistageProperties.MSTAGE_ACTIVATION_PROPERTY,
-      MultistageProperties.MSTAGE_PARAMETERS
+      EXTRACT_TABLE_NAME_KEY,
+      MSTAGE_ACTIVATION_PROPERTY,
+      MSTAGE_PARAMETERS
   );
 
   private JsonObject activationParameters = new JsonObject();
@@ -52,7 +54,7 @@ public class ExtractorKeys {
 
   public void logDebugAll(WorkUnit workUnit) {
     LOG.debug("These are values in MultistageExtractor regarding to Work Unit: {}",
-        workUnit == null ? "testing" : workUnit.getProp(MultistageProperties.DATASET_URN_KEY.toString()));
+        workUnit == null ? "testing" : workUnit.getProp(DATASET_URN_KEY.toString()));
     LOG.debug("Activation parameters: {}", activationParameters);
     LOG.debug("Payload size: {}", payloads.size());
     LOG.debug("Starting time: {}", startTime);
