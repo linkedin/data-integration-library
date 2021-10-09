@@ -33,10 +33,10 @@ set the value to: `ms.csv.column.projection=0,2-4`
 
 Other examples are:
 
-0,1,2,3,4
-0,1,2,4-15
-0,1,3-7,10
-0,5,3-4,2
+- 0,1,2,3,4
+- 0,1,2,4-15
+- 0,1,3-7,10
+- 0,5,3-4,2
 
 **Note**: the values need not be ordered
 

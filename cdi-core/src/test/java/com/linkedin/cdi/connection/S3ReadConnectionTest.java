@@ -15,7 +15,7 @@ import org.apache.gobblin.source.workunit.WorkUnit;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import static com.linkedin.cdi.configuration.MultistageProperties.*;
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 
 
 @Test

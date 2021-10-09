@@ -56,7 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
-import static com.linkedin.cdi.configuration.MultistageProperties.*;
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -522,7 +522,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
           strValue = deriveEpoc(format, strValue);
         } else {
           // Otherwise, the strValue should be a LONG string derived from a dynamic variable source
-          Assert.assertNotNull(LongValidator.getInstance().validate(strValue));
+          Assert.assertNotNull(LongValidator.getInstance().isValid(strValue));
         }
         break;
       case "regexp":

@@ -16,7 +16,6 @@ import com.linkedin.cdi.connection.MultistageConnection;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.keys.JsonExtractorKeys;
-import com.linkedin.cdi.source.HttpSource;
 import com.linkedin.cdi.source.MultistageSource;
 import com.linkedin.cdi.util.JsonUtils;
 import com.linkedin.cdi.util.ParameterTypes;
@@ -31,7 +30,6 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.SourceState;
 import org.apache.gobblin.configuration.WorkUnitState;
-import org.apache.gobblin.runtime.JobState;
 import org.apache.gobblin.source.workunit.WorkUnit;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -42,7 +40,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static com.linkedin.cdi.configuration.MultistageProperties.*;
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static org.mockito.Mockito.*;
 
 
@@ -224,36 +222,6 @@ public class JsonExtractorTest {
 
     jsonPath = "key.3";
     Assert.assertEquals(JsonUtils.get(row, jsonPath), JsonNull.INSTANCE);
-  }
-
-  /**
-   * Test Extractor shall stop the session when total count of records is met
-   */
-  @Test
-  void testStopConditionTotalCountMet() throws RetriableAuthenticationException {
-    InputStream inputStream = getClass().getResourceAsStream("/json/last-page-with-data.json");
-    WorkUnitStatus status = WorkUnitStatus.builder().buffer(inputStream).build();
-    status.setTotalCount(TOTAL_COUNT);
-
-    SourceState sourceState = mock(SourceState.class);
-    when(sourceState.getProp("ms.data.field", "")).thenReturn("items");
-    when(sourceState.getProp("ms.total.count.field", "")).thenReturn("totalResults");
-    when(sourceState.getProp("ms.pagination", "")).thenReturn("{\"fields\": [\"offset\", \"limit\"], \"initialvalues\": [0, 5000]}");
-    when(sourceState.getProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
-    MultistageSource source = new HttpSource();
-    List<WorkUnit> wus = source.getWorkunits(sourceState);
-    WorkUnitState state = new WorkUnitState(wus.get(0), new JobState());
-
-    JsonExtractor extractor = new JsonExtractor(state, source.getJobKeys());
-    extractor.setConnection(multistageConnection);
-    extractor.getJsonExtractorKeys().setTotalCount(TOTAL_COUNT);
-
-    extractor.workUnitStatus = WorkUnitStatus.builder().build();
-    when(multistageConnection.executeFirst(extractor.workUnitStatus)).thenReturn(status);
-
-    Assert.assertFalse(extractor.processInputStream(TOTAL_COUNT));
-    // If total count not reached, should not fail
-    Assert.assertTrue(extractor.processInputStream(TOTAL_COUNT-1));
   }
 
   @Test

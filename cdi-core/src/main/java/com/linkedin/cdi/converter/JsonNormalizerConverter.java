@@ -17,7 +17,7 @@ import org.apache.gobblin.converter.Converter;
 import org.apache.gobblin.converter.SingleRecordIterable;
 import org.apache.gobblin.util.EmptyIterable;
 
-import static com.linkedin.cdi.configuration.MultistageProperties.*;
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 

@@ -15,13 +15,15 @@ public interface StaticConstants {
   String KEY_WORD_BOOLEAN = "boolean";
   String KEY_WORD_CATEGORY = "category";
   String KEY_WORD_COLUMN_NAME = "columnName";
+  String KEY_WORD_COMMA = ",";
   String KEY_WORD_DATA_IS_NULLABLE = "isNullable";
   String KEY_WORD_DATA_TYPE = "dataType";
   String KEY_WORD_DATA_TYPE_TYPE = "dataType.type";
   String KEY_WORD_EOF = "EOF";
   String KEY_WORD_EPOC = "epoc";
   String KEY_WORD_FIELDS = "fields";
-  String KEY_WORD_RANGE_FROM = "from";
+  String KEY_WORD_FORMULA = "formula";
+  String KEY_WORD_FROM = "from";
   String KEY_WORD_HTTP_OK = "ok";
   String KEY_WORD_INTEGER = "integer";
   String KEY_WORD_IS_NULLABLE = "isNullable";
@@ -68,8 +70,12 @@ public interface StaticConstants {
   String KEY_WORD_CSV = "csv";
   String KEY_WORD_AVRO = "avro";
 
+  String PROPERTY_DELIMINATOR = ".";
+  String REGEXP_DEFAULT_PATTERN = ".*";
+
   String EXCEPTION_WORK_UNIT_MINIMUM = "Job requires a minimum of %s work unit(s) to proceed because ms.work.unit.min.units = %s.";
   String EXCEPTION_RECORD_MINIMUM = "Work unit requires a minimum of %s record(s) to succeed because ms.work.unit.min.records = %s.";
+  String EXCEPTION_INCORRECT_CONFIGURATION = "Property %s has incorrect configuration: %s";
 
   String MSG_ROWS_PROCESSED = "Processed %s records, work unit: %s";
   String MSG_WORK_UNIT_ALWAYS = "There should be a work unit.";

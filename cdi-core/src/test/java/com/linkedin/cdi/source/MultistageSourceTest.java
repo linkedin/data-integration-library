@@ -39,7 +39,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static com.linkedin.cdi.configuration.MultistageProperties.*;
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static org.mockito.Mockito.*;
 
 
@@ -58,10 +58,9 @@ public class MultistageSourceTest {
 
   @Test
   public void testWorkUnitPartitionDef(){
-    SourceState state = mock(SourceState.class);
-    when(state.getProp("ms.work.unit.partition", "")).thenReturn("daily");
-    when(state.getProp("ms.pagination", new JsonObject().toString())).thenReturn("{}");
-    when(state.getProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
+    SourceState state = new SourceState();
+    state.setProp("ms.work.unit.partition", "daily");
+    state.setProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "");
 
     MultistageSource source = new MultistageSource();
     source.getWorkunits(state);
@@ -72,10 +71,8 @@ public class MultistageSourceTest {
 
   @Test
   public void testWorkUnitPacingDef(){
-    SourceState state = mock(SourceState.class);
-    when(state.getPropAsInt("ms.work.unit.pacing.seconds", 0)).thenReturn(10);
-    when(state.getProp("ms.pagination", new JsonObject().toString())).thenReturn("{}");
-    when(state.getProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
+    SourceState state = new SourceState();
+    state.setProp("ms.work.unit.pacing.seconds", "10");
     MultistageSource source = new MultistageSource();
     source.getWorkunits(state);
     Assert.assertEquals(((Integer) MSTAGE_WORK_UNIT_PACING_SECONDS.getProp(state)).intValue(), 10);
@@ -83,10 +80,8 @@ public class MultistageSourceTest {
 
   @Test
   public void testWorkUnitPacingConversion(){
-    SourceState state = mock(SourceState.class);
-    when(state.getPropAsInt("ms.work.unit.pacing.seconds", 0)).thenReturn(10);
-    when(state.getProp("ms.pagination", new JsonObject().toString())).thenReturn("{\"fields\": [\"start\"]}");
-    when(state.getProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
+    SourceState state = new SourceState();
+    state.setProp("ms.work.unit.pacing.seconds", "10");
     MultistageSource source = new MultistageSource();
     source.getWorkunits(state);
     Assert.assertEquals(MSTAGE_WORK_UNIT_PACING_SECONDS.getMillis(state).longValue(), 10000L);
@@ -165,47 +160,39 @@ public class MultistageSourceTest {
 
   @Test
   public void testParallismMaxSetting() {
-    SourceState state = mock(SourceState.class);
-    when(state.getPropAsInt("ms.work.unit.parallelism.max",0)).thenReturn(0);
-    when(state.getProp("ms.pagination", new JsonObject().toString())).thenReturn("");
-
+    SourceState state = new SourceState();
+    state.setProp("ms.work.unit.parallelism.max", 0);
+    state.setProp("ms.pagination", "");
     Assert.assertFalse(MSTAGE_WORK_UNIT_PARALLELISM_MAX.validateNonblank(state));
 
-    when(state.getPropAsInt("ms.work.unit.parallelism.max",0)).thenReturn(10);
+    state.setProp("ms.work.unit.parallelism.max", 10);
     Assert.assertTrue(MSTAGE_WORK_UNIT_PARALLELISM_MAX.validateNonblank(state));
   }
 
   @Test
   public void testDerivedFields() {
-    SourceState sourceState = mock(SourceState.class);
-    when(sourceState.getProp("extract.table.type", "SNAPSHOT_ONLY")).thenReturn("SNAPSHOT_ONLY");
-    when(sourceState.getProp("extract.namespace", "")).thenReturn("test");
-    when(sourceState.getProp("extract.table.name", "")).thenReturn("table1");
-    when(sourceState.getProp("ms.derived.fields", new JsonArray().toString())).thenReturn("[{\"name\": \"activityDate\", \"formula\": {\"type\": \"epoc\", \"source\": \"fromDateTime\", \"format\": \"yyyy-MM-dd'T'HH:mm:ss'Z'\"}}]");
-    when(sourceState.getProp("ms.output.schema", new JsonArray().toString())).thenReturn("");
-    when(sourceState.getProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
+    SourceState sourceState = new SourceState();
+    sourceState.setProp("ms.derived.fields", "[{\"name\": \"activityDate\", \"formula\": {\"type\": \"epoc\", \"source\": \"fromDateTime\", \"format\": \"yyyy-MM-dd'T'HH:mm:ss'Z'\"}}]");
     MultistageSource source = new MultistageSource();
     source.getWorkunits(sourceState);
-
     Assert.assertEquals(source.getJobKeys().getDerivedFields().keySet().toString(), "[activityDate]");
   }
 
   @Test
   public void testOutputSchema(){
-    SourceState state = mock(SourceState.class);
-    when(state.getProp("ms.output.schema", new JsonArray().toString())).thenReturn("");
-    when(state.getProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
+    SourceState state = new SourceState();
+    state.setProp("ms.output.schema", "");
     MultistageSource source = new MultistageSource();
     source.getWorkunits(state);
     Assert.assertEquals(0, source.getJobKeys().getOutputSchema().size());
 
     // wrong format should be ignored
-    when(state.getProp("ms.output.schema", new JsonArray().toString())).thenReturn("{\"name\": \"responseTime\"}");
+    state.setProp("ms.output.schema", "{\"name\": \"responseTime\"}");
     source.getWorkunits(state);
     Assert.assertEquals(0, source.getJobKeys().getOutputSchema().size());
 
     // wrong format should be ignored
-    when(state.getProp("ms.output.schema", new JsonArray().toString())).thenReturn("[{\"name\": \"responseTime\"}]");
+    state.setProp("ms.output.schema", "[{\"name\": \"responseTime\"}]");
     source.getWorkunits(state);
     Assert.assertEquals(1, source.getJobKeys().getOutputSchema().size());
     Assert.assertEquals(1, source.getJobKeys().getOutputSchema().size());
@@ -323,18 +310,18 @@ public class MultistageSourceTest {
 
   @Test
   public void testCheckFullExtractState() throws Exception {
-    State state = Mockito.mock(State.class);
+    State state = new SourceState();
     Map map = Mockito.mock(Map.class);
     Method method = MultistageSource.class.getDeclaredMethod("checkFullExtractState", State.class, Map.class);
     method.setAccessible(true);
-    when(state.getProp("extract.table.type", StringUtils.EMPTY)).thenReturn("APPEND_ONLY");
+    state.setProp("extract.table.type", "APPEND_ONLY");
     when(map.isEmpty()).thenReturn(true);
     Assert.assertTrue((Boolean) method.invoke(source, state, map));
 
     when(map.isEmpty()).thenReturn(false);
     Assert.assertFalse((Boolean) method.invoke(source, state, map));
 
-    when(state.getProp("ms.enable.dynamic.full.load", StringUtils.EMPTY)).thenReturn("true");
+    state.setProp("ms.enable.dynamic.full.load", "true");
     Assert.assertFalse((Boolean) method.invoke(source, state, map));
   }
 

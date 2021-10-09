@@ -30,7 +30,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.linkedin.cdi.configuration.MultistageProperties.*;
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -136,7 +136,7 @@ public class JobKeys {
     setTargetSchema(MSTAGE_TARGET_SCHEMA.getValidNonblankWithDefault(state));
     setEncryptionField(MSTAGE_ENCRYPTION_FIELDS.getValidNonblankWithDefault(state));
     setDataField(MSTAGE_DATA_FIELD.getValidNonblankWithDefault(state));
-    setCallInterval(MSTAGE_CALL_INTERVAL.getProp(state));
+    setCallInterval(MSTAGE_CALL_INTERVAL_MILLIS.getProp(state));
     setSessionTimeout(MSTAGE_WAIT_TIMEOUT_SECONDS.getMillis(state));
     setMinWorkUnitRecords(MSTAGE_WORK_UNIT_MIN_RECORDS.getValidNonblankWithDefault(state));
     setMinWorkUnits(MSTAGE_WORK_UNIT_MIN_UNITS.getValidNonblankWithDefault(state));

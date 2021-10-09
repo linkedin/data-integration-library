@@ -5,7 +5,7 @@
 package com.linkedin.cdi.preprocessor;
 
 import com.google.gson.JsonObject;
-import com.linkedin.cdi.configuration.MultistageProperties;
+import com.linkedin.cdi.configuration.PropertyCollection;
 import com.linkedin.cdi.util.EncryptionUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +37,7 @@ public class GpgDecryptProcessor extends InputStreamProcessor {
   private StreamCodec codec;
 
   /**
-   * @param params See {@link MultistageProperties}
+   * @param params See {@link PropertyCollection}
    */
   public GpgDecryptProcessor(JsonObject params) {
     super(params);

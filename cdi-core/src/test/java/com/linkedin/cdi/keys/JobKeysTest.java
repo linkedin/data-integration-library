@@ -24,7 +24,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static com.linkedin.cdi.configuration.MultistageProperties.*;
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static org.mockito.Mockito.*;
 
 
@@ -148,8 +148,8 @@ public class JobKeysTest extends PowerMockTestCase {
     Method method = JobKeys.class.getDeclaredMethod("parseDefaultFieldTypes", State.class);
     method.setAccessible(true);
 
-    State state = Mockito.mock(State.class);
-    when(state.getProp(MSTAGE_DATA_DEFAULT_TYPE.getConfig(), new JsonObject().toString())).thenReturn("{\"testField\":100}");
+    State state = new SourceState();
+    state.setProp(MSTAGE_DATA_DEFAULT_TYPE.getConfig(), "{\"testField\":100}");
     Assert.assertEquals(method.invoke(jobkeys, state).toString(), "{testField=100}");
   }
 
@@ -175,9 +175,8 @@ public class JobKeysTest extends PowerMockTestCase {
     Method method = JobKeys.class.getDeclaredMethod("parsePaginationInitialValues", State.class);
     method.setAccessible(true);
 
-    State state = Mockito.mock(State.class);
-    when(state.getProp(MSTAGE_PAGINATION.getConfig(), new JsonObject().toString()))
-        .thenReturn("{\"fields\": [\"offset\", \"limit\"], \"initialvalues\": [0, 5000]}");
+    State state = new SourceState();
+    state.setProp(MSTAGE_PAGINATION.getConfig(), "{\"fields\": [\"offset\", \"limit\"], \"initialvalues\": [0, 5000]}");
     method.invoke(jobkeys, state);
     Map<ParameterTypes, Long> paginationInitValues = jobkeys.getPaginationInitValues();
     Assert.assertEquals((long) paginationInitValues.get(ParameterTypes.PAGESTART), 0L);

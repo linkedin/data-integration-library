@@ -31,7 +31,7 @@ import org.apache.hadoop.fs.permission.FsPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.linkedin.cdi.configuration.MultistageProperties.*;
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 
 
 /**
@@ -65,7 +65,7 @@ public class FileDumpExtractor extends MultistageExtractor<String, String> {
       throw new RuntimeException("data publisher final dir is empty or null");
     }
 
-    // file permission is required, but a default value is given in MultistageProperties
+    // file permission is required, but a default value is given in PropertyCollection
     fileDumpExtractorKeys.setFileWritePermissions(
         MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.getValidNonblankWithDefault(state));
 
