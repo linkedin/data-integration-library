@@ -9,7 +9,7 @@
 
 **Support DIL Variables**: No
 
-**Default value**: blank
+**Default value**: ".*"
 
 **Related**:
 - [job property: ms.source.uri](ms.source.uri.md)

@@ -70,7 +70,7 @@ public class BooleanProperties extends MultistageProperties<Boolean> {
 
   /**
    * Retrieves property value from state object if valid and not blank
-   * otherwise, return null
+   * otherwise, return default value
    *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
@@ -81,7 +81,7 @@ public class BooleanProperties extends MultistageProperties<Boolean> {
     if (validateNonblank(state)) {
       return Boolean.parseBoolean(state.getProp(getConfig()));
     }
-    return null;
+    return getDefaultValue();
   }
 
   /**
