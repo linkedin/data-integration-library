@@ -9,6 +9,9 @@ import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.linkedin.cdi.configuration.StaticConstants.*;
+
+
 /**
  * A Long type of property has default defaultValue of 0L
  */
@@ -50,7 +53,8 @@ public class LongProperties extends MultistageProperties<Long> {
       // Properly formed Long string is valid
       Long.parseLong(state.getProp(getConfig()));
     } catch (Exception e) {
-      LOG.error(getConfig(), e.getMessage());
+      LOG.error(String.format(EXCEPTION_INCORRECT_CONFIGURATION, getConfig(), state.getProp(getConfig())),
+          e.getMessage());
       return false;
     }
     return true;
@@ -69,29 +73,27 @@ public class LongProperties extends MultistageProperties<Long> {
 
   /**
    * Retrieves property value from state object if valid and not blank
-   * otherwise, return default value
-   *
-   * This method raises an exception when a non-conforming value is configured.
+   * otherwise, return 0
    *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
+   * @see #getValidNonblankWithDefault(State)
    */
   @Override
   public Long getProp(State state) {
     if (validateNonblank(state)) {
       return Long.parseLong(state.getProp(getConfig()));
     }
-    return getDefaultValueWithCheck(state);
+    return 0L;
   }
 
   /**
    * Retrieves property value from state object if valid and not blank
    * otherwise, return default value
    *
-   * This method will keep quiet if the configuration is incorrect
-   *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
+   * @see #getProp(State)
    */
   public Long getValidNonblankWithDefault(State state) {
     if (validateNonblank(state)) {

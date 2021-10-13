@@ -74,9 +74,11 @@ public abstract class MultistageProperties<T> {
 
   /**
    * Retrieves property value from state object if valid and not blank
-   * otherwise, return default value
+   * otherwise, return default value of the property type
+   *
    * @param state state
    * @return subclasses should override
+   * @see #getValidNonblankWithDefault(State)
    */
   abstract public T getProp(State state);
 
@@ -85,22 +87,7 @@ public abstract class MultistageProperties<T> {
    * otherwise, return default value
    * @param state state
    * @return subclasses should override
+   * @see #getProp(State)
    */
   abstract public T getValidNonblankWithDefault(State state);
-
-  /**
-   * Check and raise exception if incorrect configuration
-   *
-   * @param state state
-   */
-  protected T getDefaultValueWithCheck(State state) {
-    // raise exception for incorrect configurations
-    if (state.contains(getConfig())
-        && StringUtils.isNoneBlank(state.getProp(getConfig()))
-        && !isValid(state)) {
-      throw new RuntimeException(String.format(EXCEPTION_INCORRECT_CONFIGURATION,
-          getConfig(), state.getProp(getConfig())));
-    }
-    return getDefaultValue();
-  }
 }

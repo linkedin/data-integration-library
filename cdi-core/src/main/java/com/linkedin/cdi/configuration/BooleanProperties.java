@@ -9,6 +9,9 @@ import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.linkedin.cdi.configuration.StaticConstants.*;
+
+
 /**
  * A Boolean type of property has no default defaultValue, and each property
  * has to supply a default value, true or false
@@ -47,7 +50,8 @@ public class BooleanProperties extends MultistageProperties<Boolean> {
       // Properly formed Boolean string is valid
       Boolean.parseBoolean(state.getProp(getConfig()));
     } catch (Exception e) {
-      LOG.error(getConfig(), e.getMessage());
+      LOG.error(String.format(EXCEPTION_INCORRECT_CONFIGURATION, getConfig(), state.getProp(getConfig())),
+          e.getMessage());
       return false;
     }
     return true;
@@ -66,29 +70,27 @@ public class BooleanProperties extends MultistageProperties<Boolean> {
 
   /**
    * Retrieves property value from state object if valid and not blank
-   * otherwise, return default value
-   *
-   * This method raises an exception when a non-conforming value is configured.
+   * otherwise, return null
    *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
+   * @see #getValidNonblankWithDefault(State)
    */
   @Override
   public Boolean getProp(State state) {
     if (validateNonblank(state)) {
       return Boolean.parseBoolean(state.getProp(getConfig()));
     }
-    return getDefaultValueWithCheck(state);
+    return null;
   }
 
   /**
    * Retrieves property value from state object if valid and not blank
    * otherwise, return default value
    *
-   * This method will keep quiet if the configuration is incorrect
-   *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
+   * @see #getProp(State)
    */
   public Boolean getValidNonblankWithDefault(State state) {
     if (validateNonblank(state)) {

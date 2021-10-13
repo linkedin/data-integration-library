@@ -9,6 +9,9 @@ import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.linkedin.cdi.configuration.StaticConstants.*;
+
+
 /**
  * A Integer type of property has default defaultValue of 0
  */
@@ -50,7 +53,8 @@ public class IntegerProperties extends MultistageProperties<Integer> {
       // Properly formed Integer string is valid
       Integer.parseInt(state.getProp(getConfig()));
     } catch (Exception e) {
-      LOG.error(getConfig(), e.getMessage());
+      LOG.error(String.format(EXCEPTION_INCORRECT_CONFIGURATION, getConfig(), state.getProp(getConfig())),
+          e.getMessage());
       return false;
     }
     return true;
@@ -69,29 +73,27 @@ public class IntegerProperties extends MultistageProperties<Integer> {
 
   /**
    * Retrieves property value from state object if valid and not blank
-   * otherwise, return default value
-   *
-   * This method raises an exception when a non-conforming value is configured.
+   * otherwise, return 0
    *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
+   * @see #getValidNonblankWithDefault(State)
    */
   @Override
   public Integer getProp(State state) {
     if (validateNonblank(state)) {
       return Integer.parseInt(state.getProp(getConfig()));
     }
-    return getDefaultValueWithCheck(state);
+    return 0;
   }
 
   /**
    * Retrieves property value from state object if valid and not blank
    * otherwise, return default value
    *
-   * This method will keep quiet if the configuration is incorrect
-   *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
+   * @see #getProp(State)
    */
   public Integer getValidNonblankWithDefault(State state) {
     if (validateNonblank(state)) {

@@ -54,11 +54,11 @@ public class SftpConnection extends MultistageConnection {
 
   /**
    This method is the main method to list files based on source base directory and source entity
-   ms.source.file.pattern
+   ms.source.files.pattern
    if Is not blank:
    List the files and output as CSV
    if is blank:
-   ms.extract.target.file.name?
+   ms.extractor.target.file.name?
    if is blank:
    List the files and output as CSV
    if is not blank

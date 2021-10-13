@@ -60,29 +60,27 @@ public class StringProperties extends MultistageProperties<String> {
 
   /**
    * Retrieves property value from state object if valid and not blank
-   * otherwise, return default value
-   *
-   * This method raises an exception when a non-conforming value is configured.
+   * otherwise, return a blank string
    *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
+   * @see #getValidNonblankWithDefault(State)
    */
   @Override
   public String getProp(State state) {
     if (validateNonblank(state)) {
       return state.getProp(getConfig());
     }
-    return getDefaultValueWithCheck(state);
+    return StringUtils.EMPTY;
   }
 
   /**
    * Retrieves property value from state object if valid and not blank
    * otherwise, return default value
    *
-   * This method will keep quiet if the configuration is incorrect
-   *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
+   * @see #getProp(State)
    */
   public String getValidNonblankWithDefault(State state) {
     if (validateNonblank(state)) {

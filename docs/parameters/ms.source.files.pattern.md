@@ -9,7 +9,7 @@
 
 **Support DIL Variables**: No
 
-**Default value**: ".*"
+**Default value**: blank
 
 **Related**:
 - [job property: ms.source.uri](ms.source.uri.md)
@@ -33,5 +33,13 @@ To pick only PGP files from the source.
 To pick only source files that start with a particular prefix:
 
 `ms.source.files.pattern=^2019-01-01.+`
+
+**Note**: `ms.source.files.pattern` meant to provide advanced filtering
+          that SFTP or S3 "list" command cannot do by using its own patterns.
+          But, currently, this property is only used to indicate whether the
+          results of the "list" command should be saved into a file. When 
+          `ms.source.files.pattern` is not blank, it indicates there could 
+          be multiple files, hence the "list" results should 
+          be saved to a file.  
 
 [back to summary](summary.md#mssourcefilespattern)      

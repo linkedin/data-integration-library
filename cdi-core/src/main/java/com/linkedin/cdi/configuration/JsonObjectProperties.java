@@ -67,7 +67,8 @@ public class JsonObjectProperties extends MultistageProperties<JsonObject> {
       // Properly formed JsonObject string is valid
       GSON.fromJson(state.getProp(getConfig()), JsonObject.class);
     } catch (Exception e) {
-      LOG.error(getConfig(), e.getMessage());
+      LOG.error(String.format(EXCEPTION_INCORRECT_CONFIGURATION, getConfig(), state.getProp(getConfig())),
+          e.getMessage());
       return false;
     }
     return true;
@@ -89,29 +90,27 @@ public class JsonObjectProperties extends MultistageProperties<JsonObject> {
 
   /**
    * Retrieves property value from state object if valid and not blank
-   * otherwise, return default value
-   *
-   * This method raises an exception when a non-conforming value is configured.
+   * otherwise, return an empty JsonObject
    *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
+   * @see #getValidNonblankWithDefault(State)
    */
   @Override
   public JsonObject getProp(State state) {
     if (validateNonblank(state)) {
       return GSON.fromJson(state.getProp(getConfig()), JsonObject.class);
     }
-    return getDefaultValueWithCheck(state);
+    return new JsonObject();
   }
 
   /**
    * Retrieves property value from state object if valid and not blank
    * otherwise, return default value
    *
-   * This method will keep quiet if the configuration is incorrect
-   *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
+   * @see #getProp(State)
    */
   public JsonObject getValidNonblankWithDefault(State state) {
     if (validateNonblank(state)) {

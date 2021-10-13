@@ -79,12 +79,12 @@ public class S3Connection extends MultistageConnection {
 
   /*
   Below is the logic of when to download a file and when to list similar files based on the uri and pattern
-  ms.source.file.pattern
+  ms.source.files.pattern
       if Is not blank:
             List the S3 keys and output as CSV
 
       if Is blank:
-            ms.extract.target.file.name?
+            ms.extractor.target.file.name?
                   If is blank:
                         List the S3 keys and output as CSV
                   If is not blank:
