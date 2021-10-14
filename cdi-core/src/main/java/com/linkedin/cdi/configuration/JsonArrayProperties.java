@@ -90,27 +90,10 @@ public class JsonArrayProperties extends MultistageProperties<JsonArray> {
 
   /**
    * Retrieves property value from state object if valid and not blank
-   * otherwise, return an empty JsonArray
-   *
-   * @param state state
-   * @return property value if non-blank and valid, otherwise the default value
-   * @see #getValidNonblankWithDefault(State)
-   */
-  @Override
-  public JsonArray getProp(State state) {
-    if (validateNonblank(state)) {
-      return GSON.fromJson(state.getProp(getConfig()), JsonArray.class);
-    }
-    return new JsonArray();
-  }
-
-  /**
-   * Retrieves property value from state object if valid and not blank
    * otherwise, return default value
    *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
-   * @see #getProp(State)
    */
   public JsonArray getValidNonblankWithDefault(State state) {
     if (validateNonblank(state)) {

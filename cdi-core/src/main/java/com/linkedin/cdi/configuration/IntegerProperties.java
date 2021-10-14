@@ -73,27 +73,10 @@ public class IntegerProperties extends MultistageProperties<Integer> {
 
   /**
    * Retrieves property value from state object if valid and not blank
-   * otherwise, return 0
-   *
-   * @param state state
-   * @return property value if non-blank and valid, otherwise the default value
-   * @see #getValidNonblankWithDefault(State)
-   */
-  @Override
-  public Integer getProp(State state) {
-    if (validateNonblank(state)) {
-      return Integer.parseInt(state.getProp(getConfig()));
-    }
-    return 0;
-  }
-
-  /**
-   * Retrieves property value from state object if valid and not blank
    * otherwise, return default value
    *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
-   * @see #getProp(State)
    */
   public Integer getValidNonblankWithDefault(State state) {
     if (validateNonblank(state)) {

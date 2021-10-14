@@ -74,23 +74,6 @@ public class BooleanProperties extends MultistageProperties<Boolean> {
    *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
-   * @see #getValidNonblankWithDefault(State)
-   */
-  @Override
-  public Boolean getProp(State state) {
-    if (validateNonblank(state)) {
-      return Boolean.parseBoolean(state.getProp(getConfig()));
-    }
-    return getDefaultValue();
-  }
-
-  /**
-   * Retrieves property value from state object if valid and not blank
-   * otherwise, return default value
-   *
-   * @param state state
-   * @return property value if non-blank and valid, otherwise the default value
-   * @see #getProp(State)
    */
   public Boolean getValidNonblankWithDefault(State state) {
     if (validateNonblank(state)) {

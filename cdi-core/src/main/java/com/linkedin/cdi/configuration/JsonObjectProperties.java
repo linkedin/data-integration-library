@@ -90,27 +90,10 @@ public class JsonObjectProperties extends MultistageProperties<JsonObject> {
 
   /**
    * Retrieves property value from state object if valid and not blank
-   * otherwise, return an empty JsonObject
-   *
-   * @param state state
-   * @return property value if non-blank and valid, otherwise the default value
-   * @see #getValidNonblankWithDefault(State)
-   */
-  @Override
-  public JsonObject getProp(State state) {
-    if (validateNonblank(state)) {
-      return GSON.fromJson(state.getProp(getConfig()), JsonObject.class);
-    }
-    return new JsonObject();
-  }
-
-  /**
-   * Retrieves property value from state object if valid and not blank
    * otherwise, return default value
    *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
-   * @see #getProp(State)
    */
   public JsonObject getValidNonblankWithDefault(State state) {
     if (validateNonblank(state)) {

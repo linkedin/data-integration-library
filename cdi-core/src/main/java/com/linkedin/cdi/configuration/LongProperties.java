@@ -73,22 +73,6 @@ public class LongProperties extends MultistageProperties<Long> {
 
   /**
    * Retrieves property value from state object if valid and not blank
-   * otherwise, return 0
-   *
-   * @param state state
-   * @return property value if non-blank and valid, otherwise the default value
-   * @see #getValidNonblankWithDefault(State)
-   */
-  @Override
-  public Long getProp(State state) {
-    if (validateNonblank(state)) {
-      return Long.parseLong(state.getProp(getConfig()));
-    }
-    return 0L;
-  }
-
-  /**
-   * Retrieves property value from state object if valid and not blank
    * otherwise, return default value
    *
    * @param state state
