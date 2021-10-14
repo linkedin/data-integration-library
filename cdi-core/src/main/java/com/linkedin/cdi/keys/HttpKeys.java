@@ -7,7 +7,7 @@ package com.linkedin.cdi.keys;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
 import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.util.HttpRequestMethod;
+import com.linkedin.cdi.factory.http.HttpRequestMethod;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

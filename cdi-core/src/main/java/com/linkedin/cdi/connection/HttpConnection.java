@@ -14,7 +14,7 @@ import com.linkedin.cdi.factory.ConnectionClientFactory;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.HttpKeys;
 import com.linkedin.cdi.keys.JobKeys;
-import com.linkedin.cdi.util.HttpRequestMethod;
+import com.linkedin.cdi.factory.http.HttpRequestMethod;
 import com.linkedin.cdi.util.JsonUtils;
 import com.linkedin.cdi.util.WorkUnitStatus;
 import java.io.Closeable;
