@@ -66,7 +66,7 @@ public class MultistageSourceTest {
     source.getWorkunits(state);
 
     String expected = "daily";
-    Assert.assertEquals(expected, MSTAGE_WORK_UNIT_PARTITION.getProp(state));
+    Assert.assertEquals(expected, MSTAGE_WORK_UNIT_PARTITION.get(state));
   }
 
   @Test
@@ -75,7 +75,7 @@ public class MultistageSourceTest {
     state.setProp("ms.work.unit.pacing.seconds", "10");
     MultistageSource source = new MultistageSource();
     source.getWorkunits(state);
-    Assert.assertEquals(((Integer) MSTAGE_WORK_UNIT_PACING_SECONDS.getProp(state)).intValue(), 10);
+    Assert.assertEquals(((Integer) MSTAGE_WORK_UNIT_PACING_SECONDS.get(state)).intValue(), 10);
   }
 
   @Test

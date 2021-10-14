@@ -290,7 +290,7 @@ public class JsonParameter {
     if (listValue.isJsonPrimitive()) {
       listValueString = listValue.getAsString();
     } else if (listValue.isJsonArray() && listValue.getAsJsonArray().size() > 0) {
-      if (EXTRACT_IS_FULL.getProp(state)) {
+      if (EXTRACT_IS_FULL.get(state)) {
         listValueString = listValue.getAsJsonArray().get(0).getAsString();
       } else {
         listValueString = listValue.getAsJsonArray().size() > 1

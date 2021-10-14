@@ -16,20 +16,20 @@ public class MultistagePropertiesClassTest {
   @Test
   public void testJsonArrayProperties() {
     SourceState state = new SourceState();
-    Assert.assertEquals(MSTAGE_DERIVED_FIELDS.getProp(state), new JsonArray());
+    Assert.assertEquals(MSTAGE_DERIVED_FIELDS.get(state), new JsonArray());
 
     state.setProp("ms.derived.fields", "[0, 1, 2]");
     Assert.assertFalse(MSTAGE_DERIVED_FIELDS.isValid(state));
-    Assert.assertEquals(MSTAGE_DERIVED_FIELDS.getProp(state), new JsonArray());
+    Assert.assertEquals(MSTAGE_DERIVED_FIELDS.get(state), new JsonArray());
 
     state.setProp("ms.derived.fields", "[{}]");
     Assert.assertFalse(MSTAGE_DERIVED_FIELDS.isValid(state));
-    Assert.assertEquals(MSTAGE_DERIVED_FIELDS.getProp(state), new JsonArray());
+    Assert.assertEquals(MSTAGE_DERIVED_FIELDS.get(state), new JsonArray());
 
     state.setProp("ms.derived.fields", "[{\"name\": \"dummy\"}]");
     Assert.assertFalse(MSTAGE_DERIVED_FIELDS.isValid(state));
     Assert.assertFalse(MSTAGE_DERIVED_FIELDS.validateNonblank(state));
-    Assert.assertEquals(MSTAGE_DERIVED_FIELDS.getProp(state), new JsonArray());
+    Assert.assertEquals(MSTAGE_DERIVED_FIELDS.get(state), new JsonArray());
 
     state.setProp("ms.derived.fields", "[{\"name\": \"dummy\", \"formula\": \"dummy\"}]");
     Assert.assertTrue(MSTAGE_DERIVED_FIELDS.isValid(state));
@@ -38,15 +38,15 @@ public class MultistagePropertiesClassTest {
   @Test
   public void testJsonObjectProperties() {
     SourceState state = new SourceState();
-    Assert.assertEquals(MSTAGE_ACTIVATION_PROPERTY.getProp(state), new JsonObject());
+    Assert.assertEquals(MSTAGE_ACTIVATION_PROPERTY.get(state), new JsonObject());
 
     state.setProp("ms.activation.property", "[0, 1, 2]");
     Assert.assertFalse(MSTAGE_ACTIVATION_PROPERTY.isValid(state));
-    Assert.assertEquals(MSTAGE_ACTIVATION_PROPERTY.getProp(state), new JsonObject());
+    Assert.assertEquals(MSTAGE_ACTIVATION_PROPERTY.get(state), new JsonObject());
 
     state.setProp("ms.activation.property", "{\"name\": \"value\"");
     Assert.assertFalse(MSTAGE_ACTIVATION_PROPERTY.isValid(state));
-    Assert.assertEquals(MSTAGE_ACTIVATION_PROPERTY.getProp(state), new JsonObject());
+    Assert.assertEquals(MSTAGE_ACTIVATION_PROPERTY.get(state), new JsonObject());
 
     state.setProp("ms.activation.property", "{\"name\": \"value\"}");
     Assert.assertTrue(MSTAGE_ACTIVATION_PROPERTY.isValid(state));
@@ -55,15 +55,15 @@ public class MultistagePropertiesClassTest {
   @Test
   public void testIntegerProperties() {
     SourceState state = new SourceState();
-    Assert.assertEquals(MSTAGE_ABSTINENT_PERIOD_DAYS.getProp(state), (Integer) 0);
+    Assert.assertEquals(MSTAGE_ABSTINENT_PERIOD_DAYS.get(state), (Integer) 0);
 
     state.setProp("ms.abstinent.period.days", "abc");
     Assert.assertFalse(MSTAGE_ABSTINENT_PERIOD_DAYS.isValid(state));
-    Assert.assertEquals(MSTAGE_ABSTINENT_PERIOD_DAYS.getProp(state), (Integer) 0);
+    Assert.assertEquals(MSTAGE_ABSTINENT_PERIOD_DAYS.get(state), (Integer) 0);
 
     state.setProp("ms.abstinent.period.days", "99");
     Assert.assertTrue(MSTAGE_ABSTINENT_PERIOD_DAYS.isValid(state));
-    Assert.assertEquals(MSTAGE_ABSTINENT_PERIOD_DAYS.getProp(state), (Integer) 99);
+    Assert.assertEquals(MSTAGE_ABSTINENT_PERIOD_DAYS.get(state), (Integer) 99);
   }
 
 }

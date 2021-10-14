@@ -46,7 +46,7 @@ public class JdbcKeys extends JobKeys {
   public void logUsage(State state) {
     super.logUsage(state);
     for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getProp(state));
+      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.get(state));
     }
   }
 

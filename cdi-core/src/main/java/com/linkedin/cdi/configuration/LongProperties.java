@@ -77,7 +77,7 @@ public class LongProperties extends MultistageProperties<Long> {
    *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
-   * @see #getProp(State)
+   * @see #get(State)
    */
   protected Long getValidNonblankWithDefault(State state) {
     if (validateNonblank(state)) {

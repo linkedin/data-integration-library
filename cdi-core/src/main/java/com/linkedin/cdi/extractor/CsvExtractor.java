@@ -79,12 +79,12 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
   @Override
   protected void initialize(ExtractorKeys keys) {
     csvExtractorKeys.logUsage(state);
-    csvExtractorKeys.setColumnHeader(MSTAGE_CSV_COLUMN_HEADER.getProp(state));
-    csvExtractorKeys.setRowsToSkip(MSTAGE_CSV_SKIP_LINES.getProp(state));
+    csvExtractorKeys.setColumnHeader(MSTAGE_CSV_COLUMN_HEADER.get(state));
+    csvExtractorKeys.setRowsToSkip(MSTAGE_CSV_SKIP_LINES.get(state));
     if (csvExtractorKeys.getColumnHeader()) {
       // only set the columnHeaderIndex if ms.csv.column.header is true
       csvExtractorKeys.setColumnHeaderIndex(
-          MSTAGE_CSV_COLUMN_HEADER_INDEX.getProp(state));
+          MSTAGE_CSV_COLUMN_HEADER_INDEX.get(state));
       // if no explicit number of lines to skip is set, skip all lines up to the header by default
       if (csvExtractorKeys.getRowsToSkip() == 0) {
         csvExtractorKeys.setRowsToSkip(csvExtractorKeys.getColumnHeaderIndex() + 1);
@@ -94,20 +94,20 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
       }
     }
     csvExtractorKeys.setSeparator(
-        CsvUtils.unescape(MSTAGE_CSV_SEPARATOR.getProp(state)));
+        CsvUtils.unescape(MSTAGE_CSV_SEPARATOR.get(state)));
     csvExtractorKeys.setQuoteCharacter(
-        CsvUtils.unescape(MSTAGE_CSV_QUOTE_CHARACTER.getProp(state)));
+        CsvUtils.unescape(MSTAGE_CSV_QUOTE_CHARACTER.get(state)));
     csvExtractorKeys.setEscapeCharacter(
-        CsvUtils.unescape(MSTAGE_CSV_ESCAPE_CHARACTER.getProp(state)));
+        CsvUtils.unescape(MSTAGE_CSV_ESCAPE_CHARACTER.get(state)));
     csvExtractorKeys.setDefaultFieldType(
-        MSTAGE_CSV_DEFAULT_FIELD_TYPE.getProp(state).toString().toLowerCase());
+        MSTAGE_CSV_DEFAULT_FIELD_TYPE.get(state).toString().toLowerCase());
     csvExtractorKeys.setSampleRows(new ArrayDeque<>());
 
     // check if user has defined the output schema
     if (jobKeys.hasOutputSchema()) {
       JsonArray outputSchema = jobKeys.getOutputSchema();
       csvExtractorKeys.setColumnProjection(expandColumnProjection(MSTAGE_CSV_COLUMN_PROJECTION
-          .getProp(state), outputSchema.size()));
+          .get(state), outputSchema.size()));
       // initialize the column name to index map based on the schema when derived fields are present
       if (jobKeys.getDerivedFields().entrySet().size() > 0) {
         buildColumnToIndexMap(outputSchema);
@@ -211,7 +211,7 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
 
     // if Content-Type is provided, but not text/csv, the response can have
     // useful error information
-    JsonObject expectedContentType = MSTAGE_HTTP_RESPONSE_TYPE.getProp(state);
+    JsonObject expectedContentType = MSTAGE_HTTP_RESPONSE_TYPE.get(state);
     HashSet<String> expectedContentTypeSet = new LinkedHashSet<>(Arrays.asList("text/csv", "application/gzip"));
     if (expectedContentType.has(CONTENT_TYPE_KEY) || expectedContentType.has(CONTENT_TYPE_KEY.toLowerCase())) {
       for (Map.Entry<String, JsonElement> entry: expectedContentType.entrySet()) {
@@ -237,7 +237,7 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
             .withEscapeChar(csvExtractorKeys.getEscapeCharacter().charAt(0))
             .build();
         CSVReader reader = new CSVReaderBuilder(new InputStreamReader(input, Charset.forName(
-            MSTAGE_SOURCE_DATA_CHARACTER_SET.getProp(state)))).withCSVParser(parser)
+            MSTAGE_SOURCE_DATA_CHARACTER_SET.get(state)))).withCSVParser(parser)
             .build();
         Iterator<String[]> readerIterator = reader.iterator();
 
@@ -282,7 +282,7 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
   @Override
   protected void setRowFilter(JsonArray schemaArray) {
     if (rowFilter == null) {
-      if (MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.getProp(state)) {
+      if (MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.get(state)) {
         rowFilter = new CsvSchemaBasedFilter(new JsonIntermediateSchema(schemaArray), csvExtractorKeys);
       }
     }

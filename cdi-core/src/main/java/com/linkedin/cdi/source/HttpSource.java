@@ -64,8 +64,8 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
     super.initialize(state);
     httpSourceKeys.logUsage(state);
     httpSourceKeys.setHttpRequestHeaders(getRequestHeader(state));
-    httpSourceKeys.setHttpRequestMethod(MSTAGE_HTTP_REQUEST_METHOD.getProp(state));
-    httpSourceKeys.setAuthentication(MSTAGE_AUTHENTICATION.getProp(state));
+    httpSourceKeys.setHttpRequestMethod(MSTAGE_HTTP_REQUEST_METHOD.get(state));
+    httpSourceKeys.setAuthentication(MSTAGE_AUTHENTICATION.get(state));
     httpSourceKeys.setHttpRequestHeadersWithAuthentication(getHeadersWithAuthentication(state));
     httpSourceKeys.setHttpStatuses(getHttpStatuses(state));
     httpSourceKeys.setHttpStatusReasons(getHttpStatusReasons(state));
@@ -114,8 +114,8 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
     if (httpSourceKeys.getAuthentication().has("token")) {
       token = EncryptionUtils.decryptGobblin(httpSourceKeys.getAuthentication().get("token").getAsString(), state);
     } else {
-      String u = EncryptionUtils.decryptGobblin(SOURCE_CONN_USERNAME.getProp(state), state);
-      String p = EncryptionUtils.decryptGobblin(SOURCE_CONN_PASSWORD.getProp(state), state);
+      String u = EncryptionUtils.decryptGobblin(SOURCE_CONN_USERNAME.get(state), state);
+      String p = EncryptionUtils.decryptGobblin(SOURCE_CONN_PASSWORD.get(state), state);
       token = u + ":" + p;
     }
 
@@ -150,7 +150,7 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
 
   private Map<String, List<Integer>> getHttpStatuses(State state) {
     Map<String, List<Integer>> statuses = new HashMap<>();
-    JsonObject jsonObject = MSTAGE_HTTP_STATUSES.getProp(state);
+    JsonObject jsonObject = MSTAGE_HTTP_STATUSES.get(state);
     for (Map.Entry<String, JsonElement> entry: jsonObject.entrySet()) {
       String key = entry.getKey();
       JsonElement value = jsonObject.get(key);
@@ -163,7 +163,7 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
 
   private Map<String, List<String>> getHttpStatusReasons(State state) {
     Map<String, List<String>> reasons = new HashMap<>();
-    JsonObject jsonObject = MSTAGE_HTTP_STATUS_REASONS.getProp(state);
+    JsonObject jsonObject = MSTAGE_HTTP_STATUS_REASONS.get(state);
     for (Map.Entry<String, JsonElement> entry: jsonObject.entrySet()) {
       String key = entry.getKey();
       JsonElement value = jsonObject.get(key);
@@ -180,7 +180,7 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
    * @return the decrypted http request headers
    */
   private JsonObject getRequestHeader(State state) {
-    JsonObject headers = MSTAGE_HTTP_REQUEST_HEADERS.getProp(state);
+    JsonObject headers = MSTAGE_HTTP_REQUEST_HEADERS.get(state);
     JsonObject decrypted = new JsonObject();
     for (Map.Entry<String, JsonElement> entry: headers.entrySet()) {
       String key = entry.getKey();

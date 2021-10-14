@@ -64,7 +64,7 @@ public class StringProperties extends MultistageProperties<String> {
    *
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
-   * @see #getProp(State)
+   * @see #get(State)
    */
   protected String getValidNonblankWithDefault(State state) {
     if (validateNonblank(state)) {

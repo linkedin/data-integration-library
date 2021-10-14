@@ -109,7 +109,7 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
   @Override
   protected void setRowFilter(JsonArray schemaArray) {
     if (rowFilter == null) {
-      if (MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.getProp(state)) {
+      if (MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.get(state)) {
         rowFilter = new AvroSchemaBasedFilter(new JsonIntermediateSchema(jobKeys.getOutputSchema()),
             avroExtractorKeys, state);
       }

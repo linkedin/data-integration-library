@@ -126,23 +126,23 @@ public class JobKeys {
   public void initialize(State state) {
     parsePaginationFields(state);
     parsePaginationInitialValues(state);
-    setSessionKeyField(MSTAGE_SESSION_KEY_FIELD.getProp(state));
-    setTotalCountField(MSTAGE_TOTAL_COUNT_FIELD.getProp(state));
-    setSourceParameters(MSTAGE_PARAMETERS.getProp(state));
-    setSourceUri(MSTAGE_SOURCE_URI.getProp(state));
+    setSessionKeyField(MSTAGE_SESSION_KEY_FIELD.get(state));
+    setTotalCountField(MSTAGE_TOTAL_COUNT_FIELD.get(state));
+    setSourceParameters(MSTAGE_PARAMETERS.get(state));
+    setSourceUri(MSTAGE_SOURCE_URI.get(state));
     setDefaultFieldTypes(parseDefaultFieldTypes(state));
     setDerivedFields(parseDerivedFields(state));
     setOutputSchema(parseOutputSchema(state));
-    setTargetSchema(MSTAGE_TARGET_SCHEMA.getProp(state));
-    setEncryptionField(MSTAGE_ENCRYPTION_FIELDS.getProp(state));
-    setDataField(MSTAGE_DATA_FIELD.getProp(state));
-    setCallInterval(MSTAGE_CALL_INTERVAL_MILLIS.getProp(state));
+    setTargetSchema(MSTAGE_TARGET_SCHEMA.get(state));
+    setEncryptionField(MSTAGE_ENCRYPTION_FIELDS.get(state));
+    setDataField(MSTAGE_DATA_FIELD.get(state));
+    setCallInterval(MSTAGE_CALL_INTERVAL_MILLIS.get(state));
     setSessionTimeout(MSTAGE_WAIT_TIMEOUT_SECONDS.getMillis(state));
-    setMinWorkUnitRecords(MSTAGE_WORK_UNIT_MIN_RECORDS.getProp(state));
-    setMinWorkUnits(MSTAGE_WORK_UNIT_MIN_UNITS.getProp(state));
+    setMinWorkUnitRecords(MSTAGE_WORK_UNIT_MIN_RECORDS.get(state));
+    setMinWorkUnits(MSTAGE_WORK_UNIT_MIN_UNITS.get(state));
 
-    setEnableCleansing(MSTAGE_ENABLE_CLEANSING.getProp(state));
-    JsonObject schemaCleansing = MSTAGE_SCHEMA_CLENSING.getProp(state);
+    setEnableCleansing(MSTAGE_ENABLE_CLEANSING.get(state));
+    JsonObject schemaCleansing = MSTAGE_SCHEMA_CLENSING.get(state);
     if (schemaCleansing.has("enabled")) {
       setEnableCleansing(Boolean.parseBoolean(schemaCleansing.get("enabled").getAsString()));
       if (enableCleansing && schemaCleansing.has("pattern")) {
@@ -156,20 +156,20 @@ public class JobKeys {
       }
     }
 
-    setIsPartialPartition(MSTAGE_WORK_UNIT_PARTIAL_PARTITION.getProp(state));
+    setIsPartialPartition(MSTAGE_WORK_UNIT_PARTIAL_PARTITION.get(state));
     setWorkUnitPartitionType(parsePartitionType(state));
-    setWatermarkDefinition(MSTAGE_WATERMARK.getProp(state));
+    setWatermarkDefinition(MSTAGE_WATERMARK.get(state));
     Map<String, Long> retry = parseSecondaryInputRetry(
-        MSTAGE_SECONDARY_INPUT.getProp(state));
+        MSTAGE_SECONDARY_INPUT.get(state));
     setRetryDelayInSec(retry.get(KEY_WORD_RETRY_DELAY_IN_SEC));
     setRetryCount(retry.get(KEY_WORD_RETRY_COUNT));
-    setSecondaryInputs(MSTAGE_SECONDARY_INPUT.getProp(state));
+    setSecondaryInputs(MSTAGE_SECONDARY_INPUT.get(state));
     setIsSecondaryAuthenticationEnabled(checkSecondaryAuthenticationEnabled());
 
     setSourceSchema(readSourceSchemaFromUrn(state,
-        MSTAGE_SOURCE_SCHEMA_URN.getProp(state)));
+        MSTAGE_SOURCE_SCHEMA_URN.get(state)));
     setTargetSchema(readTargetSchemaFromUrn(state,
-        MSTAGE_TARGET_SCHEMA_URN.getProp(state)));
+        MSTAGE_TARGET_SCHEMA_URN.get(state)));
 
     // closing out schema reader if it was created because of reading
     // output schema or target schema.
@@ -332,7 +332,7 @@ public class JobKeys {
 
   public void logUsage(State state) {
     for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getProp(state));
+      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.get(state));
     }
   }
 
@@ -343,7 +343,7 @@ public class JobKeys {
         ParameterTypes.PAGENO
     );
     if (MSTAGE_PAGINATION.validateNonblank(state)) {
-      JsonObject p = MSTAGE_PAGINATION.getProp(state);
+      JsonObject p = MSTAGE_PAGINATION.get(state);
       if (p.has("fields")) {
         JsonArray fields = p.get("fields").getAsJsonArray();
         for (int i = 0; i < fields.size(); i++) {
@@ -362,7 +362,7 @@ public class JobKeys {
         ParameterTypes.PAGENO
     );
     if (MSTAGE_PAGINATION.validateNonblank(state)) {
-      JsonObject p = MSTAGE_PAGINATION.getProp(state);
+      JsonObject p = MSTAGE_PAGINATION.get(state);
       if (p.has("initialvalues")) {
         JsonArray values = p.get("initialvalues").getAsJsonArray();
         for (int i = 0; i < values.size(); i++) {
@@ -382,7 +382,7 @@ public class JobKeys {
    */
   private Map<String, String> parseDefaultFieldTypes(State state) {
     if (MSTAGE_DATA_DEFAULT_TYPE.validateNonblank(state)) {
-      return GSON.fromJson(MSTAGE_DATA_DEFAULT_TYPE.getProp(state).toString(),
+      return GSON.fromJson(MSTAGE_DATA_DEFAULT_TYPE.get(state).toString(),
           new TypeToken<HashMap<String, String>>() {
           }.getType());
     }
@@ -409,7 +409,7 @@ public class JobKeys {
     }
 
     Map<String, Map<String, String>> derivedFields = new HashMap<>();
-    JsonArray jsonArray = MSTAGE_DERIVED_FIELDS.getProp(state);
+    JsonArray jsonArray = MSTAGE_DERIVED_FIELDS.get(state);
     for (JsonElement field: jsonArray) {
 
       // change the formula part, which is JsonObject, into map
@@ -429,7 +429,7 @@ public class JobKeys {
    * @return the output schema
    */
   public JsonArray parseOutputSchema(State state) {
-    return JsonUtils.deepCopy(MSTAGE_OUTPUT_SCHEMA.getProp(state)).getAsJsonArray();
+    return JsonUtils.deepCopy(MSTAGE_OUTPUT_SCHEMA.get(state)).getAsJsonArray();
   }
 
 
@@ -440,7 +440,7 @@ public class JobKeys {
    */
   WorkUnitPartitionTypes parsePartitionType(State state) {
     WorkUnitPartitionTypes partitionType = WorkUnitPartitionTypes.fromString(
-        MSTAGE_WORK_UNIT_PARTITION.getProp(state));
+        MSTAGE_WORK_UNIT_PARTITION.get(state));
 
     if (partitionType != WorkUnitPartitionTypes.COMPOSITE) {
       return partitionType;
@@ -450,7 +450,7 @@ public class JobKeys {
     WorkUnitPartitionTypes.COMPOSITE.resetSubRange();
     try {
       JsonObject jsonObject = GSON.fromJson(
-          MSTAGE_WORK_UNIT_PARTITION.getProp(state).toString(),
+          MSTAGE_WORK_UNIT_PARTITION.get(state).toString(),
           JsonObject.class);
 
       for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
@@ -467,7 +467,7 @@ public class JobKeys {
       }
     } catch (Exception e) {
       LOG.error("Error parsing composite partition string: "
-              + MSTAGE_WORK_UNIT_PARTITION.getProp(state).toString()
+              + MSTAGE_WORK_UNIT_PARTITION.get(state).toString()
               + "\n partitions may not be generated properly.",
           e);
     }
@@ -553,7 +553,7 @@ public class JobKeys {
       // Schema Reader could be plugged in before the initialization on JobKeys
       if (schemaReader == null) {
         Class<?> factoryClass = Class.forName(
-            MSTAGE_CONNECTION_CLIENT_FACTORY.getProp(state));
+            MSTAGE_CONNECTION_CLIENT_FACTORY.get(state));
         ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.newInstance();
         schemaReader = factory.getSchemaReader(state);
       }

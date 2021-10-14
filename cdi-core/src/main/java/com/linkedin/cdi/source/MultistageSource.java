@@ -204,7 +204,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
   public Extractor<S, D> getExtractor(WorkUnitState state) {
     try {
       ClassLoader loader = this.getClass().getClassLoader();
-      Class<?> extractorClass = loader.loadClass(MSTAGE_EXTRACTOR_CLASS.getProp(state));
+      Class<?> extractorClass = loader.loadClass(MSTAGE_EXTRACTOR_CLASS.get(state));
       Constructor<MultistageExtractor<?, ?>> constructor = (Constructor<MultistageExtractor<?, ?>>)
           extractorClass.getConstructor(WorkUnitState.class, JobKeys.class);
       MultistageExtractor<S, D> extractor = (MultistageExtractor<S, D>) constructor.newInstance(state, this.jobKeys);
@@ -293,7 +293,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
         // watermark doesn't require a rerun.
         // a work unit signature is a date time partition and unit partition combination.
         if (MSTAGE_WORK_UNIT_PARALLELISM_MAX.validateNonblank(sourceState)
-            && workUnits.size() >= (Integer) MSTAGE_WORK_UNIT_PARALLELISM_MAX.getProp(sourceState)) {
+            && workUnits.size() >= (Integer) MSTAGE_WORK_UNIT_PARALLELISM_MAX.get(sourceState)) {
           break;
         }
 
@@ -380,7 +380,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
     List<ImmutablePair<Long, Long>> partitions = Lists.newArrayList();
     if (jobKeys.getWorkUnitPartitionType() != null) {
       partitions = jobKeys.getWorkUnitPartitionType().getRanges(datetimeRange,
-          MSTAGE_WORK_UNIT_PARTIAL_PARTITION.getProp(sourceState));
+          MSTAGE_WORK_UNIT_PARTIAL_PARTITION.get(sourceState));
     } else {
       partitions.add(new ImmutablePair<>(datetimeRange.getLeft().getMillis(), datetimeRange.getRight().getMillis()));
     }
@@ -457,9 +457,9 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
 
   Extract createExtractObject(final boolean isFull) {
     Extract extract = createExtract(
-        Extract.TableType.valueOf(EXTRACT_TABLE_TYPE_KEY.getProp(sourceState)),
-        EXTRACT_NAMESPACE_NAME_KEY.getProp(sourceState),
-        EXTRACT_TABLE_NAME_KEY.getProp(sourceState));
+        Extract.TableType.valueOf(EXTRACT_TABLE_TYPE_KEY.get(sourceState)),
+        EXTRACT_NAMESPACE_NAME_KEY.get(sourceState),
+        EXTRACT_TABLE_NAME_KEY.get(sourceState));
     extract.setProp(ConfigurationKeys.EXTRACT_IS_FULL_KEY, isFull);
     return extract;
   }
@@ -519,12 +519,12 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
    * @return true if all conditions met for a full extract, otherwise false
    */
   private boolean checkFullExtractState(final State state, final Map<String, Long> previousHighWatermarks) {
-    if (EXTRACT_TABLE_TYPE_KEY.getProp(state).toString()
+    if (EXTRACT_TABLE_TYPE_KEY.get(state).toString()
         .equalsIgnoreCase(KEY_WORD_SNAPSHOT_ONLY)) {
       return true;
     }
 
-    if (MSTAGE_ENABLE_DYNAMIC_FULL_LOAD.getProp(state)) {
+    if (MSTAGE_ENABLE_DYNAMIC_FULL_LOAD.get(state)) {
       if (previousHighWatermarks.isEmpty()) {
         return true;
       }

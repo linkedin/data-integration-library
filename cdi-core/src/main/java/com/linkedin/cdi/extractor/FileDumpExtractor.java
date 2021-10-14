@@ -60,14 +60,14 @@ public class FileDumpExtractor extends MultistageExtractor<String, String> {
     // Extractors follow the pattern of initializing in constructor to avoid forgetting initialization
     // in sub-classes
     if (DATA_PUBLISHER_FINAL_DIR.validateNonblank(state)) {
-      fileDumpExtractorKeys.setFileDumpLocation(DATA_PUBLISHER_FINAL_DIR.getProp(state));
+      fileDumpExtractorKeys.setFileDumpLocation(DATA_PUBLISHER_FINAL_DIR.get(state));
     } else {
       throw new RuntimeException("data publisher final dir is empty or null");
     }
 
     // file permission is required, but a default value is given in PropertyCollection
     fileDumpExtractorKeys.setFileWritePermissions(
-        MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.getProp(state));
+        MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.get(state));
 
     // work unit file name is based on a template that is defined by ms.extractor.target.file.name
     // and then substituted with activation parameters
@@ -217,7 +217,7 @@ public class FileDumpExtractor extends MultistageExtractor<String, String> {
    * @return the file name
    */
   private String getFileName(WorkUnitState state) {
-    String fileNameTemplate = MSTAGE_EXTRACTOR_TARGET_FILE_NAME.getProp(state);
+    String fileNameTemplate = MSTAGE_EXTRACTOR_TARGET_FILE_NAME.get(state);
     JsonObject activationParameters = extractorKeys.getActivationParameters();
     try {
       String filePath = VariableUtils.replaceWithTracking(fileNameTemplate, activationParameters).getKey();

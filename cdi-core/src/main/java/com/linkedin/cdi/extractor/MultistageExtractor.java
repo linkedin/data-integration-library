@@ -179,10 +179,10 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
 
   protected void initialize(ExtractorKeys keys) {
     extractorKeys = keys;
-    extractorKeys.setActivationParameters(MSTAGE_ACTIVATION_PROPERTY.getProp(state));
-    extractorKeys.setDelayStartTime(MSTAGE_WORKUNIT_STARTTIME_KEY.getProp(state));
-    extractorKeys.setExplictEof(MSTAGE_DATA_EXPLICIT_EOF.getProp(state));
-    extractorKeys.setSignature(DATASET_URN_KEY.getProp(state));
+    extractorKeys.setActivationParameters(MSTAGE_ACTIVATION_PROPERTY.get(state));
+    extractorKeys.setDelayStartTime(MSTAGE_WORKUNIT_STARTTIME_KEY.get(state));
+    extractorKeys.setExplictEof(MSTAGE_DATA_EXPLICIT_EOF.get(state));
+    extractorKeys.setSignature(DATASET_URN_KEY.get(state));
     extractorKeys.setPreprocessors(getPreprocessors(state));
     extractorKeys.setPayloads(getPayloads(state));
     payloadIterator = extractorKeys.getPayloads().iterator();
@@ -292,7 +292,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
    */
   protected void setRowFilter(JsonArray schemaArray) {
     if (rowFilter == null) {
-      if (MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.getProp(state)) {
+      if (MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.get(state)) {
         rowFilter = new JsonSchemaBasedFilter(new JsonIntermediateSchema(schemaArray));
       }
     }
@@ -372,8 +372,8 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   List<StreamProcessor<?>> getPreprocessors(State state) {
     ImmutableList.Builder<StreamProcessor<?>> builder = ImmutableList.builder();
     JsonObject preprocessorsParams =
-        MSTAGE_EXTRACT_PREPROCESSORS_PARAMETERS.getProp(state);
-    String preprocessors = MSTAGE_EXTRACT_PREPROCESSORS.getProp(state);
+        MSTAGE_EXTRACT_PREPROCESSORS_PARAMETERS.get(state);
+    String preprocessors = MSTAGE_EXTRACT_PREPROCESSORS.get(state);
     JsonObject preprocessorParams;
     for (String preprocessor : preprocessors.split(COMMA_STR)) {
       String p = preprocessor.trim();
@@ -563,7 +563,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
     if (input != null) {
       try {
         data = InputStreamUtils.extractText(input,
-            MSTAGE_SOURCE_DATA_CHARACTER_SET.getProp(state));
+            MSTAGE_SOURCE_DATA_CHARACTER_SET.get(state));
       } catch (Exception e) {
         LOG.debug(e.toString());
       }
@@ -941,7 +941,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
     LOG.info("Checking essential (not always mandatory) parameters...");
     LOG.info("Values can be default values for the specific type if the property is not configured");
     for (MultistageProperties p : JobKeys.ESSENTIAL_PARAMETERS) {
-      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getProp(state));
+      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.get(state));
     }
   }
 
@@ -953,7 +953,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
    * @return the payload records
    */
   protected JsonArray getPayloads(State state) {
-    JsonArray payloads = MSTAGE_PAYLOAD_PROPERTY.getProp(state);
+    JsonArray payloads = MSTAGE_PAYLOAD_PROPERTY.get(state);
     JsonArray records = new JsonArray();
     for (JsonElement entry : payloads) {
       records.addAll(new HdfsReader(state).readSecondary(entry.getAsJsonObject()));

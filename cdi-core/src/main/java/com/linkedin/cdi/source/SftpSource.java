@@ -46,9 +46,9 @@ public class SftpSource extends MultistageSource<Schema, GenericRecord> {
     super.initialize(state);
     sftpSourceKeys.logUsage(state);
     this.parseUri(state);
-    sftpSourceKeys.setFilesPattern(MSTAGE_SOURCE_FILES_PATTERN.getProp(state));
+    sftpSourceKeys.setFilesPattern(MSTAGE_SOURCE_FILES_PATTERN.get(state));
     sftpSourceKeys.setTargetFilePattern(
-        MSTAGE_EXTRACTOR_TARGET_FILE_NAME.getProp(state));
+        MSTAGE_EXTRACTOR_TARGET_FILE_NAME.get(state));
     sftpSourceKeys.logDebugAll();
   }
 
@@ -74,7 +74,7 @@ public class SftpSource extends MultistageSource<Schema, GenericRecord> {
    * Valid[Supported for backward compatibility] : /a/b/*c*.csv
    */
   private void parseUri(State state) {
-    String sourceUri = MSTAGE_SOURCE_URI.getProp(state);
+    String sourceUri = MSTAGE_SOURCE_URI.get(state);
     if (VariableUtils.hasVariable(sourceUri)) {
       sftpSourceKeys.setFilesPath(sourceUri);
     } else {

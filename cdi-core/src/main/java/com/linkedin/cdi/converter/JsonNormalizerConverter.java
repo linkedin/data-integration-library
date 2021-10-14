@@ -50,8 +50,8 @@ public class JsonNormalizerConverter extends Converter<JsonArray, JsonArray, Jso
 
   @Override
   public Converter<JsonArray, JsonArray, JsonObject, JsonObject> init(WorkUnitState workUnit) {
-    maxRecordsPerBatch = MSTAGE_NORMALIZER_BATCH_SIZE.getProp(workUnit);
-    targetSchema = MSTAGE_TARGET_SCHEMA.getProp(workUnit);
+    maxRecordsPerBatch = MSTAGE_NORMALIZER_BATCH_SIZE.get(workUnit);
+    targetSchema = MSTAGE_TARGET_SCHEMA.get(workUnit);
     return this;
   }
 
