@@ -16,6 +16,15 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 public class MultistagePropertiesIndividualTest {
   @Test
+  public void testAllKeys() {
+    SourceState state = new SourceState();
+    Assert.assertTrue(new JobKeys().validate(state));
+
+    state.setProp("ms.csv.column.header", "xxx");
+    Assert.assertFalse(new JobKeys().validate(state));
+  }
+
+  @Test
   public void testMsAuthentication() {
     SourceState state = new SourceState();
     Assert.assertEquals(MSTAGE_AUTHENTICATION.get(state), new JsonObject());
@@ -62,5 +71,19 @@ public class MultistagePropertiesIndividualTest {
     Assert.assertEquals(MSTAGE_SOURCE_DATA_CHARACTER_SET.get(state), "UTF-8");
     Assert.assertEquals(MSTAGE_SOURCE_FILES_PATTERN.get(state), REGEXP_DEFAULT_PATTERN);
     Assert.assertEquals(MSTAGE_WORK_UNIT_PARTITION.get(state), "none");
+  }
+
+
+  @Test
+  public void testCsvColumnHeader() {
+    SourceState state = new SourceState();
+    state.setProp("ms.csv.column.header", "xxx");
+    Assert.assertFalse(MSTAGE_CSV_COLUMN_HEADER.isValid(state));
+
+    state.setProp("ms.csv.column.header", "true");
+    Assert.assertTrue(MSTAGE_CSV_COLUMN_HEADER.isValid(state));
+
+    state.setProp("ms.csv.column.header", "false");
+    Assert.assertTrue(MSTAGE_CSV_COLUMN_HEADER.isValid(state));
   }
 }
