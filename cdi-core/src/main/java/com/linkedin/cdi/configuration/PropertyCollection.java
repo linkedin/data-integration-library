@@ -200,7 +200,7 @@ public interface PropertyCollection {
 
     @Override
     protected Integer getValidNonblankWithDefault(State state) {
-      Integer value = super.getValidNonblankWithDefault(state);
+      int value = super.getValidNonblankWithDefault(state).intValue();
       return value <= 0 || value > 10000 ? 10000 : value;
     }
   };

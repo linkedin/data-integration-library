@@ -159,17 +159,6 @@ public class MultistageSourceTest {
   }
 
   @Test
-  public void testParallismMaxSetting() {
-    SourceState state = new SourceState();
-    state.setProp("ms.work.unit.parallelism.max", 0);
-    state.setProp("ms.pagination", "");
-    Assert.assertFalse(MSTAGE_WORK_UNIT_PARALLELISM_MAX.isValidNonblank(state));
-
-    state.setProp("ms.work.unit.parallelism.max", 10);
-    Assert.assertTrue(MSTAGE_WORK_UNIT_PARALLELISM_MAX.isValidNonblank(state));
-  }
-
-  @Test
   public void testDerivedFields() {
     SourceState sourceState = new SourceState();
     sourceState.setProp("ms.derived.fields", "[{\"name\": \"activityDate\", \"formula\": {\"type\": \"epoc\", \"source\": \"fromDateTime\", \"format\": \"yyyy-MM-dd'T'HH:mm:ss'Z'\"}}]");
