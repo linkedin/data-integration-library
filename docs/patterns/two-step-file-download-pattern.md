@@ -45,26 +45,21 @@ values each time the list is pulled.
 
 ### Step-1 Configuration
 
-- `ms.source.files.pattern=.*`
 - `ms.extractor.target.file.name=`
 
-**Explanation**:  By setting a value in `ms.source.files.pattern`, it indicates there could be multiple
-files, and the results should be saved as a list file. If `ms.source.files.pattern` is not set, DIL will check 
-if `ms.extractor.target.file.name` is set. The whole logic works as the following:
+**Explanation**:  By setting `ms.extractor.target.file.name` 
+to blank, DIL will output the results of the "list" command
+to files. The whole logic works as the following:
 
 - retrieve a list of files based on `ms.source.uri` configuration 
-- is `ms.source.files.pattern` blank?
-    - if it is not blank:
-        - List the files and output the results as CSV
+- is `ms.extractor.target.file.name` blank?
     - if is blank:
-        - is `ms.extractor.target.file.name` blank?
-            - if is blank:
-                - List the files and output the results as CSV
-            - if is not blank:
-                - the number of files == 1
-                    - dump the file content
-                - the number of files > 1
-                    - dump the first file which matches the pattern
+        - List the files and output the results as CSV
+    - if is not blank:
+        - the number of files == 1
+            - dump the file content
+        - the number of files > 1
+            - dump the first file which matches the pattern
 
 **Note**: Per above logic, it is also sufficient by 
 setting `ms.source.files.pattern` to blank.  
@@ -117,6 +112,11 @@ a dynamic variable being generated internally.
 there are 10 files (10 paths), the secondary input will get 10 records, and each
 will be assigned to a work unit. Then each work unit will have a path in the
 dynamic variable {{filePath}}.  
+
+- `ms.extractor.target.file.name={{filePath}}`
+
+**Explanation**: by setting `ms.extractor.target.file.name`, DIL will
+dump the file. 
 
 #### Optional Configurations
 
