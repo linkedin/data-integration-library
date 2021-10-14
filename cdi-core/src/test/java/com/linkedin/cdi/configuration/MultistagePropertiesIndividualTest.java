@@ -5,6 +5,7 @@
 package com.linkedin.cdi.configuration;
 
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.keys.JobKeys;
 import org.apache.gobblin.configuration.SourceState;
 import org.testng.Assert;
 import org.testng.annotations.Test;

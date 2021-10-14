@@ -249,6 +249,21 @@ public class JobKeys {
    * @return true if validation was successful, otherwise false
    */
   public boolean validate(State state) {
+
+    // Validate all job parameters
+    boolean allValid = true;
+    for (MultistageProperties p: allProperties) {
+      if (!p.isBlank(state) && !p.isValid(state))  {
+        LOG.error(String.format(EXCEPTION_INCORRECT_CONFIGURATION,
+            p.getConfig(), state.getProp(p.getConfig())));
+        allValid = false;
+      }
+    }
+
+    if(!allValid) {
+      return false;
+    }
+
     /**
      * If pagination is enabled,  we need one of following ways to stop pagination
      *  1. through a total count field, i.e. ms.total.count.field = data.
