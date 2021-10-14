@@ -170,12 +170,10 @@ public class JdbcConnection extends MultistageConnection {
 
     if (stmt.execute(query)) {
       ResultSet resultSet = stmt.getResultSet();
-      if (MSTAGE_EXTRACTOR_CLASS.get(getState()).toString()
-          .matches(".*JsonExtractor.*")) {
+      if (MSTAGE_EXTRACTOR_CLASS.get(getState()).matches(".*JsonExtractor.*")) {
         wuStatus.setBuffer(new ByteArrayInputStream(toJson(resultSet,
             resultSet.getMetaData()).toString().getBytes(StandardCharsets.UTF_8)));
-      } else if (MSTAGE_EXTRACTOR_CLASS.get(getState()).toString()
-          .matches(".*CsvExtractor.*")) {
+      } else if (MSTAGE_EXTRACTOR_CLASS.get(getState()).matches(".*CsvExtractor.*")) {
         wuStatus.setBuffer(new ByteArrayInputStream(toCsv(resultSet,
             resultSet.getMetaData()).getBytes(StandardCharsets.UTF_8)));
       } else {
