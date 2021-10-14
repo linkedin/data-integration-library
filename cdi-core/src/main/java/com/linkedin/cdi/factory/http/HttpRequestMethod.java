@@ -228,7 +228,9 @@ public enum HttpRequestMethod {
     try {
       URIBuilder builder = new URIBuilder(new URI(uri));
       for (Map.Entry<String, JsonElement> entry : parameters.entrySet()) {
-        builder.addParameter(entry.getKey(), entry.getValue().getAsString());
+        if (!entry.getKey().matches("tmp.*")) {
+          builder.addParameter(entry.getKey(), entry.getValue().getAsString());
+        }
       }
       return builder.build().toString();
     } catch (Exception e) {
