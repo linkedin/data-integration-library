@@ -97,7 +97,7 @@ public class InFlowValidationConverter extends Converter<Schema, Schema, Generic
 
   private void fillValidationAttributes(WorkUnitState workUnitState) {
     JsonObject validationAttributes =
-        MSTAGE_VALIDATION_ATTRIBUTES.getValidNonblankWithDefault(workUnitState);
+        MSTAGE_VALIDATION_ATTRIBUTES.getProp(workUnitState);
     if (validationAttributes.has(KEY_WORD_THRESHOLD)) {
       threshold = validationAttributes.get(KEY_WORD_THRESHOLD).getAsInt();
     }
@@ -119,7 +119,7 @@ public class InFlowValidationConverter extends Converter<Schema, Schema, Generic
    */
   private int getBaseRowCount(WorkUnitState workUnitState) {
     JsonArray payloads = JsonUtils.filter(KEY_WORD_CATEGORY, KEY_WORD_PAYLOAD,
-        MSTAGE_SECONDARY_INPUT.getValidNonblankWithDefault(workUnitState));
+        MSTAGE_SECONDARY_INPUT.getProp(workUnitState));
 
     // by default, we expect 1 record
     if (payloads.size() == 0) {

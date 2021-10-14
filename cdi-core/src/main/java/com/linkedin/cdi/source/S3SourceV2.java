@@ -53,7 +53,7 @@ public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
 
     URL url = null;
     try {
-      String sourceUri = MSTAGE_SOURCE_URI.getValidNonblankWithDefault(state);
+      String sourceUri = MSTAGE_SOURCE_URI.getProp(state);
       url = new URL(sourceUri.replaceAll("(s3|S3)://", "https://"));
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -66,7 +66,7 @@ public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
 
     // set region, note that aws SDK won't raise an error here if region is invalid,
     // later on, an exception will be raised when the actual request is issued
-    JsonObject parameters = MSTAGE_SOURCE_S3_PARAMETERS.getValidNonblankWithDefault(state);
+    JsonObject parameters = MSTAGE_SOURCE_S3_PARAMETERS.getProp(state);
     if (parameters.has(KEY_REGION)) {
       String region = parameters.get(KEY_REGION).getAsString();
       if (!S3_REGIONS_SET.contains(region)) {
@@ -95,11 +95,11 @@ public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
     s3SourceV2Keys.setBucket(url.getHost().split("\\.")[0]);
 
     s3SourceV2Keys.setFilesPattern(MSTAGE_SOURCE_FILES_PATTERN.getProp(state));
-    s3SourceV2Keys.setMaxKeys(MSTAGE_S3_LIST_MAX_KEYS.getValidNonblankWithDefault(state));
-    s3SourceV2Keys.setAccessKey(SOURCE_CONN_USERNAME.getValidNonblankWithDefault(state));
-    s3SourceV2Keys.setSecretId(SOURCE_CONN_PASSWORD.getValidNonblankWithDefault(state));
+    s3SourceV2Keys.setMaxKeys(MSTAGE_S3_LIST_MAX_KEYS.getProp(state));
+    s3SourceV2Keys.setAccessKey(SOURCE_CONN_USERNAME.getProp(state));
+    s3SourceV2Keys.setSecretId(SOURCE_CONN_PASSWORD.getProp(state));
     s3SourceV2Keys.setTargetFilePattern(
-        MSTAGE_EXTRACTOR_TARGET_FILE_NAME.getValidNonblankWithDefault(state));
+        MSTAGE_EXTRACTOR_TARGET_FILE_NAME.getProp(state));
     s3SourceV2Keys.logDebugAll();
   }
 

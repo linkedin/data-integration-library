@@ -130,7 +130,7 @@ public class S3Connection extends MultistageConnection {
   synchronized S3Client getS3HttpClient(State state) {
     if (s3Client == null) {
       try {
-        Class<?> factoryClass = Class.forName(MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
+        Class<?> factoryClass = Class.forName(MSTAGE_CONNECTION_CLIENT_FACTORY.getProp(state));
         ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.getDeclaredConstructor().newInstance();
 
         Integer connectionTimeout = s3SourceV2Keys.getConnectionTimeout();

@@ -126,23 +126,23 @@ public class JobKeys {
   public void initialize(State state) {
     parsePaginationFields(state);
     parsePaginationInitialValues(state);
-    setSessionKeyField(MSTAGE_SESSION_KEY_FIELD.getValidNonblankWithDefault(state));
-    setTotalCountField(MSTAGE_TOTAL_COUNT_FIELD.getValidNonblankWithDefault(state));
-    setSourceParameters(MSTAGE_PARAMETERS.getValidNonblankWithDefault(state));
-    setSourceUri(MSTAGE_SOURCE_URI.getValidNonblankWithDefault(state));
+    setSessionKeyField(MSTAGE_SESSION_KEY_FIELD.getProp(state));
+    setTotalCountField(MSTAGE_TOTAL_COUNT_FIELD.getProp(state));
+    setSourceParameters(MSTAGE_PARAMETERS.getProp(state));
+    setSourceUri(MSTAGE_SOURCE_URI.getProp(state));
     setDefaultFieldTypes(parseDefaultFieldTypes(state));
     setDerivedFields(parseDerivedFields(state));
     setOutputSchema(parseOutputSchema(state));
-    setTargetSchema(MSTAGE_TARGET_SCHEMA.getValidNonblankWithDefault(state));
-    setEncryptionField(MSTAGE_ENCRYPTION_FIELDS.getValidNonblankWithDefault(state));
-    setDataField(MSTAGE_DATA_FIELD.getValidNonblankWithDefault(state));
+    setTargetSchema(MSTAGE_TARGET_SCHEMA.getProp(state));
+    setEncryptionField(MSTAGE_ENCRYPTION_FIELDS.getProp(state));
+    setDataField(MSTAGE_DATA_FIELD.getProp(state));
     setCallInterval(MSTAGE_CALL_INTERVAL_MILLIS.getProp(state));
     setSessionTimeout(MSTAGE_WAIT_TIMEOUT_SECONDS.getMillis(state));
-    setMinWorkUnitRecords(MSTAGE_WORK_UNIT_MIN_RECORDS.getValidNonblankWithDefault(state));
-    setMinWorkUnits(MSTAGE_WORK_UNIT_MIN_UNITS.getValidNonblankWithDefault(state));
+    setMinWorkUnitRecords(MSTAGE_WORK_UNIT_MIN_RECORDS.getProp(state));
+    setMinWorkUnits(MSTAGE_WORK_UNIT_MIN_UNITS.getProp(state));
 
-    setEnableCleansing(MSTAGE_ENABLE_CLEANSING.getValidNonblankWithDefault(state));
-    JsonObject schemaCleansing = MSTAGE_SCHEMA_CLENSING.getValidNonblankWithDefault(state);
+    setEnableCleansing(MSTAGE_ENABLE_CLEANSING.getProp(state));
+    JsonObject schemaCleansing = MSTAGE_SCHEMA_CLENSING.getProp(state);
     if (schemaCleansing.has("enabled")) {
       setEnableCleansing(Boolean.parseBoolean(schemaCleansing.get("enabled").getAsString()));
       if (enableCleansing && schemaCleansing.has("pattern")) {
@@ -156,20 +156,20 @@ public class JobKeys {
       }
     }
 
-    setIsPartialPartition(MSTAGE_WORK_UNIT_PARTIAL_PARTITION.getValidNonblankWithDefault(state));
+    setIsPartialPartition(MSTAGE_WORK_UNIT_PARTIAL_PARTITION.getProp(state));
     setWorkUnitPartitionType(parsePartitionType(state));
-    setWatermarkDefinition(MSTAGE_WATERMARK.getValidNonblankWithDefault(state));
+    setWatermarkDefinition(MSTAGE_WATERMARK.getProp(state));
     Map<String, Long> retry = parseSecondaryInputRetry(
-        MSTAGE_SECONDARY_INPUT.getValidNonblankWithDefault(state));
+        MSTAGE_SECONDARY_INPUT.getProp(state));
     setRetryDelayInSec(retry.get(KEY_WORD_RETRY_DELAY_IN_SEC));
     setRetryCount(retry.get(KEY_WORD_RETRY_COUNT));
-    setSecondaryInputs(MSTAGE_SECONDARY_INPUT.getValidNonblankWithDefault(state));
+    setSecondaryInputs(MSTAGE_SECONDARY_INPUT.getProp(state));
     setIsSecondaryAuthenticationEnabled(checkSecondaryAuthenticationEnabled());
 
     setSourceSchema(readSourceSchemaFromUrn(state,
-        MSTAGE_SOURCE_SCHEMA_URN.getValidNonblankWithDefault(state)));
+        MSTAGE_SOURCE_SCHEMA_URN.getProp(state)));
     setTargetSchema(readTargetSchemaFromUrn(state,
-        MSTAGE_TARGET_SCHEMA_URN.getValidNonblankWithDefault(state)));
+        MSTAGE_TARGET_SCHEMA_URN.getProp(state)));
 
     // closing out schema reader if it was created because of reading
     // output schema or target schema.
@@ -332,7 +332,7 @@ public class JobKeys {
 
   public void logUsage(State state) {
     for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
+      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getProp(state));
     }
   }
 
@@ -429,7 +429,7 @@ public class JobKeys {
    * @return the output schema
    */
   public JsonArray parseOutputSchema(State state) {
-    return JsonUtils.deepCopy(MSTAGE_OUTPUT_SCHEMA.getValidNonblankWithDefault(state)).getAsJsonArray();
+    return JsonUtils.deepCopy(MSTAGE_OUTPUT_SCHEMA.getProp(state)).getAsJsonArray();
   }
 
 
@@ -440,7 +440,7 @@ public class JobKeys {
    */
   WorkUnitPartitionTypes parsePartitionType(State state) {
     WorkUnitPartitionTypes partitionType = WorkUnitPartitionTypes.fromString(
-        MSTAGE_WORK_UNIT_PARTITION.getValidNonblankWithDefault(state));
+        MSTAGE_WORK_UNIT_PARTITION.getProp(state));
 
     if (partitionType != WorkUnitPartitionTypes.COMPOSITE) {
       return partitionType;
@@ -450,7 +450,7 @@ public class JobKeys {
     WorkUnitPartitionTypes.COMPOSITE.resetSubRange();
     try {
       JsonObject jsonObject = GSON.fromJson(
-          MSTAGE_WORK_UNIT_PARTITION.getValidNonblankWithDefault(state).toString(),
+          MSTAGE_WORK_UNIT_PARTITION.getProp(state).toString(),
           JsonObject.class);
 
       for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
@@ -467,7 +467,7 @@ public class JobKeys {
       }
     } catch (Exception e) {
       LOG.error("Error parsing composite partition string: "
-              + MSTAGE_WORK_UNIT_PARTITION.getValidNonblankWithDefault(state).toString()
+              + MSTAGE_WORK_UNIT_PARTITION.getProp(state).toString()
               + "\n partitions may not be generated properly.",
           e);
     }
@@ -553,7 +553,7 @@ public class JobKeys {
       // Schema Reader could be plugged in before the initialization on JobKeys
       if (schemaReader == null) {
         Class<?> factoryClass = Class.forName(
-            MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
+            MSTAGE_CONNECTION_CLIENT_FACTORY.getProp(state));
         ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.newInstance();
         schemaReader = factory.getSchemaReader(state);
       }

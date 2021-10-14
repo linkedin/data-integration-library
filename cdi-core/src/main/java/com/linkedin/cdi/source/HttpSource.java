@@ -65,7 +65,7 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
     httpSourceKeys.logUsage(state);
     httpSourceKeys.setHttpRequestHeaders(getRequestHeader(state));
     httpSourceKeys.setHttpRequestMethod(MSTAGE_HTTP_REQUEST_METHOD.getProp(state));
-    httpSourceKeys.setAuthentication(MSTAGE_AUTHENTICATION.getValidNonblankWithDefault(state));
+    httpSourceKeys.setAuthentication(MSTAGE_AUTHENTICATION.getProp(state));
     httpSourceKeys.setHttpRequestHeadersWithAuthentication(getHeadersWithAuthentication(state));
     httpSourceKeys.setHttpStatuses(getHttpStatuses(state));
     httpSourceKeys.setHttpStatusReasons(getHttpStatusReasons(state));
@@ -150,7 +150,7 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
 
   private Map<String, List<Integer>> getHttpStatuses(State state) {
     Map<String, List<Integer>> statuses = new HashMap<>();
-    JsonObject jsonObject = MSTAGE_HTTP_STATUSES.getValidNonblankWithDefault(state);
+    JsonObject jsonObject = MSTAGE_HTTP_STATUSES.getProp(state);
     for (Map.Entry<String, JsonElement> entry: jsonObject.entrySet()) {
       String key = entry.getKey();
       JsonElement value = jsonObject.get(key);
@@ -163,7 +163,7 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
 
   private Map<String, List<String>> getHttpStatusReasons(State state) {
     Map<String, List<String>> reasons = new HashMap<>();
-    JsonObject jsonObject = MSTAGE_HTTP_STATUS_REASONS.getValidNonblankWithDefault(state);
+    JsonObject jsonObject = MSTAGE_HTTP_STATUS_REASONS.getProp(state);
     for (Map.Entry<String, JsonElement> entry: jsonObject.entrySet()) {
       String key = entry.getKey();
       JsonElement value = jsonObject.get(key);
@@ -180,7 +180,7 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
    * @return the decrypted http request headers
    */
   private JsonObject getRequestHeader(State state) {
-    JsonObject headers = MSTAGE_HTTP_REQUEST_HEADERS.getValidNonblankWithDefault(state);
+    JsonObject headers = MSTAGE_HTTP_REQUEST_HEADERS.getProp(state);
     JsonObject decrypted = new JsonObject();
     for (Map.Entry<String, JsonElement> entry: headers.entrySet()) {
       String key = entry.getKey();

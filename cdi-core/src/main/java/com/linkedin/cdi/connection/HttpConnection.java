@@ -92,7 +92,7 @@ public class HttpConnection extends MultistageConnection {
     if (httpClient == null) {
       try {
         Class<?> factoryClass = Class.forName(
-            MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
+            MSTAGE_CONNECTION_CLIENT_FACTORY.getProp(state));
         ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.newInstance();
         httpClient = factory.getHttpClient(state);
       } catch (Exception e) {

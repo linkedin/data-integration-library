@@ -78,7 +78,7 @@ public class IntegerProperties extends MultistageProperties<Integer> {
    * @param state state
    * @return property value if non-blank and valid, otherwise the default value
    */
-  public Integer getValidNonblankWithDefault(State state) {
+  protected Integer getValidNonblankWithDefault(State state) {
     if (validateNonblank(state)) {
       return Integer.parseInt(state.getProp(getConfig()));
     }

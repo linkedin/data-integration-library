@@ -56,15 +56,15 @@ public class JdbcSource extends MultistageSource<Schema, GenericRecord> {
   protected void initialize(State state) {
     super.initialize(state);
     jdbcSourceKeys.logUsage(state);
-    jdbcSourceKeys.setJdbcStatement(MSTAGE_JDBC_STATEMENT.getValidNonblankWithDefault(state));
+    jdbcSourceKeys.setJdbcStatement(MSTAGE_JDBC_STATEMENT.getProp(state));
     jdbcSourceKeys.setSeparator(CsvUtils.unescape(MSTAGE_CSV_SEPARATOR
-        .getValidNonblankWithDefault(state)));
+        .getProp(state)));
     jdbcSourceKeys.setQuoteCharacter(CsvUtils.unescape(MSTAGE_CSV_QUOTE_CHARACTER
-        .getValidNonblankWithDefault(state)));
+        .getProp(state)));
     jdbcSourceKeys.setEscapeCharacter(CsvUtils.unescape(MSTAGE_CSV_ESCAPE_CHARACTER
-        .getValidNonblankWithDefault(state)));
+        .getProp(state)));
     jdbcSourceKeys.setSchemaRefactorFunction(MSTAGE_JDBC_SCHEMA_REFACTOR
-        .getValidNonblankWithDefault(state));
+        .getProp(state));
     jdbcSourceKeys.logDebugAll();
   }
 

@@ -108,7 +108,7 @@ public class SftpConnection extends MultistageConnection {
   private SftpClient getFsClient() {
     if (this.fsClient == null) {
       try {
-        Class<?> factoryClass = Class.forName(MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(this.getState()));
+        Class<?> factoryClass = Class.forName(MSTAGE_CONNECTION_CLIENT_FACTORY.getProp(this.getState()));
         ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.getDeclaredConstructor().newInstance();
         this.fsClient = factory.getSftpChannelClient(this.getState());
       } catch (Exception e) {

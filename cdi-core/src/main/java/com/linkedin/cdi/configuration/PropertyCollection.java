@@ -17,7 +17,7 @@ public interface PropertyCollection {
   IntegerProperties MSTAGE_ABSTINENT_PERIOD_DAYS = new IntegerProperties("ms.abstinent.period.days") {
     @Override
     public Long getMillis(State state) {
-      return 24L * 3600L * 1000L * this.getValidNonblankWithDefault(state);
+      return 24L * 3600L * 1000L * this.getProp(state);
     }
   };
 
@@ -164,7 +164,7 @@ public interface PropertyCollection {
   LongProperties MSTAGE_WAIT_TIMEOUT_SECONDS = new LongProperties("ms.wait.timeout.seconds", 600L) {
     @Override
     public Long getMillis(State state) {
-      return 1000L * this.getValidNonblankWithDefault(state);
+      return 1000L * this.getProp(state);
     }
   };
 
@@ -205,7 +205,7 @@ public interface PropertyCollection {
   StringProperties EXTRACT_TABLE_NAME_KEY = new StringProperties("extract.table.name");
   StringProperties EXTRACT_TABLE_TYPE_KEY = new StringProperties("extract.table.type", "SNAPSHOT_ONLY") {
     @Override
-    public String getValidNonblankWithDefault(State state) {
+    protected String getValidNonblankWithDefault(State state) {
       return super.getValidNonblankWithDefault(state).toUpperCase();
     }
   };

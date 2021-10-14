@@ -201,7 +201,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
 
     // if Content-Type is provided, but not application/json, the response can have
     // useful error information
-    JsonObject expectedContentType = MSTAGE_HTTP_RESPONSE_TYPE.getValidNonblankWithDefault(state);
+    JsonObject expectedContentType = MSTAGE_HTTP_RESPONSE_TYPE.getProp(state);
     HashSet<String> expectedContentTypeSet = new LinkedHashSet<>(Collections.singletonList("application/json"));
     if (expectedContentType.has(CONTENT_TYPE_KEY)) {
       for (Map.Entry<String, JsonElement> entry: expectedContentType.entrySet()) {
@@ -586,7 +586,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
     JsonElement data = null;
     if (input != null) {
       data = new JsonParser().parse(new InputStreamReader(input,
-          Charset.forName(MSTAGE_SOURCE_DATA_CHARACTER_SET.getValidNonblankWithDefault(state))));
+          Charset.forName(MSTAGE_SOURCE_DATA_CHARACTER_SET.getProp(state))));
       connection.closeStream();
     }
     return data;

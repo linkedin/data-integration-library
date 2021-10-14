@@ -67,12 +67,12 @@ public class AvroNormalizerConverter extends Converter<Schema, Schema, GenericRe
     // Avro Array's max capacity is max int. In case of overflow, use the default value 500.
     try {
       maxRecordsPerBatch =
-          Math.toIntExact(MSTAGE_NORMALIZER_BATCH_SIZE.getValidNonblankWithDefault(workUnit));
+          Math.toIntExact(MSTAGE_NORMALIZER_BATCH_SIZE.getProp(workUnit));
     } catch (ArithmeticException e) {
       maxRecordsPerBatch = 500;
     }
 
-    targetSchema = MSTAGE_TARGET_SCHEMA.getValidNonblankWithDefault(workUnit);
+    targetSchema = MSTAGE_TARGET_SCHEMA.getProp(workUnit);
     return this;
   }
 

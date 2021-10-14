@@ -113,13 +113,13 @@ public class JdbcConnection extends MultistageConnection {
    */
   private synchronized Connection getJdbcConnection(State state) {
     try {
-      Class<?> factoryClass = Class.forName(MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
+      Class<?> factoryClass = Class.forName(MSTAGE_CONNECTION_CLIENT_FACTORY.getProp(state));
       ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.newInstance();
 
       return factory.getJdbcConnection(
           jdbcSourceKeys.getSourceUri(),
-          SOURCE_CONN_USERNAME.getValidNonblankWithDefault(state),
-          SOURCE_CONN_PASSWORD.getValidNonblankWithDefault(state),
+          SOURCE_CONN_USERNAME.getProp(state),
+          SOURCE_CONN_PASSWORD.getProp(state),
           state);
     } catch (Exception e) {
       LOG.error("Error creating Jdbc connection: {}", e.getMessage());
@@ -170,11 +170,11 @@ public class JdbcConnection extends MultistageConnection {
 
     if (stmt.execute(query)) {
       ResultSet resultSet = stmt.getResultSet();
-      if (MSTAGE_EXTRACTOR_CLASS.getValidNonblankWithDefault(getState()).toString()
+      if (MSTAGE_EXTRACTOR_CLASS.getProp(getState()).toString()
           .matches(".*JsonExtractor.*")) {
         wuStatus.setBuffer(new ByteArrayInputStream(toJson(resultSet,
             resultSet.getMetaData()).toString().getBytes(StandardCharsets.UTF_8)));
-      } else if (MSTAGE_EXTRACTOR_CLASS.getValidNonblankWithDefault(getState()).toString()
+      } else if (MSTAGE_EXTRACTOR_CLASS.getProp(getState()).toString()
           .matches(".*CsvExtractor.*")) {
         wuStatus.setBuffer(new ByteArrayInputStream(toCsv(resultSet,
             resultSet.getMetaData()).getBytes(StandardCharsets.UTF_8)));

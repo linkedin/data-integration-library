@@ -67,7 +67,7 @@ public class FileDumpExtractor extends MultistageExtractor<String, String> {
 
     // file permission is required, but a default value is given in PropertyCollection
     fileDumpExtractorKeys.setFileWritePermissions(
-        MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.getValidNonblankWithDefault(state));
+        MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.getProp(state));
 
     // work unit file name is based on a template that is defined by ms.extractor.target.file.name
     // and then substituted with activation parameters
@@ -217,7 +217,7 @@ public class FileDumpExtractor extends MultistageExtractor<String, String> {
    * @return the file name
    */
   private String getFileName(WorkUnitState state) {
-    String fileNameTemplate = MSTAGE_EXTRACTOR_TARGET_FILE_NAME.getValidNonblankWithDefault(state);
+    String fileNameTemplate = MSTAGE_EXTRACTOR_TARGET_FILE_NAME.getProp(state);
     JsonObject activationParameters = extractorKeys.getActivationParameters();
     try {
       String filePath = VariableUtils.replaceWithTracking(fileNameTemplate, activationParameters).getKey();

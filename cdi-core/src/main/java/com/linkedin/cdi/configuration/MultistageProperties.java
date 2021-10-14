@@ -89,5 +89,5 @@ public abstract class MultistageProperties<T> {
    * @param state state
    * @return subclasses should override
    */
-  abstract public T getValidNonblankWithDefault(State state);
+  abstract protected T getValidNonblankWithDefault(State state);
 }
