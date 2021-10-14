@@ -77,22 +77,11 @@ public class S3Connection extends MultistageConnection {
     return true;
   }
 
-  /*
-  Below is the logic of when to download a file and when to list similar files based on the uri and pattern
-  ms.source.files.pattern
-      if Is not blank:
-            List the S3 keys and output as CSV
-
-      if Is blank:
-            ms.extractor.target.file.name?
-                  If is blank:
-                        List the S3 keys and output as CSV
-                  If is not blank:
-                        If ms.source.uri prefix produces only 1 file:
-                              dump the S3 object into the given output file name
-                        If ms.source.uir prefix produces more than 1 file:
-                              dump only the file where prefix = object key, and ignore all other objects
- */
+  /**
+   * @param workUnitStatus prior work unit status
+   * @return new work unit status
+   * @throws RetriableAuthenticationException
+   */
   @Override
   public WorkUnitStatus executeFirst(WorkUnitStatus workUnitStatus) throws RetriableAuthenticationException {
     WorkUnitStatus status = super.executeFirst(workUnitStatus);
@@ -101,36 +90,31 @@ public class S3Connection extends MultistageConnection {
     String finalPrefix = getWorkUnitSpecificString(s3SourceV2Keys.getPrefix(), getExtractorKeys().getDynamicParameters());
     LOG.debug("Final Prefix to get files list: {}", finalPrefix);
     try {
-      List<String> files = getFilesList(finalPrefix);
-      boolean isObjectWithPrefixExist = files.stream().anyMatch(objectKey -> objectKey.equals(finalPrefix));
+      List<String> files = getFilesList(finalPrefix).stream()
+          .filter(objectKey -> objectKey.matches(s3SourceV2Keys.getFilesPattern()))
+          .collect(Collectors.toList());
+
       LOG.debug("Number of files identified: {}", files.size());
 
-      if (StringUtils.isNotBlank(s3SourceV2Keys.getFilesPattern())) {
-        List<String> filteredFiles = files.stream()
-            .filter(fileName -> fileName.matches(s3SourceV2Keys.getFilesPattern()))
-            .collect(Collectors.toList());
-        status.setBuffer(InputStreamUtils.convertListToInputStream(filteredFiles));
+      if (StringUtils.isBlank(s3SourceV2Keys.getTargetFilePattern())) {
+        status.setBuffer(InputStreamUtils.convertListToInputStream(files));
       } else {
-        if (StringUtils.isBlank(s3SourceV2Keys.getTargetFilePattern())) {
-          status.setBuffer(InputStreamUtils.convertListToInputStream(files));
+        // Multiple files are returned, then only process the exact match
+        String fileToDownload = files.size() == 0
+            ? StringUtils.EMPTY : files.size() == 1
+            ? files.get(0) : finalPrefix;
+
+        if (StringUtils.isNotBlank(fileToDownload)) {
+          LOG.debug("Downloading file: {}", fileToDownload);
+          GetObjectRequest getObjectRequest =
+              GetObjectRequest.builder().bucket(s3SourceV2Keys.getBucket()).key(fileToDownload).build();
+          ResponseInputStream<GetObjectResponse> response =
+              s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
+          status.setBuffer(response);
         } else {
-          String fileToDownload = "";
-          if (files.size() == 1) {
-            fileToDownload = files.get(0);
-          } else if (isObjectWithPrefixExist) {
-            fileToDownload = finalPrefix;
-          }
-          if (StringUtils.isNotBlank(fileToDownload)) {
-            LOG.debug("Downloading file: {}", files.get(0));
-            GetObjectRequest getObjectRequest =
-                GetObjectRequest.builder().bucket(s3SourceV2Keys.getBucket()).key(files.get(0)).build();
-            ResponseInputStream<GetObjectResponse> response =
-                s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
-            status.setBuffer(response);
-          } else {
-            LOG.warn("Invalid set of parameters. To list down files from a bucket, pattern "
-                + "parameter is needed and to get object from s3 source target file name is needed.");
-          }
+          LOG.warn("Invalid set of parameters. "
+              + "To list down files from a bucket, pattern parameter is needed,"
+              + ", and to get object from s3 source target file name is needed.");
         }
       }
     } catch (Exception e) {
