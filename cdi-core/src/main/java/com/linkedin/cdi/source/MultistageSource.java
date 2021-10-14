@@ -292,7 +292,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
         // it reaches ms.work.unit.parallelism.max. a combination is not added if its prior
         // watermark doesn't require a rerun.
         // a work unit signature is a date time partition and unit partition combination.
-        if (MSTAGE_WORK_UNIT_PARALLELISM_MAX.validateNonblank(sourceState)
+        if (MSTAGE_WORK_UNIT_PARALLELISM_MAX.isValidNonblank(sourceState)
             && workUnits.size() >= (Integer) MSTAGE_WORK_UNIT_PARALLELISM_MAX.get(sourceState)) {
           break;
         }
@@ -347,7 +347,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
               DateTime.now().getMillis()
                   + workUnits.size() * MSTAGE_WORK_UNIT_PACING_SECONDS.getMillis(sourceState));
 
-          if (!MSTAGE_OUTPUT_SCHEMA.validateNonblank(sourceState)
+          if (!MSTAGE_OUTPUT_SCHEMA.isValidNonblank(sourceState)
             && this.jobKeys.hasOutputSchema()) {
             // populate the output schema read from URN reader to sub tasks
             // so that the URN reader will not be called again

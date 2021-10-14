@@ -81,7 +81,7 @@ public class JsonObjectProperties extends MultistageProperties<JsonObject> {
    * @param state source state
    * @return true when the configuration is non-blank and valid
    */
-  public boolean validateNonblank(State state) {
+  public boolean isValidNonblank(State state) {
     if (!isBlank(state) && isValid(state)) {
       return GSON.fromJson(state.getProp(getConfig()), JsonObject.class).entrySet().size() > 0;
     }
@@ -96,7 +96,7 @@ public class JsonObjectProperties extends MultistageProperties<JsonObject> {
    * @return property value if non-blank and valid, otherwise the default value
    */
   protected JsonObject getValidNonblankWithDefault(State state) {
-    if (validateNonblank(state)) {
+    if (isValidNonblank(state)) {
       return GSON.fromJson(state.getProp(getConfig()), JsonObject.class);
     }
     return getDefaultValue();

@@ -25,12 +25,12 @@ public class MultistagePropertiesIndividualTest {
 
     state.setProp("ms.authentication", "{\"name\": \"value\"");
     Assert.assertFalse(MSTAGE_AUTHENTICATION.isValid(state));
-    Assert.assertFalse(MSTAGE_AUTHENTICATION.validateNonblank(state));
+    Assert.assertFalse(MSTAGE_AUTHENTICATION.isValidNonblank(state));
     Assert.assertEquals(MSTAGE_AUTHENTICATION.get(state), new JsonObject());
 
     state.setProp("ms.authentication", "{\"method\": \"bearer\"}");
     Assert.assertFalse(MSTAGE_AUTHENTICATION.isValid(state));
-    Assert.assertFalse(MSTAGE_AUTHENTICATION.validateNonblank(state));
+    Assert.assertFalse(MSTAGE_AUTHENTICATION.isValidNonblank(state));
     Assert.assertEquals(MSTAGE_AUTHENTICATION.get(state), new JsonObject());
 
     state.setProp("ms.authentication", "{\"method\": \"bearer\", \"encryption\": \"base64\", \"header\": \"Authorization\"}");

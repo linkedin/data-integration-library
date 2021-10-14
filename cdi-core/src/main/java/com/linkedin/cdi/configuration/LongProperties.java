@@ -67,7 +67,7 @@ public class LongProperties extends MultistageProperties<Long> {
    * @param state source state
    * @return true when the configuration is non-blank and valid
    */
-  public boolean validateNonblank(State state) {
+  public boolean isValidNonblank(State state) {
     return !isBlank(state) && isValid(state);
   }
 
@@ -80,7 +80,7 @@ public class LongProperties extends MultistageProperties<Long> {
    * @see #get(State)
    */
   protected Long getValidNonblankWithDefault(State state) {
-    if (validateNonblank(state)) {
+    if (isValidNonblank(state)) {
       return Long.parseLong(state.getProp(getConfig()));
     }
     return getDefaultValue();

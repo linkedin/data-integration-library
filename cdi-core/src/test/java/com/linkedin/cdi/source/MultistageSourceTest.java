@@ -163,10 +163,10 @@ public class MultistageSourceTest {
     SourceState state = new SourceState();
     state.setProp("ms.work.unit.parallelism.max", 0);
     state.setProp("ms.pagination", "");
-    Assert.assertFalse(MSTAGE_WORK_UNIT_PARALLELISM_MAX.validateNonblank(state));
+    Assert.assertFalse(MSTAGE_WORK_UNIT_PARALLELISM_MAX.isValidNonblank(state));
 
     state.setProp("ms.work.unit.parallelism.max", 10);
-    Assert.assertTrue(MSTAGE_WORK_UNIT_PARALLELISM_MAX.validateNonblank(state));
+    Assert.assertTrue(MSTAGE_WORK_UNIT_PARALLELISM_MAX.isValidNonblank(state));
   }
 
   @Test

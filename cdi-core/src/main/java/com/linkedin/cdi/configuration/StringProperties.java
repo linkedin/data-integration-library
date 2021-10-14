@@ -54,7 +54,7 @@ public class StringProperties extends MultistageProperties<String> {
    * @param state source state
    * @return true when the configuration is non-blank and valid
    */
-  public boolean validateNonblank(State state) {
+  public boolean isValidNonblank(State state) {
     return !isBlank(state) && isValid(state);
   }
 
@@ -67,7 +67,7 @@ public class StringProperties extends MultistageProperties<String> {
    * @see #get(State)
    */
   protected String getValidNonblankWithDefault(State state) {
-    if (validateNonblank(state)) {
+    if (isValidNonblank(state)) {
       return state.getProp(getConfig());
     }
     return getDefaultValue();

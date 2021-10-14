@@ -342,7 +342,7 @@ public class JobKeys {
         ParameterTypes.PAGESIZE,
         ParameterTypes.PAGENO
     );
-    if (MSTAGE_PAGINATION.validateNonblank(state)) {
+    if (MSTAGE_PAGINATION.isValidNonblank(state)) {
       JsonObject p = MSTAGE_PAGINATION.get(state);
       if (p.has("fields")) {
         JsonArray fields = p.get("fields").getAsJsonArray();
@@ -361,7 +361,7 @@ public class JobKeys {
         ParameterTypes.PAGESIZE,
         ParameterTypes.PAGENO
     );
-    if (MSTAGE_PAGINATION.validateNonblank(state)) {
+    if (MSTAGE_PAGINATION.isValidNonblank(state)) {
       JsonObject p = MSTAGE_PAGINATION.get(state);
       if (p.has("initialvalues")) {
         JsonArray values = p.get("initialvalues").getAsJsonArray();
@@ -381,7 +381,7 @@ public class JobKeys {
    * @return A map of fields and their default types
    */
   private Map<String, String> parseDefaultFieldTypes(State state) {
-    if (MSTAGE_DATA_DEFAULT_TYPE.validateNonblank(state)) {
+    if (MSTAGE_DATA_DEFAULT_TYPE.isValidNonblank(state)) {
       return GSON.fromJson(MSTAGE_DATA_DEFAULT_TYPE.get(state).toString(),
           new TypeToken<HashMap<String, String>>() {
           }.getType());
@@ -404,7 +404,7 @@ public class JobKeys {
    */
   @VisibleForTesting
   Map<String, Map<String, String>> parseDerivedFields(State state) {
-    if (!MSTAGE_DERIVED_FIELDS.validateNonblank(state)) {
+    if (!MSTAGE_DERIVED_FIELDS.isValidNonblank(state)) {
       return new HashMap<>();
     }
 

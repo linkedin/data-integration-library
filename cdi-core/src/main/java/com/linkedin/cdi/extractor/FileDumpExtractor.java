@@ -59,7 +59,7 @@ public class FileDumpExtractor extends MultistageExtractor<String, String> {
     // initialize FileDumpExtractor keys
     // Extractors follow the pattern of initializing in constructor to avoid forgetting initialization
     // in sub-classes
-    if (DATA_PUBLISHER_FINAL_DIR.validateNonblank(state)) {
+    if (DATA_PUBLISHER_FINAL_DIR.isValidNonblank(state)) {
       fileDumpExtractorKeys.setFileDumpLocation(DATA_PUBLISHER_FINAL_DIR.get(state));
     } else {
       throw new RuntimeException("data publisher final dir is empty or null");

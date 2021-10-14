@@ -64,7 +64,7 @@ public class BooleanProperties extends MultistageProperties<Boolean> {
    * @param state source state
    * @return true when the configuration is non-blank and valid
    */
-  public boolean validateNonblank(State state) {
+  public boolean isValidNonblank(State state) {
     return !isBlank(state) && isValid(state);
   }
 
@@ -76,7 +76,7 @@ public class BooleanProperties extends MultistageProperties<Boolean> {
    * @return property value if non-blank and valid, otherwise the default value
    */
   protected Boolean getValidNonblankWithDefault(State state) {
-    if (validateNonblank(state)) {
+    if (isValidNonblank(state)) {
       return Boolean.parseBoolean(state.getProp(getConfig()));
     }
     return getDefaultValue();

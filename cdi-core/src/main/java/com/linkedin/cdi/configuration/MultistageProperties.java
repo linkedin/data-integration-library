@@ -70,7 +70,7 @@ public abstract class MultistageProperties<T> {
    * @param state source state
    * @return true when the configuration is non-blank and valid
    */
-  abstract public boolean validateNonblank(State state);
+  abstract public boolean isValidNonblank(State state);
 
   /**
    * Retrieves property value from state object if valid and not blank
