@@ -14,6 +14,17 @@ import org.apache.gobblin.configuration.State;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
+
+/**
+ * Defines all properties here.
+ *
+ * Properties can have their unique default values and validation rules through
+ * inline class override. If the rules become too complicated, a new class
+ * should be derived to avoid making this class too clumsy.
+ *
+ * Definitions are recommended to be organized in alphabetic order.
+ *
+ */
 public interface PropertyCollection {
 
   IntegerProperties MSTAGE_ABSTINENT_PERIOD_DAYS = new IntegerProperties("ms.abstinent.period.days") {
