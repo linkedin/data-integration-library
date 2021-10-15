@@ -8,6 +8,8 @@
 
 **Default value**: 600 seconds (or 10 minutes)
 
+**Maximum value**: 24 hours (24 * 3600 seconds)
+
 **Related**:
 
 - [job property: ms.call.interval.millis](ms.call.interval.millis.md).

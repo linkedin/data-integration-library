@@ -194,8 +194,8 @@ public interface PropertyCollection {
         }
       };
 
-  // default: 600 second, minimum: 1 second, maximum: 24 hours
-  LongProperties MSTAGE_WAIT_TIMEOUT_SECONDS = new LongProperties("ms.wait.timeout.seconds", 24 * 3600L, 1L, 600L) {
+  // default: 600 second, minimum: 0 second, maximum: 24 hours
+  LongProperties MSTAGE_WAIT_TIMEOUT_SECONDS = new LongProperties("ms.wait.timeout.seconds", 24 * 3600L, 0L, 600L) {
     @Override
     public Long getMillis(State state) {
       return 1000L * this.get(state);

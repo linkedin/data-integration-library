@@ -7,6 +7,8 @@
 
 **Default value**: 1000
 
+**Minimum value**: 1
+
 **Related**:
 
 ## Description
