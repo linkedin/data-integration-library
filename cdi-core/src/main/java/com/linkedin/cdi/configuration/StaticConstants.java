@@ -72,10 +72,11 @@ public interface StaticConstants {
 
   String PROPERTY_DELIMINATOR = ".";
   String REGEXP_DEFAULT_PATTERN = ".*";
+  String DOC_BASE_URL = "https://github.com/linkedin/data-integration-library/blob/master/docs";
 
   String EXCEPTION_WORK_UNIT_MINIMUM = "Job requires a minimum of %s work unit(s) to proceed because ms.work.unit.min.units = %s.";
   String EXCEPTION_RECORD_MINIMUM = "Work unit requires a minimum of %s record(s) to succeed because ms.work.unit.min.records = %s.";
-  String EXCEPTION_INCORRECT_CONFIGURATION = "Property %s has incorrect configuration: %s";
+  String EXCEPTION_INCORRECT_CONFIGURATION = "Property %s has incorrect configuration: %s, see: %s";
 
   String MSG_ROWS_PROCESSED = "Processed %s records, work unit: %s";
   String MSG_WORK_UNIT_ALWAYS = "There should be a work unit.";

@@ -67,8 +67,7 @@ public class JsonObjectProperties extends MultistageProperties<JsonObject> {
       // Properly formed JsonObject string is valid
       GSON.fromJson(state.getProp(getConfig()), JsonObject.class);
     } catch (Exception e) {
-      LOG.error(String.format(EXCEPTION_INCORRECT_CONFIGURATION, getConfig(), state.getProp(getConfig())),
-          e.getMessage());
+      LOG.error(alertMessage(state), e.getMessage());
       return false;
     }
     return true;

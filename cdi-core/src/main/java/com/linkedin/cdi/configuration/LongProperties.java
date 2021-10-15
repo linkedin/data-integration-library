@@ -19,11 +19,19 @@ public class LongProperties extends MultistageProperties<Long> {
   private static final Logger LOG = LoggerFactory.getLogger(LongProperties.class);
 
   LongProperties(String config) {
-    super(config, Long.class, 0L);
+    super(config, Long.class, Long.MAX_VALUE, 0L, 0L);
   }
 
-  LongProperties(String config, Long defaultValue) {
-    super(config, Long.class, defaultValue);
+  LongProperties(String config, Long maxValue) {
+    super(config, Long.class, maxValue, 0L, 0L);
+  }
+
+  LongProperties(String config, Long maxValue, Long minValue) {
+    super(config, Long.class, maxValue, minValue, 0L);
+  }
+
+  LongProperties(String config, Long maxValue, Long minValue, Long defaultValue) {
+    super(config, Long.class, maxValue, minValue, defaultValue);
   }
 
   /**
@@ -51,10 +59,10 @@ public class LongProperties extends MultistageProperties<Long> {
   public boolean isValid(State state) {
     if (!isBlank(state)) try {
       // Properly formed Long string is valid
-      Long.parseLong(state.getProp(getConfig()));
+      long value = Long.parseLong(state.getProp(getConfig()));
+      return value >= getMinValue() && value <= getMaxValue();
     } catch (Exception e) {
-      LOG.error(String.format(EXCEPTION_INCORRECT_CONFIGURATION, getConfig(), state.getProp(getConfig())),
-          e.getMessage());
+      LOG.error(alertMessage(state), e.getMessage());
       return false;
     }
     return true;

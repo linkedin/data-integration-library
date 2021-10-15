@@ -14,6 +14,13 @@ import static com.linkedin.cdi.configuration.PropertyCollection.*;
 
 public class MultistagePropertiesClassTest {
   @Test
+  public void testBaseClass() {
+    SourceState state = new SourceState();
+    Assert.assertEquals(MSTAGE_CALL_INTERVAL_MILLIS.getDocUrl(),
+        "https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.call.interval.millis.md");
+  }
+
+  @Test
   public void testJsonArrayProperties() {
     SourceState state = new SourceState();
     Assert.assertEquals(MSTAGE_DERIVED_FIELDS.get(state), new JsonArray());

@@ -27,6 +27,7 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
  */
 public interface PropertyCollection {
 
+  // default: 0, minimum: 0, maximum: -
   IntegerProperties MSTAGE_ABSTINENT_PERIOD_DAYS = new IntegerProperties("ms.abstinent.period.days") {
     @Override
     public Long getMillis(State state) {
@@ -47,13 +48,22 @@ public interface PropertyCollection {
   };
 
   BooleanProperties MSTAGE_BACKFILL = new BooleanProperties("ms.backfill", Boolean.FALSE);
+
+  // default: 0, minimum: 0, maximum: -
   LongProperties MSTAGE_CALL_INTERVAL_MILLIS = new LongProperties("ms.call.interval.millis");
+
   StringProperties MSTAGE_CONNECTION_CLIENT_FACTORY = new StringProperties("ms.connection.client.factory",
           "com.linkedin.cdi.factory.DefaultConnectionClientFactory");
+
+  // default: 0, minimum: 0, maximum: -
   LongProperties MSTAGE_CONVERTER_CSV_MAX_FAILURES = new LongProperties("ms.converter.csv.max.failures");
+
   BooleanProperties MSTAGE_CONVERTER_KEEP_NULL_STRINGS = new BooleanProperties("ms.converter.keep.null.strings", Boolean.FALSE);
   BooleanProperties MSTAGE_CSV_COLUMN_HEADER = new BooleanProperties("ms.csv.column.header", Boolean.FALSE);
+
+  // default: 0, minimum: 0, maximum: -
   IntegerProperties MSTAGE_CSV_COLUMN_HEADER_INDEX = new IntegerProperties("ms.csv.column.header.index");
+
   StringProperties MSTAGE_CSV_COLUMN_PROJECTION = new StringProperties("ms.csv.column.projection") {
     @Override
     public boolean isValid(State state) {
@@ -69,7 +79,10 @@ public interface PropertyCollection {
   StringProperties MSTAGE_CSV_ESCAPE_CHARACTER = new StringProperties("ms.csv.escape.character", "u005C");
   StringProperties MSTAGE_CSV_QUOTE_CHARACTER = new StringProperties("ms.csv.quote.character", "\"");
   StringProperties MSTAGE_CSV_SEPARATOR = new StringProperties("ms.csv.separator", KEY_WORD_COMMA);
+
+  // default: 0, minimum: 0, maximum: -
   IntegerProperties MSTAGE_CSV_SKIP_LINES = new IntegerProperties("ms.csv.skip.lines");
+
   BooleanProperties MSTAGE_DATA_EXPLICIT_EOF = new BooleanProperties("ms.data.explicit.eof", Boolean.FALSE);
   JsonObjectProperties MSTAGE_DATA_DEFAULT_TYPE = new JsonObjectProperties("ms.data.default.type");
   StringProperties MSTAGE_DATA_FIELD = new StringProperties("ms.data.field");
@@ -101,6 +114,8 @@ public interface PropertyCollection {
   StringProperties MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION = new StringProperties("ms.extractor.target.file.permission", "755");
   StringProperties MSTAGE_EXTRACT_PREPROCESSORS = new StringProperties("ms.extract.preprocessors");
   JsonObjectProperties MSTAGE_EXTRACT_PREPROCESSORS_PARAMETERS = new JsonObjectProperties("ms.extract.preprocessor.parameters");
+
+  // default: 0, minimum: 0, maximum: -
   IntegerProperties MSTAGE_GRACE_PERIOD_DAYS = new IntegerProperties("ms.grace.period.days") {
     @Override
     public Long getMillis(State state) {
@@ -120,7 +135,10 @@ public interface PropertyCollection {
   StringProperties MSTAGE_KAFKA_SCHEMA_REGISTRY_URL = new StringProperties("ms.kafka.schema.registry.url");
   StringProperties MSTAGE_KAFKA_CLIENT_ID = new StringProperties("ms.kafka.clientId");
   StringProperties MSTAGE_KAFKA_TOPIC_NAME = new StringProperties("ms.kafka.audit.topic.name");
-  LongProperties MSTAGE_NORMALIZER_BATCH_SIZE = new LongProperties("ms.normalizer.batch.size", 500L);
+
+  // default: 500, minimum: 1, maximum: -
+  LongProperties MSTAGE_NORMALIZER_BATCH_SIZE = new LongProperties("ms.normalizer.batch.size", Long.MAX_VALUE, 1L, 500L);
+
   JsonArrayProperties MSTAGE_OUTPUT_SCHEMA = new JsonArrayProperties("ms.output.schema");
   JsonObjectProperties MSTAGE_PAGINATION = new JsonObjectProperties("ms.pagination");
   JsonArrayProperties MSTAGE_PARAMETERS = new JsonArrayProperties("ms.parameters") {
@@ -149,7 +167,9 @@ public interface PropertyCollection {
         }
       };
 
-  IntegerProperties MSTAGE_S3_LIST_MAX_KEYS = new IntegerProperties("ms.s3.list.max.keys",1000);
+  // default: 1000, minimum: 1, maximum: -
+  IntegerProperties MSTAGE_S3_LIST_MAX_KEYS = new IntegerProperties("ms.s3.list.max.keys", Integer.MAX_VALUE, 1, 1000);
+
   JsonObjectProperties MSTAGE_SCHEMA_CLENSING = new JsonObjectProperties("ms.schema.cleansing");
   JsonArrayProperties MSTAGE_SECONDARY_INPUT = new JsonArrayProperties("ms.secondary.input");
   JsonObjectProperties MSTAGE_SESSION_KEY_FIELD = new JsonObjectProperties("ms.session.key.field");
@@ -174,7 +194,8 @@ public interface PropertyCollection {
         }
       };
 
-  LongProperties MSTAGE_WAIT_TIMEOUT_SECONDS = new LongProperties("ms.wait.timeout.seconds", 600L) {
+  // default: 600 second, minimum: 1 second, maximum: 24 hours
+  LongProperties MSTAGE_WAIT_TIMEOUT_SECONDS = new LongProperties("ms.wait.timeout.seconds", 24 * 3600L, 1L, 600L) {
     @Override
     public Long getMillis(State state) {
       return 1000L * this.get(state);
@@ -183,9 +204,17 @@ public interface PropertyCollection {
 
   JsonArrayProperties MSTAGE_WATERMARK = new JsonArrayProperties("ms.watermark");
   JsonArrayProperties MSTAGE_WATERMARK_GROUPS = new JsonArrayProperties("ms.watermark.groups");
+
+  // default: 0, minimum: 0, maximum: -
   LongProperties MSTAGE_WORKUNIT_STARTTIME_KEY = new LongProperties("ms.work.unit.scheduling.starttime");
+
+  // default: 0, minimum: 0, maximum: -
   LongProperties MSTAGE_WORK_UNIT_MIN_RECORDS = new LongProperties("ms.work.unit.min.records");
+
+  // default: 0, minimum: 0, maximum: -
   LongProperties MSTAGE_WORK_UNIT_MIN_UNITS = new LongProperties("ms.work.unit.min.units");
+
+  // default: 0, minimum: 0, maximum: -
   IntegerProperties MSTAGE_WORK_UNIT_PACING_SECONDS = new IntegerProperties("ms.work.unit.pacing.seconds") {
     @Override
     public Long getMillis(State state) {
@@ -193,22 +222,9 @@ public interface PropertyCollection {
     }
   };
 
-  // Default value is 100
+  // default: 100, minimum: 0, maximum: 10,000
   // 0 is interpreted as the default value
-  // Actual should be less than 10,000
-  IntegerProperties MSTAGE_WORK_UNIT_PARALLELISM_MAX = new IntegerProperties("ms.work.unit.parallelism.max", 100) {
-    @Override
-    public boolean isValid(State state) {
-      if (!super.isBlank(state)) {
-        if (!super.isValid(state)) {
-          return false;
-        }
-        int value = state.getPropAsInt(getConfig());
-        return value >= 0 && value <= 10000;
-      }
-      return true;
-    }
-
+  IntegerProperties MSTAGE_WORK_UNIT_PARALLELISM_MAX = new IntegerProperties("ms.work.unit.parallelism.max", 10000, 0, 100) {
     @Override
     protected Integer getValidNonblankWithDefault(State state) {
       int value = super.getValidNonblankWithDefault(state);

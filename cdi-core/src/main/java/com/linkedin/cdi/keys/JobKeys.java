@@ -254,8 +254,7 @@ public class JobKeys {
     boolean allValid = true;
     for (MultistageProperties p: allProperties) {
       if (!p.isBlank(state) && !p.isValid(state))  {
-        LOG.error(String.format(EXCEPTION_INCORRECT_CONFIGURATION,
-            p.getConfig(), state.getProp(p.getConfig())));
+        LOG.error(p.alertMessage(state));
         allValid = false;
       }
     }

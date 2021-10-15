@@ -49,14 +49,13 @@ public class BooleanProperties extends MultistageProperties<Boolean> {
     if (!isBlank(state)) try {
       String value = state.getProp(getConfig());
       if (!value.toLowerCase().matches("true|false")) {
-        LOG.error(String.format(EXCEPTION_INCORRECT_CONFIGURATION, getConfig(), state.getProp(getConfig())));
+        LOG.error(alertMessage(state));
         return false;
       }
       // Properly formed Boolean string is valid
       Boolean.parseBoolean(state.getProp(getConfig()));
     } catch (Exception e) {
-      LOG.error(String.format(EXCEPTION_INCORRECT_CONFIGURATION, getConfig(), state.getProp(getConfig())),
-          e.getMessage());
+      LOG.error(alertMessage(state), e.getMessage());
       return false;
     }
     return true;

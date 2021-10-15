@@ -18,12 +18,23 @@ public abstract class MultistageProperties<T> {
   private final String config;
   private final Class<T> className;
   private final T defaultValue;
+  private final T maxValue;
+  private final T minValue;
 
-  public String getConfig() {
+  final public String getDocUrl() {
+    return DOC_BASE_URL + "/parameters/" + getConfig() + ".md";
+  }
+
+  final public String alertMessage(State state) {
+    return String.format(EXCEPTION_INCORRECT_CONFIGURATION,
+        getConfig(), state.getProp(getConfig(), StringUtils.EMPTY), getDocUrl());
+  }
+
+  final public String getConfig() {
     return config;
   }
 
-  public Class<?> getClassName() {
+  final public Class<?> getClassName() {
     return className;
   }
 
@@ -31,10 +42,28 @@ public abstract class MultistageProperties<T> {
     return defaultValue;
   }
 
+  public T getMaxValue() {
+    return maxValue;
+  }
+
+  public T getMinValue() {
+    return minValue;
+  }
+
   MultistageProperties(String config, Class<T> className, T defaultValue) {
     this.config = config;
     this.className = className;
     this.defaultValue = defaultValue;
+    this.maxValue = null;
+    this.minValue = null;
+  }
+
+  MultistageProperties(String config, Class<T> className, T maxValue, T minValue, T defaultValue) {
+    this.config = config;
+    this.className = className;
+    this.defaultValue = defaultValue;
+    this.maxValue = maxValue;
+    this.minValue = minValue;
   }
 
   @Override

@@ -19,11 +19,19 @@ public class IntegerProperties extends MultistageProperties<Integer> {
   private static final Logger LOG = LoggerFactory.getLogger(IntegerProperties.class);
 
   IntegerProperties(String config) {
-    super(config, Integer.class, 0);
+    super(config, Integer.class, Integer.MAX_VALUE, 0, 0);
   }
 
-  IntegerProperties(String config, Integer defaultValue) {
-    super(config, Integer.class, defaultValue);
+  IntegerProperties(String config, Integer maxValue) {
+    super(config, Integer.class, maxValue, 0, 0);
+  }
+
+  IntegerProperties(String config, Integer maxValue, Integer minValue) {
+    super(config, Integer.class, maxValue, minValue, 0);
+  }
+
+  IntegerProperties(String config, Integer maxValue, Integer minValue, Integer defaultValue) {
+    super(config, Integer.class, maxValue, minValue, defaultValue);
   }
 
   /**
@@ -51,10 +59,10 @@ public class IntegerProperties extends MultistageProperties<Integer> {
   public boolean isValid(State state) {
     if (!isBlank(state)) try {
       // Properly formed Integer string is valid
-      Integer.parseInt(state.getProp(getConfig()));
+      int value = Integer.parseInt(state.getProp(getConfig()));
+      return value >= getMinValue() && value <= getMaxValue();
     } catch (Exception e) {
-      LOG.error(String.format(EXCEPTION_INCORRECT_CONFIGURATION, getConfig(), state.getProp(getConfig())),
-          e.getMessage());
+      LOG.error(alertMessage(state), e.getMessage());
       return false;
     }
     return true;
