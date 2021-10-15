@@ -4,9 +4,9 @@
 
 **Type**: integer
 
-**Default value**: 500
+**Default value**: 100 (value 0 will also be interpreted as 100)
 
-**Max value**: 10,000 (value 0 will also be interpreted as 10,000)
+**Max value**: 10,000 
 
 **Related**:
  

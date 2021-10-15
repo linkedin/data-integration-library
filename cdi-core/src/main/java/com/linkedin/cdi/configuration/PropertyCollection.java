@@ -193,26 +193,26 @@ public interface PropertyCollection {
     }
   };
 
-  // Default value is 500
-  // 0 means max 10,000
+  // Default value is 100
+  // 0 is interpreted as the default value
   // Actual should be less than 10,000
-  IntegerProperties MSTAGE_WORK_UNIT_PARALLELISM_MAX = new IntegerProperties("ms.work.unit.parallelism.max", 500) {
+  IntegerProperties MSTAGE_WORK_UNIT_PARALLELISM_MAX = new IntegerProperties("ms.work.unit.parallelism.max", 100) {
     @Override
     public boolean isValid(State state) {
       if (!super.isBlank(state)) {
         if (!super.isValid(state)) {
           return false;
         }
-        Integer parallelMax = state.getPropAsInt(getConfig());
-        return parallelMax >= 0 && parallelMax <= 10000;
+        int value = state.getPropAsInt(getConfig());
+        return value >= 0 && value <= 10000;
       }
       return true;
     }
 
     @Override
     protected Integer getValidNonblankWithDefault(State state) {
-      int value = super.getValidNonblankWithDefault(state).intValue();
-      return value <= 0 || value > 10000 ? 10000 : value;
+      int value = super.getValidNonblankWithDefault(state);
+      return value > 10000 ? 10000 : value <= 0 ? getDefaultValue() : value;
     }
   };
 
