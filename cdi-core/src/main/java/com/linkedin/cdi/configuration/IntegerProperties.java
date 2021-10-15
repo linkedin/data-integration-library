@@ -88,7 +88,8 @@ public class IntegerProperties extends MultistageProperties<Integer> {
    */
   protected Integer getValidNonblankWithDefault(State state) {
     if (isValidNonblank(state)) {
-      return Integer.parseInt(state.getProp(getConfig()));
+      int value = Integer.parseInt(state.getProp(getConfig()));
+      return value > getMaxValue() ? getMaxValue() : value < getMinValue() ? getMinValue() : value;
     }
     return getDefaultValue();
   }

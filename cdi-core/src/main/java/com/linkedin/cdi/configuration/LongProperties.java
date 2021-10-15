@@ -89,7 +89,8 @@ public class LongProperties extends MultistageProperties<Long> {
    */
   protected Long getValidNonblankWithDefault(State state) {
     if (isValidNonblank(state)) {
-      return Long.parseLong(state.getProp(getConfig()));
+      long value = Long.parseLong(state.getProp(getConfig()));
+      return value > getMaxValue() ? getMaxValue() : value < getMinValue() ? getMinValue() : value;
     }
     return getDefaultValue();
   }
