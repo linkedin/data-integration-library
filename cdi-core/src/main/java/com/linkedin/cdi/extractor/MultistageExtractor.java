@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.connection.MultistageConnection;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.filter.JsonSchemaBasedFilter;
@@ -935,14 +934,6 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
     updatedVariableValues.addProperty(ParameterTypes.PAGENO.toString(), wuStatus.getPageNumber());
 
     return updatedVariableValues;
-  }
-
-  protected void logUsage(State state) {
-    LOG.info("Checking essential (not always mandatory) parameters...");
-    LOG.info("Values can be default values for the specific type if the property is not configured");
-    for (MultistageProperties p : allProperties) {
-      LOG.info(p.info(state));
-    }
   }
 
   /**
