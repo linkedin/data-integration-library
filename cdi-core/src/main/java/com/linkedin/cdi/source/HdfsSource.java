@@ -40,7 +40,6 @@ public class HdfsSource extends MultistageSource<Schema, GenericRecord> {
 
   protected void initialize(State state) {
     super.initialize(state);
-    hdfsKeys.logUsage(state);
     hdfsKeys.logDebugAll();
   }
 

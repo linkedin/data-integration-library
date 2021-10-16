@@ -49,7 +49,6 @@ public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
   }
   protected void initialize(State state) {
     super.initialize(state);
-    s3SourceV2Keys.logUsage(state);
 
     URL url = null;
     try {

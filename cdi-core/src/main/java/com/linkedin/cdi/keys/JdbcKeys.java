@@ -4,11 +4,7 @@
 
 package com.linkedin.cdi.keys;
 
-import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import java.util.List;
-import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,11 +18,6 @@ import static com.linkedin.cdi.configuration.PropertyCollection.*;
  */
 public class JdbcKeys extends JobKeys {
   private static final Logger LOG = LoggerFactory.getLogger(JdbcKeys.class);
-  final private static List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      MSTAGE_JDBC_STATEMENT,
-      SOURCE_CONN_USERNAME,
-      SOURCE_CONN_PASSWORD);
-
   private String jdbcStatement = null;
   private JsonObject initialParameterValues = new JsonObject();
   private String separator = MSTAGE_CSV_SEPARATOR.getDefaultValue();
@@ -40,14 +31,6 @@ public class JdbcKeys extends JobKeys {
     LOG.debug("These are values in JdbcSource");
     LOG.debug("JDBC statement: {}", jdbcStatement);
     LOG.debug("Initial values of dynamic parameters: {}", initialParameterValues);
-  }
-
-  @Override
-  public void logUsage(State state) {
-    super.logUsage(state);
-    for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.get(state));
-    }
   }
 
   public String getJdbcStatement() {

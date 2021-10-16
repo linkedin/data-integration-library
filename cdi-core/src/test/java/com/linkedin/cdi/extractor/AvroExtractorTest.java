@@ -81,7 +81,7 @@ public class AvroExtractorTest {
 
     List<WorkUnit> wus = new MultistageSource().getWorkunits(new SourceState());
     workUnit = wus.get(0);
-    workUnit.setProp(DATASET_URN_KEY.getConfig(), DATA_SET_URN_KEY);
+    workUnit.setProp(DATASET_URN.getConfig(), DATA_SET_URN_KEY);
 
     jobKeys = mock(JobKeys.class);
     workUnitStatus = mock(WorkUnitStatus.class);
@@ -94,7 +94,7 @@ public class AvroExtractorTest {
     // mock for state
     when(state.getWorkunit()).thenReturn(workUnit);
     when(state.getProp(MSTAGE_ACTIVATION_PROPERTY.getConfig(), new JsonObject().toString())).thenReturn(ACTIVATION_PROP);
-    when(state.getPropAsLong(MSTAGE_WORKUNIT_STARTTIME_KEY.getConfig(), 0L)).thenReturn(WORK_UNIT_START_TIME_KEY);
+    when(state.getPropAsLong(MSTAGE_WORK_UNIT_SCHEDULING_STARTTIME.getConfig(), 0L)).thenReturn(WORK_UNIT_START_TIME_KEY);
     when(state.getProp(DATA_PUBLISHER_FINAL_DIR.getConfig(), StringUtils.EMPTY)).thenReturn(DATA_FINAL_DIR);
     when(state.getProp(MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION.getConfig(), StringUtils.EMPTY)).thenReturn(FILE_PERMISSION);
     Extract extract = new Extract(Extract.TableType.SNAPSHOT_ONLY, "com.linkedin.test", "test");

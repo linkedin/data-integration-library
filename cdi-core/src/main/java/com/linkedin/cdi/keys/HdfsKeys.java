@@ -4,10 +4,6 @@
 
 package com.linkedin.cdi.keys;
 
-import com.google.common.collect.Lists;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import java.util.List;
-import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,15 +16,4 @@ import org.slf4j.LoggerFactory;
  */
 public class HdfsKeys extends JobKeys {
   private static final Logger LOG = LoggerFactory.getLogger(HdfsKeys.class);
-  final private static List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      // HDFS essential parameters
-  );
-
-  @Override
-  public void logUsage(State state) {
-    super.logUsage(state);
-    for (MultistageProperties p : ESSENTIAL_PARAMETERS) {
-      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.get(state));
-    }
-  }
 }

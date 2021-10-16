@@ -105,7 +105,17 @@ public interface PropertyCollection {
     }
   };
 
-  BooleanProperties MSTAGE_ENABLE_CLEANSING = new BooleanProperties("ms.enable.cleansing", Boolean.TRUE);
+  /**
+   * Deprecated
+   * @see #MSTAGE_SCHEMA_CLEANSING
+   */
+  BooleanProperties MSTAGE_ENABLE_CLEANSING = new BooleanProperties("ms.enable.cleansing", Boolean.TRUE) {
+    @Override
+    public boolean isDeprecated() {
+      return true;
+    }
+  };
+
   BooleanProperties MSTAGE_ENABLE_DYNAMIC_FULL_LOAD = new BooleanProperties("ms.enable.dynamic.full.load", Boolean.TRUE);
   BooleanProperties MSTAGE_ENABLE_SCHEMA_BASED_FILTERING = new BooleanProperties("ms.enable.schema.based.filtering", Boolean.TRUE);
   JsonArrayProperties MSTAGE_ENCRYPTION_FIELDS = new JsonArrayProperties("ms.encryption.fields");
@@ -137,7 +147,7 @@ public interface PropertyCollection {
   StringProperties MSTAGE_KAFKA_TOPIC_NAME = new StringProperties("ms.kafka.audit.topic.name");
 
   // default: 500, minimum: 1, maximum: -
-  LongProperties MSTAGE_NORMALIZER_BATCH_SIZE = new LongProperties("ms.normalizer.batch.size", Long.MAX_VALUE, 1L, 500L);
+  LongProperties MSTAGE_NORMALIZER_BATCH_SIZE = new LongProperties("ms.normalizer.batch.size", 500L, Long.MAX_VALUE, 1L);
 
   JsonArrayProperties MSTAGE_OUTPUT_SCHEMA = new JsonArrayProperties("ms.output.schema");
   JsonObjectProperties MSTAGE_PAGINATION = new JsonObjectProperties("ms.pagination");
@@ -168,9 +178,9 @@ public interface PropertyCollection {
       };
 
   // default: 1000, minimum: 1, maximum: -
-  IntegerProperties MSTAGE_S3_LIST_MAX_KEYS = new IntegerProperties("ms.s3.list.max.keys", Integer.MAX_VALUE, 1, 1000);
+  IntegerProperties MSTAGE_S3_LIST_MAX_KEYS = new IntegerProperties("ms.s3.list.max.keys", 1000, Integer.MAX_VALUE, 1);
 
-  JsonObjectProperties MSTAGE_SCHEMA_CLENSING = new JsonObjectProperties("ms.schema.cleansing");
+  JsonObjectProperties MSTAGE_SCHEMA_CLEANSING = new JsonObjectProperties("ms.schema.cleansing");
   JsonArrayProperties MSTAGE_SECONDARY_INPUT = new JsonArrayProperties("ms.secondary.input");
   JsonObjectProperties MSTAGE_SESSION_KEY_FIELD = new JsonObjectProperties("ms.session.key.field");
   StringProperties MSTAGE_SOURCE_DATA_CHARACTER_SET = new StringProperties("ms.source.data.character.set",
@@ -195,7 +205,7 @@ public interface PropertyCollection {
       };
 
   // default: 600 second, minimum: 0 second, maximum: 24 hours
-  LongProperties MSTAGE_WAIT_TIMEOUT_SECONDS = new LongProperties("ms.wait.timeout.seconds", 24 * 3600L, 0L, 600L) {
+  LongProperties MSTAGE_WAIT_TIMEOUT_SECONDS = new LongProperties("ms.wait.timeout.seconds", 600L, 24 * 3600L, 0L) {
     @Override
     public Long getMillis(State state) {
       return 1000L * this.get(state);
@@ -206,7 +216,7 @@ public interface PropertyCollection {
   JsonArrayProperties MSTAGE_WATERMARK_GROUPS = new JsonArrayProperties("ms.watermark.groups");
 
   // default: 0, minimum: 0, maximum: -
-  LongProperties MSTAGE_WORKUNIT_STARTTIME_KEY = new LongProperties("ms.work.unit.scheduling.starttime");
+  LongProperties MSTAGE_WORK_UNIT_SCHEDULING_STARTTIME = new LongProperties("ms.work.unit.scheduling.starttime");
 
   // default: 0, minimum: 0, maximum: -
   LongProperties MSTAGE_WORK_UNIT_MIN_RECORDS = new LongProperties("ms.work.unit.min.records");
@@ -222,13 +232,12 @@ public interface PropertyCollection {
     }
   };
 
-  // default: 100, minimum: 0, maximum: 10,000
-  // 0 is interpreted as the default value
-  IntegerProperties MSTAGE_WORK_UNIT_PARALLELISM_MAX = new IntegerProperties("ms.work.unit.parallelism.max", 10000, 0, 100) {
+  // default: 100, minimum: 0, maximum: 1000, 0 = default value
+  IntegerProperties MSTAGE_WORK_UNIT_PARALLELISM_MAX = new IntegerProperties("ms.work.unit.parallelism.max", 100, 1000, 0) {
     @Override
     protected Integer getValidNonblankWithDefault(State state) {
       int value = super.getValidNonblankWithDefault(state);
-      return value > 10000 ? 10000 : value <= 0 ? getDefaultValue() : value;
+      return value == 0 ? getDefaultValue() : value;
     }
   };
 
@@ -237,26 +246,32 @@ public interface PropertyCollection {
   StringProperties MSTAGE_WORK_UNIT_PARTITION = new StringProperties("ms.work.unit.partition", "none");
   StringProperties CONVERTER_CLASSES = new StringProperties("converter.classes");
   StringProperties DATA_PUBLISHER_FINAL_DIR = new StringProperties("data.publisher.final.dir");
-  StringProperties DATASET_URN_KEY = new StringProperties("dataset.urn");
+  StringProperties DATASET_URN = new StringProperties("dataset.urn");
   StringProperties ENCRYPT_KEY_LOC = new StringProperties("encrypt.key.loc");
   StringProperties EXTRACTOR_CLASSES = new StringProperties("extractor.class");
   // add a default value of FALSE to Gobblin configuration extract.is.full
   BooleanProperties EXTRACT_IS_FULL = new BooleanProperties("extract.is.full", Boolean.FALSE);
-  StringProperties EXTRACT_NAMESPACE_NAME_KEY = new StringProperties("extract.namespace");
-  StringProperties EXTRACT_TABLE_NAME_KEY = new StringProperties("extract.table.name");
-  StringProperties EXTRACT_TABLE_TYPE_KEY = new StringProperties("extract.table.type", "SNAPSHOT_ONLY") {
+  StringProperties EXTRACT_NAMESPACE = new StringProperties("extract.namespace");
+  StringProperties EXTRACT_TABLE_NAME = new StringProperties("extract.table.name");
+  StringProperties EXTRACT_TABLE_TYPE = new StringProperties("extract.table.type", "SNAPSHOT_ONLY") {
     @Override
     protected String getValidNonblankWithDefault(State state) {
       return super.getValidNonblankWithDefault(state).toUpperCase();
     }
   };
 
+  StringProperties JOB_DIR = new StringProperties("job.dir");
+  StringProperties JOB_NAME = new StringProperties("job.name");
   StringProperties SOURCE_CLASS = new StringProperties("source.class");
   StringProperties SOURCE_CONN_USERNAME = new StringProperties("source.conn.username");
   StringProperties SOURCE_CONN_PASSWORD = new StringProperties("source.conn.password");
   StringProperties SOURCE_CONN_USE_PROXY_URL = new StringProperties("source.conn.use.proxy.url");
   StringProperties SOURCE_CONN_USE_PROXY_PORT = new StringProperties("source.conn.use.proxy.port");
+  StringProperties STATE_STORE_DIR = new StringProperties("state.store.dir");
   BooleanProperties STATE_STORE_ENABLED = new BooleanProperties("state.store.enabled", Boolean.TRUE);
+  StringProperties STATE_STORE_TYPE = new StringProperties("state.store.type");
+  IntegerProperties TASK_MAXRETRIES = new IntegerProperties("task.maxretries", 4);
+  IntegerProperties TASKEXECUTOR_THREADPOOL_SIZE = new IntegerProperties("taskexecutor.threadpool.size", 10);
 
   List<MultistageProperties> allProperties = Lists.newArrayList(
       MSTAGE_ABSTINENT_PERIOD_DAYS,
@@ -307,7 +322,7 @@ public interface PropertyCollection {
       MSTAGE_PAYLOAD_PROPERTY,
       MSTAGE_RETENTION,
       MSTAGE_S3_LIST_MAX_KEYS,
-      MSTAGE_SCHEMA_CLENSING,
+      MSTAGE_SCHEMA_CLEANSING,
       MSTAGE_SECONDARY_INPUT,
       MSTAGE_SESSION_KEY_FIELD,
       MSTAGE_SOURCE_DATA_CHARACTER_SET,
@@ -322,7 +337,7 @@ public interface PropertyCollection {
       MSTAGE_WAIT_TIMEOUT_SECONDS,
       MSTAGE_WATERMARK,
       MSTAGE_WATERMARK_GROUPS,
-      MSTAGE_WORKUNIT_STARTTIME_KEY,
+      MSTAGE_WORK_UNIT_SCHEDULING_STARTTIME,
       MSTAGE_WORK_UNIT_MIN_RECORDS,
       MSTAGE_WORK_UNIT_MIN_UNITS,
       MSTAGE_WORK_UNIT_PACING_SECONDS,
@@ -331,18 +346,24 @@ public interface PropertyCollection {
       MSTAGE_WORK_UNIT_PARTITION,
       CONVERTER_CLASSES,
       DATA_PUBLISHER_FINAL_DIR,
-      DATASET_URN_KEY,
+      DATASET_URN,
       ENCRYPT_KEY_LOC,
       EXTRACTOR_CLASSES,
       EXTRACT_IS_FULL,
-      EXTRACT_NAMESPACE_NAME_KEY,
-      EXTRACT_TABLE_NAME_KEY,
-      EXTRACT_TABLE_TYPE_KEY,
+      EXTRACT_NAMESPACE,
+      EXTRACT_TABLE_NAME,
+      EXTRACT_TABLE_TYPE,
+      JOB_DIR,
+      JOB_NAME,
       SOURCE_CLASS,
       SOURCE_CONN_USERNAME,
       SOURCE_CONN_PASSWORD,
       SOURCE_CONN_USE_PROXY_URL,
       SOURCE_CONN_USE_PROXY_PORT,
-      STATE_STORE_ENABLED
+      STATE_STORE_DIR,
+      STATE_STORE_ENABLED,
+      STATE_STORE_TYPE,
+      TASK_MAXRETRIES,
+      TASKEXECUTOR_THREADPOOL_SIZE
   );
 }

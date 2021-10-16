@@ -9,8 +9,6 @@ import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.linkedin.cdi.configuration.StaticConstants.*;
-
 
 /**
  * A Integer type of property has default defaultValue of 0
@@ -18,20 +16,43 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
 public class IntegerProperties extends MultistageProperties<Integer> {
   private static final Logger LOG = LoggerFactory.getLogger(IntegerProperties.class);
 
+
+  /**
+   * Constructor with implicit default, max, and min
+   * @param config the property name
+   */
   IntegerProperties(String config) {
-    super(config, Integer.class, Integer.MAX_VALUE, 0, 0);
+    super(config, Integer.class, 0, Integer.MAX_VALUE, 0);
   }
 
-  IntegerProperties(String config, Integer maxValue) {
-    super(config, Integer.class, maxValue, 0, 0);
+  /**
+   * Constructor with explicit default, and implicit max and min
+   * @param config the property name
+   * @param defaultValue default value
+   */
+  IntegerProperties(String config, Integer defaultValue) {
+    super(config, Integer.class, defaultValue, Integer.MAX_VALUE, 0);
   }
 
-  IntegerProperties(String config, Integer maxValue, Integer minValue) {
-    super(config, Integer.class, maxValue, minValue, 0);
+  /**
+   * Constructor with explicit default and max, and implicit min
+   * @param config the property name
+   * @param defaultValue default value
+   * @param maxValue max value
+   */
+  IntegerProperties(String config, Integer defaultValue, Integer maxValue) {
+    super(config, Integer.class, defaultValue, maxValue, 0);
   }
 
-  IntegerProperties(String config, Integer maxValue, Integer minValue, Integer defaultValue) {
-    super(config, Integer.class, maxValue, minValue, defaultValue);
+  /**
+   * Constructor with explicit default, max and min
+   * @param config the property name
+   * @param defaultValue default value
+   * @param maxValue max value
+   * @param minValue min value
+   */
+  IntegerProperties(String config, Integer defaultValue, Integer maxValue, Integer minValue) {
+    super(config, Integer.class, defaultValue, maxValue, minValue);
   }
 
   /**
@@ -62,7 +83,7 @@ public class IntegerProperties extends MultistageProperties<Integer> {
       int value = Integer.parseInt(state.getProp(getConfig()));
       return value >= getMinValue() && value <= getMaxValue();
     } catch (Exception e) {
-      LOG.error(alertMessage(state), e.getMessage());
+      LOG.error(errorMessage(state), e.getMessage());
       return false;
     }
     return true;

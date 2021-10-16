@@ -30,11 +30,11 @@ import static com.linkedin.cdi.configuration.PropertyCollection.*;
  */
 public class ExtractorKeys {
   private static final Logger LOG = LoggerFactory.getLogger(ExtractorKeys.class);
-  final static private List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      EXTRACT_TABLE_NAME_KEY,
+  final static private List<MultistageProperties<?>> WORK_UNIT_PARAMETERS = Lists.newArrayList(
       MSTAGE_ACTIVATION_PROPERTY,
-      MSTAGE_PARAMETERS
-  );
+      MSTAGE_PAYLOAD_PROPERTY,
+      MSTAGE_WATERMARK_GROUPS,
+      MSTAGE_WORK_UNIT_SCHEDULING_STARTTIME);
 
   private JsonObject activationParameters = new JsonObject();
   private long startTime = DateTime.now().getMillis();
@@ -54,7 +54,7 @@ public class ExtractorKeys {
 
   public void logDebugAll(WorkUnit workUnit) {
     LOG.debug("These are values in MultistageExtractor regarding to Work Unit: {}",
-        workUnit == null ? "testing" : workUnit.getProp(DATASET_URN_KEY.toString()));
+        workUnit == null ? "testing" : workUnit.getProp(DATASET_URN.toString()));
     LOG.debug("Activation parameters: {}", activationParameters);
     LOG.debug("Payload size: {}", payloads.size());
     LOG.debug("Starting time: {}", startTime);
@@ -67,9 +67,13 @@ public class ExtractorKeys {
     LOG.debug("Total rows processed: {}", processedCount);
   }
 
+  /**
+   * Log work unit specific property values
+   * @param state work unit states
+   */
   public void logUsage(State state) {
-    for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.get(state));
+    for (MultistageProperties<?> p: WORK_UNIT_PARAMETERS) {
+      LOG.info(p.info(state));
     }
   }
 

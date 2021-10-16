@@ -9,8 +9,6 @@ import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.linkedin.cdi.configuration.StaticConstants.*;
-
 
 /**
  * A Boolean type of property has no default defaultValue, and each property
@@ -19,6 +17,11 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
 public class BooleanProperties extends MultistageProperties<Boolean> {
   private static final Logger LOG = LoggerFactory.getLogger(BooleanProperties.class);
 
+  /**
+   * Constructor with explicit default value
+   * @param config property name
+   * @param defaultValue default value
+   */
   BooleanProperties(String config, Boolean defaultValue) {
     super(config, Boolean.class, defaultValue);
   }
@@ -49,13 +52,13 @@ public class BooleanProperties extends MultistageProperties<Boolean> {
     if (!isBlank(state)) try {
       String value = state.getProp(getConfig());
       if (!value.toLowerCase().matches("true|false")) {
-        LOG.error(alertMessage(state));
+        LOG.error(errorMessage(state));
         return false;
       }
       // Properly formed Boolean string is valid
       Boolean.parseBoolean(state.getProp(getConfig()));
     } catch (Exception e) {
-      LOG.error(alertMessage(state), e.getMessage());
+      LOG.error(errorMessage(state), e.getMessage());
       return false;
     }
     return true;

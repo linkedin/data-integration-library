@@ -19,10 +19,19 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
 public class JsonObjectProperties extends MultistageProperties<JsonObject> {
   private static final Logger LOG = LoggerFactory.getLogger(JsonObjectProperties.class);
 
+  /**
+   * Constructor with implicit default value
+   * @param config property name
+   */
   JsonObjectProperties(String config) {
     super(config, JsonObject.class, new JsonObject());
   }
 
+  /**
+   * Constructor with explicit default value
+   * @param config property name
+   * @param defaultValue default value
+   */
   JsonObjectProperties(String config, JsonObject defaultValue) {
     super(config, JsonObject.class, defaultValue);
   }
@@ -67,7 +76,7 @@ public class JsonObjectProperties extends MultistageProperties<JsonObject> {
       // Properly formed JsonObject string is valid
       GSON.fromJson(state.getProp(getConfig()), JsonObject.class);
     } catch (Exception e) {
-      LOG.error(alertMessage(state), e.getMessage());
+      LOG.error(errorMessage(state), e.getMessage());
       return false;
     }
     return true;

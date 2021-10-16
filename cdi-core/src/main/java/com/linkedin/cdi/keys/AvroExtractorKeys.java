@@ -4,13 +4,9 @@
 
 package com.linkedin.cdi.keys;
 
-import com.google.common.collect.Lists;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import java.util.List;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileStream;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.source.workunit.WorkUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,10 +69,6 @@ public class AvroExtractorKeys extends ExtractorKeys {
   }
 
   private static final Logger LOG = LoggerFactory.getLogger(AvroExtractorKeys.class);
-  final private static List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      MSTAGE_DATA_FIELD,
-      MSTAGE_TOTAL_COUNT_FIELD);
-
   private DataFileStream<GenericRecord> avroRecordIterator = null;
   private long totalCount;
   // TODO: move this to ExtractorKeys if pagination is needed
@@ -95,15 +87,7 @@ public class AvroExtractorKeys extends ExtractorKeys {
   public void logDebugAll(WorkUnit workUnit) {
     super.logDebugAll(workUnit);
     LOG.debug("These are values of JsonExtractor regarding to Work Unit: {}",
-        workUnit == null ? "testing" : workUnit.getProp(DATASET_URN_KEY.toString()));
+        workUnit == null ? "testing" : workUnit.getProp(DATASET_URN.toString()));
     LOG.debug("Total rows expected or processed: {}", totalCount);
-  }
-
-  @Override
-  public void logUsage(State state) {
-    super.logUsage(state);
-    for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.get(state));
-    }
   }
 }

@@ -62,7 +62,6 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
 
   protected void initialize(State state) {
     super.initialize(state);
-    httpSourceKeys.logUsage(state);
     httpSourceKeys.setHttpRequestHeaders(getRequestHeader(state));
     httpSourceKeys.setHttpRequestMethod(MSTAGE_HTTP_REQUEST_METHOD.get(state));
     httpSourceKeys.setAuthentication(MSTAGE_AUTHENTICATION.get(state));

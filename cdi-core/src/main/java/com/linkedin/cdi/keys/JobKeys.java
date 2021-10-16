@@ -51,37 +51,6 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
 public class JobKeys {
   private static final Logger LOG = LoggerFactory.getLogger(JobKeys.class);
   final static public Gson GSON = new Gson();
-  final static public List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      SOURCE_CLASS,
-      EXTRACTOR_CLASSES,
-      CONVERTER_CLASSES,
-      EXTRACT_IS_FULL,
-      EXTRACT_TABLE_TYPE_KEY,
-      STATE_STORE_ENABLED,
-      MSTAGE_ABSTINENT_PERIOD_DAYS,
-      MSTAGE_DERIVED_FIELDS,
-      MSTAGE_ENABLE_CLEANSING,
-      MSTAGE_ENABLE_DYNAMIC_FULL_LOAD,
-      MSTAGE_ENABLE_SCHEMA_BASED_FILTERING,
-      MSTAGE_ENCRYPTION_FIELDS,
-      MSTAGE_GRACE_PERIOD_DAYS,
-      MSTAGE_OUTPUT_SCHEMA,
-      MSTAGE_PAGINATION,
-      MSTAGE_PARAMETERS,
-      MSTAGE_RETENTION,
-      MSTAGE_SECONDARY_INPUT,
-      MSTAGE_SESSION_KEY_FIELD,
-      MSTAGE_SOURCE_DATA_CHARACTER_SET,
-      MSTAGE_SOURCE_SCHEMA_URN,
-      MSTAGE_SOURCE_URI,
-      MSTAGE_TOTAL_COUNT_FIELD,
-      MSTAGE_WAIT_TIMEOUT_SECONDS,
-      MSTAGE_WORK_UNIT_MIN_RECORDS,
-      MSTAGE_WORK_UNIT_MIN_UNITS,
-      MSTAGE_WORK_UNIT_PACING_SECONDS,
-      MSTAGE_WORK_UNIT_PARALLELISM_MAX,
-      MSTAGE_WORK_UNIT_PARTIAL_PARTITION,
-      MSTAGE_WATERMARK);
   final private static int RETRY_DELAY_IN_SEC_DEFAULT = 300;
   final private static int RETRY_COUNT_DEFAULT = 3;
   final private static String ITEMS_KEY = "items";
@@ -142,7 +111,7 @@ public class JobKeys {
     setMinWorkUnits(MSTAGE_WORK_UNIT_MIN_UNITS.get(state));
 
     setEnableCleansing(MSTAGE_ENABLE_CLEANSING.get(state));
-    JsonObject schemaCleansing = MSTAGE_SCHEMA_CLENSING.get(state);
+    JsonObject schemaCleansing = MSTAGE_SCHEMA_CLEANSING.get(state);
     if (schemaCleansing.has("enabled")) {
       setEnableCleansing(Boolean.parseBoolean(schemaCleansing.get("enabled").getAsString()));
       if (enableCleansing && schemaCleansing.has("pattern")) {
@@ -159,17 +128,14 @@ public class JobKeys {
     setIsPartialPartition(MSTAGE_WORK_UNIT_PARTIAL_PARTITION.get(state));
     setWorkUnitPartitionType(parsePartitionType(state));
     setWatermarkDefinition(MSTAGE_WATERMARK.get(state));
-    Map<String, Long> retry = parseSecondaryInputRetry(
-        MSTAGE_SECONDARY_INPUT.get(state));
+    Map<String, Long> retry = parseSecondaryInputRetry(MSTAGE_SECONDARY_INPUT.get(state));
     setRetryDelayInSec(retry.get(KEY_WORD_RETRY_DELAY_IN_SEC));
     setRetryCount(retry.get(KEY_WORD_RETRY_COUNT));
     setSecondaryInputs(MSTAGE_SECONDARY_INPUT.get(state));
     setIsSecondaryAuthenticationEnabled(checkSecondaryAuthenticationEnabled());
 
-    setSourceSchema(readSourceSchemaFromUrn(state,
-        MSTAGE_SOURCE_SCHEMA_URN.get(state)));
-    setTargetSchema(readTargetSchemaFromUrn(state,
-        MSTAGE_TARGET_SCHEMA_URN.get(state)));
+    setSourceSchema(readSourceSchemaFromUrn(state, MSTAGE_SOURCE_SCHEMA_URN.get(state)));
+    setTargetSchema(readTargetSchemaFromUrn(state, MSTAGE_TARGET_SCHEMA_URN.get(state)));
 
     // closing out schema reader if it was created because of reading
     // output schema or target schema.
@@ -252,9 +218,9 @@ public class JobKeys {
 
     // Validate all job parameters
     boolean allValid = true;
-    for (MultistageProperties p: allProperties) {
+    for (MultistageProperties<?> p: allProperties) {
       if (!p.isBlank(state) && !p.isValid(state))  {
-        LOG.error(p.alertMessage(state));
+        LOG.error(p.errorMessage(state));
         allValid = false;
       }
     }
@@ -345,8 +311,8 @@ public class JobKeys {
   }
 
   public void logUsage(State state) {
-    for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.get(state));
+    for (MultistageProperties<?> p: allProperties) {
+      LOG.info(p.info(state));
     }
   }
 

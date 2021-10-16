@@ -4,18 +4,14 @@
 
 package com.linkedin.cdi.keys;
 
-import com.google.common.collect.Lists;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.source.workunit.WorkUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +26,6 @@ import static com.linkedin.cdi.configuration.PropertyCollection.*;
  */
 public class CsvExtractorKeys extends ExtractorKeys {
   private static final Logger LOG = LoggerFactory.getLogger(CsvExtractorKeys.class);
-  final private static List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      MSTAGE_CSV_COLUMN_HEADER,
-      MSTAGE_CSV_SEPARATOR,
-      MSTAGE_CSV_SKIP_LINES,
-      MSTAGE_CSV_QUOTE_CHARACTER,
-      MSTAGE_CSV_ESCAPE_CHARACTER);
-
   private Iterator<String[]> csvIterator = null;
   private long currentPageNumber = 0;
   private Boolean columnHeader = false;
@@ -63,17 +52,9 @@ public class CsvExtractorKeys extends ExtractorKeys {
   public void logDebugAll(WorkUnit workUnit) {
     super.logDebugAll(workUnit);
     LOG.debug("These are values of CsvExtractor regarding to Work Unit: {}",
-        workUnit == null ? "testing" : workUnit.getProp(DATASET_URN_KEY.toString()));
+        workUnit == null ? "testing" : workUnit.getProp(DATASET_URN.toString()));
     LOG.debug("Is column header present: {}", columnHeader);
     LOG.debug("Total rows to skip: {}", rowsToSkip);
-  }
-
-  @Override
-  public void logUsage(State state) {
-    super.logUsage(state);
-    for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.get(state));
-    }
   }
 
   public Iterator<String[]> getCsvIterator() {

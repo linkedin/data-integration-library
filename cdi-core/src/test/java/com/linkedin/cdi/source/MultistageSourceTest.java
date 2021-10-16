@@ -154,7 +154,7 @@ public class MultistageSourceTest {
     workUnit.setProp("watermark.unit", "NONE");
     WorkUnit workUnit1 = (WorkUnit) source.getWorkunits(state).get(0);
     Assert.assertEquals(workUnit1.getLowWatermark().toString(), workUnit.getLowWatermark().toString());
-    Assert.assertEquals(workUnit1.getProp(DATASET_URN_KEY.toString()), "[watermark.system.1483257600000, watermark.unit.{}]");
+    Assert.assertEquals(workUnit1.getProp(DATASET_URN.toString()), "[watermark.system.1483257600000, watermark.unit.{}]");
     Assert.assertEquals(workUnit1.getProp(MSTAGE_WATERMARK_GROUPS.toString()), "[\"watermark.system\",\"watermark.unit\"]");
   }
 

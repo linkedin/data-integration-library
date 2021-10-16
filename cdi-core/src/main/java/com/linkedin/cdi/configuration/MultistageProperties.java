@@ -25,9 +25,20 @@ public abstract class MultistageProperties<T> {
     return DOC_BASE_URL + "/parameters/" + getConfig() + ".md";
   }
 
-  final public String alertMessage(State state) {
+  final public String getSummaryUrl() {
+    return DOC_BASE_URL + "/parameters/summary.md";
+  }
+
+  final public String errorMessage(State state) {
     return String.format(EXCEPTION_INCORRECT_CONFIGURATION,
         getConfig(), state.getProp(getConfig(), StringUtils.EMPTY), getDocUrl());
+  }
+
+  final public String info(State state) {
+    if (get(state).equals(getDefaultValue())) {
+      return String.format("Property %s has default value %s", getConfig(), get(state));
+    }
+    return String.format("Property %s has none default value %s", getConfig(), get(state));
   }
 
   final public String getConfig() {
@@ -50,6 +61,14 @@ public abstract class MultistageProperties<T> {
     return minValue;
   }
 
+  /**
+   * Constructor with explicit default, and implicit max and min
+   *
+   * All subclasses don't need to have a max or min
+   *
+   * @param config property name
+   * @param defaultValue default value
+   */
   MultistageProperties(String config, Class<T> className, T defaultValue) {
     this.config = config;
     this.className = className;
@@ -58,7 +77,15 @@ public abstract class MultistageProperties<T> {
     this.minValue = null;
   }
 
-  MultistageProperties(String config, Class<T> className, T maxValue, T minValue, T defaultValue) {
+  /**
+   * Constructor with explicit default, max, and min for subclasses using min/max control
+   *
+   * @param config property name
+   * @param defaultValue default value
+   * @param maxValue max value
+   * @param minValue min value
+   */
+  MultistageProperties(String config, Class<T> className, T defaultValue, T maxValue, T minValue) {
     this.config = config;
     this.className = className;
     this.defaultValue = defaultValue;
@@ -120,5 +147,7 @@ public abstract class MultistageProperties<T> {
    */
   abstract protected T getValidNonblankWithDefault(State state);
 
-
+  public boolean isDeprecated() {
+    return false;
+  }
 }

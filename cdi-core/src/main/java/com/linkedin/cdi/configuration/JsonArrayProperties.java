@@ -19,9 +19,19 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
 public class JsonArrayProperties extends MultistageProperties<JsonArray> {
   private static final Logger LOG = LoggerFactory.getLogger(JsonArrayProperties.class);
 
+  /**
+   * Constructor with implicit default value
+   * @param config property name
+   */
   JsonArrayProperties(String config) {
     super(config, JsonArray.class, new JsonArray());
   }
+
+  /**
+   * Constructor with explicit default value
+   * @param config property name
+   * @param defaultValue default value
+   */
 
   JsonArrayProperties(String config, JsonArray defaultValue) {
     super(config, JsonArray.class, defaultValue);
@@ -67,7 +77,7 @@ public class JsonArrayProperties extends MultistageProperties<JsonArray> {
       // Properly formed JsonArray string is valid
       GSON.fromJson(state.getProp(getConfig()), JsonArray.class);
     } catch (Exception e) {
-      LOG.error(alertMessage(state), e.getMessage());
+      LOG.error(errorMessage(state), e.getMessage());
       return false;
     }
     return true;

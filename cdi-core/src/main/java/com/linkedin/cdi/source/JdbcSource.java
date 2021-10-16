@@ -55,7 +55,6 @@ public class JdbcSource extends MultistageSource<Schema, GenericRecord> {
 
   protected void initialize(State state) {
     super.initialize(state);
-    jdbcSourceKeys.logUsage(state);
     jdbcSourceKeys.setJdbcStatement(MSTAGE_JDBC_STATEMENT.get(state));
     jdbcSourceKeys.setSeparator(CsvUtils.unescape(MSTAGE_CSV_SEPARATOR
         .get(state)));

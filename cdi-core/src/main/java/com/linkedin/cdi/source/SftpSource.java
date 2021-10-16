@@ -44,7 +44,6 @@ public class SftpSource extends MultistageSource<Schema, GenericRecord> {
 
   protected void initialize(State state) {
     super.initialize(state);
-    sftpSourceKeys.logUsage(state);
     this.parseUri(state);
     sftpSourceKeys.setFilesPattern(MSTAGE_SOURCE_FILES_PATTERN.get(state));
     sftpSourceKeys.setTargetFilePattern(

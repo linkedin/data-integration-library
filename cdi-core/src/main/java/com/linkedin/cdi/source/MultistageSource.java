@@ -102,6 +102,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
 
   protected void initialize(State state) {
     jobKeys.initialize(state);
+    jobKeys.logUsage(state);
   }
 
   /**
@@ -337,14 +338,14 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
           // because each dataset URN key will have a state file on Hadoop, it cannot contain path separator
           workUnit.setProp(MSTAGE_WATERMARK_GROUPS.toString(),
               watermarkGroups.toString());
-          workUnit.setProp(DATASET_URN_KEY.toString(), EndecoUtils.getHadoopFsEncoded(wuSignature));
+          workUnit.setProp(DATASET_URN.toString(), EndecoUtils.getHadoopFsEncoded(wuSignature));
 
           // save the lower number of datetime watermark partition and the unit watermark partition
           workUnit.setProp(datetimeWatermarkName, dtPartition.getLeft());
           workUnit.setProp(unitWatermarkName, unitPartition);
 
           workUnit.setProp(MSTAGE_ACTIVATION_PROPERTY.toString(), unitPartition);
-          workUnit.setProp(MSTAGE_WORKUNIT_STARTTIME_KEY.toString(),
+          workUnit.setProp(MSTAGE_WORK_UNIT_SCHEDULING_STARTTIME.toString(),
               DateTime.now().getMillis()
                   + workUnits.size() * MSTAGE_WORK_UNIT_PACING_SECONDS.getMillis(sourceState));
 
@@ -458,9 +459,9 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
 
   Extract createExtractObject(final boolean isFull) {
     Extract extract = createExtract(
-        Extract.TableType.valueOf(EXTRACT_TABLE_TYPE_KEY.get(sourceState)),
-        EXTRACT_NAMESPACE_NAME_KEY.get(sourceState),
-        EXTRACT_TABLE_NAME_KEY.get(sourceState));
+        Extract.TableType.valueOf(EXTRACT_TABLE_TYPE.get(sourceState)),
+        EXTRACT_NAMESPACE.get(sourceState),
+        EXTRACT_TABLE_NAME.get(sourceState));
     extract.setProp(ConfigurationKeys.EXTRACT_IS_FULL_KEY, isFull);
     return extract;
   }
@@ -520,7 +521,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
    * @return true if all conditions met for a full extract, otherwise false
    */
   private boolean checkFullExtractState(final State state, final Map<String, Long> previousHighWatermarks) {
-    if (EXTRACT_TABLE_TYPE_KEY.get(state).toString()
+    if (EXTRACT_TABLE_TYPE.get(state).toString()
         .equalsIgnoreCase(KEY_WORD_SNAPSHOT_ONLY)) {
       return true;
     }

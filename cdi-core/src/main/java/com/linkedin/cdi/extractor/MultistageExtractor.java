@@ -180,9 +180,9 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   protected void initialize(ExtractorKeys keys) {
     extractorKeys = keys;
     extractorKeys.setActivationParameters(MSTAGE_ACTIVATION_PROPERTY.get(state));
-    extractorKeys.setDelayStartTime(MSTAGE_WORKUNIT_STARTTIME_KEY.get(state));
+    extractorKeys.setDelayStartTime(MSTAGE_WORK_UNIT_SCHEDULING_STARTTIME.get(state));
     extractorKeys.setExplictEof(MSTAGE_DATA_EXPLICIT_EOF.get(state));
-    extractorKeys.setSignature(DATASET_URN_KEY.get(state));
+    extractorKeys.setSignature(DATASET_URN.get(state));
     extractorKeys.setPreprocessors(getPreprocessors(state));
     extractorKeys.setPayloads(getPayloads(state));
     payloadIterator = extractorKeys.getPayloads().iterator();
@@ -940,8 +940,8 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   protected void logUsage(State state) {
     LOG.info("Checking essential (not always mandatory) parameters...");
     LOG.info("Values can be default values for the specific type if the property is not configured");
-    for (MultistageProperties p : JobKeys.ESSENTIAL_PARAMETERS) {
-      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.get(state));
+    for (MultistageProperties p : allProperties) {
+      LOG.info(p.info(state));
     }
   }
 

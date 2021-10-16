@@ -9,8 +9,6 @@ import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.linkedin.cdi.configuration.StaticConstants.*;
-
 
 /**
  * A Long type of property has default defaultValue of 0L
@@ -18,20 +16,42 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
 public class LongProperties extends MultistageProperties<Long> {
   private static final Logger LOG = LoggerFactory.getLogger(LongProperties.class);
 
+  /**
+   * Constructor with implicit default, max, and min
+   * @param config the property name
+   */
   LongProperties(String config) {
-    super(config, Long.class, Long.MAX_VALUE, 0L, 0L);
+    super(config, Long.class, 0L, Long.MAX_VALUE, 0L);
   }
 
-  LongProperties(String config, Long maxValue) {
-    super(config, Long.class, maxValue, 0L, 0L);
+  /**
+   * Constructor with explicit default, and implicit max and min
+   * @param config the property name
+   * @param defaultValue default value
+   */
+  LongProperties(String config, Long defaultValue) {
+    super(config, Long.class, defaultValue, Long.MAX_VALUE, 0L);
   }
 
-  LongProperties(String config, Long maxValue, Long minValue) {
-    super(config, Long.class, maxValue, minValue, 0L);
+  /**
+   * Constructor with explicit default and max, and implicit min
+   * @param config the property name
+   * @param defaultValue default value
+   * @param maxValue max value
+   */
+  LongProperties(String config, Long defaultValue, Long maxValue) {
+    super(config, Long.class, defaultValue, maxValue, 0L);
   }
 
-  LongProperties(String config, Long maxValue, Long minValue, Long defaultValue) {
-    super(config, Long.class, maxValue, minValue, defaultValue);
+  /**
+   * Constructor with explicit default, max and min
+   * @param config the property name
+   * @param defaultValue default value
+   * @param maxValue max value
+   * @param minValue min value
+   */
+  LongProperties(String config, Long defaultValue, Long maxValue, Long minValue) {
+    super(config, Long.class, defaultValue, maxValue, minValue);
   }
 
   /**
@@ -62,7 +82,7 @@ public class LongProperties extends MultistageProperties<Long> {
       long value = Long.parseLong(state.getProp(getConfig()));
       return value >= getMinValue() && value <= getMaxValue();
     } catch (Exception e) {
-      LOG.error(alertMessage(state), e.getMessage());
+      LOG.error(errorMessage(state), e.getMessage());
       return false;
     }
     return true;

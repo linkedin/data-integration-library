@@ -76,9 +76,9 @@ public class JsonExtractorTest {
     workUnitStatus = Mockito.mock(WorkUnitStatus.class);
     state = Mockito.mock(WorkUnitState.class);
     when(state.getProp(MSTAGE_ACTIVATION_PROPERTY.getConfig(), new JsonObject().toString())).thenReturn(ACTIVATION_PROP);
-    when(state.getPropAsLong(MSTAGE_WORKUNIT_STARTTIME_KEY.getConfig(), 0L)).thenReturn(WORKUNIT_STARTTIME_KEY);
+    when(state.getPropAsLong(MSTAGE_WORK_UNIT_SCHEDULING_STARTTIME.getConfig(), 0L)).thenReturn(WORKUNIT_STARTTIME_KEY);
     when(state.getWorkunit()).thenReturn(workUnit);
-    workUnit.setProp(DATASET_URN_KEY.getConfig(), DATA_SET_URN_KEY);
+    workUnit.setProp(DATASET_URN.getConfig(), DATA_SET_URN_KEY);
     when(source.getJobKeys()).thenReturn(jobKeys);
     when(jobKeys.getSourceParameters()).thenReturn(new JsonArray());
     when(jobKeys.getPaginationInitValues()).thenReturn(new HashMap<>());
@@ -117,7 +117,7 @@ public class JsonExtractorTest {
     when(jobKeys.getOutputSchema()).thenReturn(outputSchema);
     when(jsonExtractorKeys.getCurrentPageNumber()).thenReturn(Long.valueOf(0));
     when(jsonExtractorKeys.getSessionKeyValue()).thenReturn("session_key");
-    workUnit.setProp(DATASET_URN_KEY.getConfig(), "com.linkedin.xxxxx.UserGroups");
+    workUnit.setProp(DATASET_URN.getConfig(), "com.linkedin.xxxxx.UserGroups");
     Iterator jsonElementIterator = ImmutableList.of().iterator();
     when(jsonExtractorKeys.getJsonElementIterator()).thenReturn(jsonElementIterator);
     when(jsonExtractorKeys.getProcessedCount()).thenReturn(Long.valueOf(0));

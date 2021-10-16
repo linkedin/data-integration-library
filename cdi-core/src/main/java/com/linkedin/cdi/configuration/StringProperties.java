@@ -16,10 +16,19 @@ import org.slf4j.LoggerFactory;
 public class StringProperties extends MultistageProperties<String> {
   private static final Logger LOG = LoggerFactory.getLogger(StringProperties.class);
 
+  /**
+   * Constructor with implicit default value
+   * @param config property name
+   */
   StringProperties(String config) {
     super(config, String.class, StringUtils.EMPTY);
   }
 
+  /**
+   * Constructor with explicit default value
+   * @param config property name
+   * @param defaultValue default value
+   */
   StringProperties(String config, String defaultValue) {
     super(config, String.class, defaultValue);
   }

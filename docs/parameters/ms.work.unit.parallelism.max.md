@@ -6,7 +6,7 @@
 
 **Default value**: 100 (value 0 will also be interpreted as 100)
 
-**Max value**: 10,000 
+**Max value**: 1000 
 
 **Related**:
  
