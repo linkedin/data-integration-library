@@ -102,7 +102,6 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
 
   protected void initialize(State state) {
     jobKeys.initialize(state);
-    jobKeys.logUsage(state);
   }
 
   /**
@@ -114,6 +113,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
     sourceState = state;
     initialize(state);
 
+    jobKeys.logUsage(state);
     if (!jobKeys.validate(state)) {
       LOG.error("Some parameters are invalid, job will do nothing until they are fixed.");
       return new ArrayList<>();
