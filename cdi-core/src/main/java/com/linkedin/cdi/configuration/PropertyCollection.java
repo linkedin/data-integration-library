@@ -133,6 +133,38 @@ public interface PropertyCollection {
     }
   };
 
+  // ms.http.maxConnections has default value 50 and max value 500
+  // 0 is interpreted as default
+  IntegerProperties MSTAGE_HTTP_CONN_MAX =
+      new IntegerProperties("ms.http.conn.max", 50, 500) {
+        @Override
+        protected Integer getValidNonblankWithDefault(State state) {
+          int value = super.getValidNonblankWithDefault(state);
+          return value == 0 ? getDefaultValue() : value;
+        }
+      };
+
+  // ms.http.maxConnectionsPerRoute has default value 20 and max value 200
+  // 0 is interpreted as default
+  IntegerProperties MSTAGE_HTTP_CONN_PER_ROUTE_MAX =
+      new IntegerProperties("ms.http.conn.per.route.max", 20, 200) {
+        @Override
+        protected Integer getValidNonblankWithDefault(State state) {
+          int value = super.getValidNonblankWithDefault(state);
+          return value == 0 ? getDefaultValue() : value;
+        }
+      };
+
+  /**
+   * see org.apache.http.impl.client.HttpClientBuilder#connTimeToLive
+   */
+  IntegerProperties MSTAGE_HTTP_CONN_TTL_SECONDS = new IntegerProperties("ms.http.conn.ttl.seconds", 10) {
+    @Override
+    public Long getMillis(State state) {
+      return 1000L * this.get(state);
+    }
+  };
+
   JsonObjectProperties MSTAGE_HTTP_REQUEST_HEADERS = new JsonObjectProperties("ms.http.request.headers");
   StringProperties MSTAGE_HTTP_REQUEST_METHOD = new StringProperties("ms.http.request.method");
   JsonObjectProperties MSTAGE_HTTP_RESPONSE_TYPE = new JsonObjectProperties("ms.http.response.type");
@@ -183,6 +215,17 @@ public interface PropertyCollection {
   JsonObjectProperties MSTAGE_SCHEMA_CLEANSING = new JsonObjectProperties("ms.schema.cleansing");
   JsonArrayProperties MSTAGE_SECONDARY_INPUT = new JsonArrayProperties("ms.secondary.input");
   JsonObjectProperties MSTAGE_SESSION_KEY_FIELD = new JsonObjectProperties("ms.session.key.field");
+
+  // default: 30seconds, minimum: 0, maximum: -
+  // 0 is interpreted as default
+  IntegerProperties MSTAGE_SFTP_CONNECTION_TIMEOUT_MILLIS = new IntegerProperties("ms.sftp.connection.timeout.millis", 30000) {
+    @Override
+    public Integer get(State state) {
+      int value = super.get(state);
+      return value == 0 ? getDefaultValue() : value;
+    }
+  };
+
   StringProperties MSTAGE_SOURCE_DATA_CHARACTER_SET = new StringProperties("ms.source.data.character.set",
       StandardCharsets.UTF_8.toString());
 
@@ -190,6 +233,39 @@ public interface PropertyCollection {
   JsonObjectProperties MSTAGE_SOURCE_S3_PARAMETERS = new JsonObjectProperties("ms.source.s3.parameters");
   StringProperties MSTAGE_SOURCE_SCHEMA_URN = new StringProperties("ms.source.schema.urn");
   StringProperties MSTAGE_SOURCE_URI = new StringProperties("ms.source.uri");
+
+  // default: 10seconds, minimum: 0, maximum: -
+  // 0 is interpreted as default
+  // see org.apache.http.client.config.RequestConfig#connectTimeout
+  IntegerProperties MSTAGE_SSL_CONN_TIMEOUT_MILLIS = new IntegerProperties("ms.ssl.conn.timeout.millis", 10000) {
+    @Override
+    public Integer get(State state) {
+      int value = super.get(state);
+      return value == 0 ? getDefaultValue() : value;
+    }
+  };
+
+  StringProperties MSTAGE_SSL_KEY_PASSWORD = new StringProperties("ms.ssl.key.password") {
+
+  };
+  StringProperties MSTAGE_SSL_KEY_STORE_PATH = new StringProperties("ms.ssl.key.store.path");
+  StringProperties MSTAGE_SSL_KEY_STORE_PASSWORD = new StringProperties("ms.ssl.key.store.password");
+  StringProperties MSTAGE_SSL_KEY_STORE_TYPE = new StringProperties("ms.ssl.key.store.type", "pkcs12");
+  StringProperties MSTAGE_SSL_TRUST_STORE_PASSWORD = new StringProperties("ms.ssl.trust.store.password");
+  StringProperties MSTAGE_SSL_TRUST_STORE_PATH = new StringProperties("ms.ssl.trust.store.path");
+  StringProperties MSTAGE_SSL_VERSION = new StringProperties("ms.ssl.version", "TLSv1.2");
+
+  // default: 2minutes, minimum: 0, maximum: -
+  // 0 is interpreted as default
+  // see org.apache.http.client.config.RequestConfig#socketTimeout
+  IntegerProperties MSTAGE_SSL_SOCKET_TIMEOUT_MILLIS = new IntegerProperties("ms.ssl.socket.timeout.millis", 120000) {
+    @Override
+    public Integer get(State state) {
+      int value = super.get(state);
+      return value == 0 ? getDefaultValue() : value;
+    }
+  };
+
   JsonArrayProperties MSTAGE_TARGET_SCHEMA = new JsonArrayProperties("ms.target.schema");
   StringProperties MSTAGE_TARGET_SCHEMA_URN = new StringProperties("ms.target.schema.urn");
   StringProperties MSTAGE_TOTAL_COUNT_FIELD = new StringProperties("ms.total.count.field");
@@ -263,8 +339,12 @@ public interface PropertyCollection {
   StringProperties JOB_DIR = new StringProperties("job.dir");
   StringProperties JOB_NAME = new StringProperties("job.name");
   StringProperties SOURCE_CLASS = new StringProperties("source.class");
+  StringProperties SOURCE_CONN_HOST = new StringProperties("source.conn.host");
+  StringProperties SOURCE_CONN_KNOWN_HOSTS = new StringProperties("source.conn.known.hosts");
   StringProperties SOURCE_CONN_USERNAME = new StringProperties("source.conn.username");
   StringProperties SOURCE_CONN_PASSWORD = new StringProperties("source.conn.password");
+  StringProperties SOURCE_CONN_PORT = new StringProperties("source.conn.port");
+  StringProperties SOURCE_CONN_PRIVATE_KEY = new StringProperties("source.conn.private.key");
   StringProperties SOURCE_CONN_USE_PROXY_URL = new StringProperties("source.conn.use.proxy.url");
   StringProperties SOURCE_CONN_USE_PROXY_PORT = new StringProperties("source.conn.use.proxy.port");
   StringProperties STATE_STORE_DIR = new StringProperties("state.store.dir");
@@ -273,7 +353,7 @@ public interface PropertyCollection {
   IntegerProperties TASK_MAXRETRIES = new IntegerProperties("task.maxretries", 4);
   IntegerProperties TASKEXECUTOR_THREADPOOL_SIZE = new IntegerProperties("taskexecutor.threadpool.size", 10);
 
-  List<MultistageProperties> allProperties = Lists.newArrayList(
+  List<MultistageProperties<?>> allProperties = Lists.newArrayList(
       MSTAGE_ABSTINENT_PERIOD_DAYS,
       MSTAGE_ACTIVATION_PROPERTY,
       MSTAGE_AUTHENTICATION,
@@ -304,6 +384,9 @@ public interface PropertyCollection {
       MSTAGE_EXTRACT_PREPROCESSORS,
       MSTAGE_EXTRACT_PREPROCESSORS_PARAMETERS,
       MSTAGE_GRACE_PERIOD_DAYS,
+      MSTAGE_HTTP_CONN_MAX,
+      MSTAGE_HTTP_CONN_PER_ROUTE_MAX,
+      MSTAGE_HTTP_CONN_TTL_SECONDS,
       MSTAGE_HTTP_REQUEST_HEADERS,
       MSTAGE_HTTP_REQUEST_METHOD,
       MSTAGE_HTTP_RESPONSE_TYPE,
