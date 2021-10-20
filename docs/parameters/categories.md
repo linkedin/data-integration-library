@@ -78,6 +78,9 @@ The following are related to HTTP sources:
 - [ms.http.request.method](ms.http.request.method.md)
 - [ms.http.response.type](ms.http.response.type.md)
 - [ms.http.statuses](ms.http.statuses.md)
+- [ms.http.conn.max](ms.http.conn.max.md)
+- [ms.http.conn.per.route.max](ms.http.conn.per.route.max.md)
+- [ms.http.conn.ttl.seconds](ms.http.conn.ttl.seconds.md)
 
 # Pagination Properties 
 - [ms.call.interval.millis](ms.call.interval.millis.md)

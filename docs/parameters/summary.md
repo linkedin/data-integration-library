@@ -201,6 +201,23 @@ very common if the ingestion source is a data warehouse.
 and it adds extra buffer to cutoff timestamp during the
 incremental load so that more data can be included. 
 
+## [ms.http.conn.max](ms.http.conn.max.md)
+
+`ms.http.conn.max` defines maximum number of connections to keep
+in a connection pool. It limits the total connections to an HTTP
+server. The default value is 50.
+
+## [ms.http.conn.per.route.max](ms.http.conn.per.route.max.md)
+
+`ms.http.conn.per.route.max` defines maximum number of connections to keep
+in a connection pool. It limits the total connections to a particular
+path, or endpoint, on the HTTP server. The default value is 20.
+
+## [ms.http.conn.ttl.seconds](ms.http.conn.ttl.seconds.md)
+
+`ms.http.conn.ttl.seconds` defines maximum idle time allowed when there
+is no activity on an HTTP connection. When there is no activity after
+TTL passed, the connection is disconnected. The default is 10 seconds. 
 
 ## [ms.http.request.headers](ms.http.request.headers.md)
 
@@ -340,6 +357,10 @@ store. `ms.target.schema.urn` address the option that defines source schema in m
 `ms.source.uri` defines the integration point, which is called data source for data ingestion or target for data egression. 
 It follows the [URI format](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier). 
 The only exception is that authority is not supported, because all authority cannot be fit in the URI.
+
+## [ms.ssl.connection.timeout.millis](ms.ssl.connection.timeout.millis.md)
+
+## [ms.ssl.socket.timeout.millis](ms.ssl.socket.timeout.millis.md)
 
 ## [ms.target.schema](ms.target.schema.md)
 

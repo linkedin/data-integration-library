@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.factory.sftp;
 
+import com.google.common.collect.ImmutableList;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -20,35 +21,48 @@ import org.apache.gobblin.source.extractor.extract.sftp.SftpFsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
+
 
 public class SftpChannelClient implements SftpClient {
   private static final Logger LOG = LoggerFactory.getLogger(SftpChannelClient.class);
-  private static final String SFTP_CONNECTION_TIMEOUT_KEY = "sftpConn.timeout";
-  private static final int DEFAULT_SFTP_CONNECTION_TIMEOUT_IN_MS = 3000; //in milliseconds
+
+  private static final List<IdentityStrategy> STRATEGIES = ImmutableList.of(
+      new LocalFileIdentityStrategy(),
+      new DistributedCacheIdentityStrategy(),
+      new HdfsIdentityStrategy());
 
   protected State state;
   protected Session session = null;
   protected JSch jsch = new JSch();
+//  protected SSLContext sslContext = null;
 
   public SftpChannelClient(State state) {
     this.state = state;
     initializeConnection(state);
   }
+//
+//  public SftpChannelClient(State state, SSLContext sslContext) {
+//    this(state);
+//    this.sslContext = sslContext;
+//    initializeConnection(state);
+//  }
 
   protected void initializeConnection(State state) {
     JSch.setLogger(new SftpFsHelper.JSchLogger());
     try {
-      if (StringUtils.isBlank(Credentials.getProxyHost(state))
-          && Credentials.getProxyPort(state) == -1) {
-        session = jsch.getSession(Credentials.getUserName(state),
-            Credentials.getHostName(state), Credentials.getPort(state));
-        session.setPassword(Credentials.getPassword(state));
-        if (!session.isConnected()) {
-          this.session.connect();
-        }
-        LOG.info("Finished connecting to source");
+      setIdentityStrategy(this.jsch);
+      if (StringUtils.isNotEmpty(Credentials.getKnownHosts(state))) {
+        jsch.setKnownHosts(Credentials.getKnownHosts(state));
       }
-      // TODO with proxy
+      session = jsch.getSession(Credentials.getUserName(state),
+          Credentials.getHostName(state),
+          Credentials.getPort(state));
+      configSessionProperties();
+      if (!session.isConnected()) {
+        this.session.connect();
+      }
+      LOG.info("Finished connecting to source");
     } catch (JSchException e) {
       if (session != null) {
         session.disconnect();
@@ -68,9 +82,7 @@ public class SftpChannelClient implements SftpClient {
   public ChannelSftp getSftpChannel() throws SftpException {
     try {
       ChannelSftp channelSftp = (ChannelSftp) this.session.openChannel("sftp");
-      // In milliseconds
-      int connTimeout = state.getPropAsInt(SFTP_CONNECTION_TIMEOUT_KEY, DEFAULT_SFTP_CONNECTION_TIMEOUT_IN_MS);
-      channelSftp.connect(connTimeout);
+      channelSftp.connect(MSTAGE_SFTP_CONNECTION_TIMEOUT_MILLIS.get(state));
       return channelSftp;
     } catch (JSchException e) {
       throw new SftpException(0, "Cannot open a channel to SFTP server", e);
@@ -159,6 +171,31 @@ public class SftpChannelClient implements SftpClient {
     } catch (SftpException e) {
       throw new RuntimeException(
           String.format("Failed to get size for file at path %s due to error %s", path, e.getMessage()), e);
+    }
+  }
+
+  private void setIdentityStrategy(JSch jsch) {
+    String privateKey = Credentials.getPrivateKey(state);
+    if (StringUtils.isNotEmpty(privateKey)) {
+      for (IdentityStrategy strategy : STRATEGIES) {
+        if (strategy.setIdentity(privateKey, jsch)) {
+          break;
+        }
+      }
+    }
+  }
+
+  private void configSessionProperties() throws JSchException {
+    session.setUserInfo(new MyUserInfo());
+    session.setDaemonThread(true);
+    session.setTimeout(MSTAGE_SFTP_CONNECTION_TIMEOUT_MILLIS.get(state));
+    session.setConfig("PreferredAuthentications", "publickey,password");
+    if (StringUtils.isEmpty(SOURCE_CONN_KNOWN_HOSTS.get(state))) {
+      LOG.info("Known hosts path is not set, StrictHostKeyChecking will be turned off");
+      session.setConfig("StrictHostKeyChecking", "no");
+    }
+    if (!StringUtils.isEmpty(Credentials.getPassword(state))) {
+      session.setPassword(Credentials.getPassword(state));
     }
   }
 }
