@@ -26,6 +26,7 @@ The following are related to connections:
 - [ms.connection.client.factory](ms.connection.client.factory.md)
 - [ms.source.uri](ms.source.uri.md)
 - [ms.source.s3.parameters](ms.source.s3.parameters.md)
+- [ms.sftp.conn.timeout.millis](ms.sftp.conn.timeout.millis.md)
 - source.conn.username
 - source.conn.password
 

@@ -18,12 +18,12 @@ public class SecureConnectionClientFactoryTest {
   @Test (enabled = false)
   public void testHttpConnection() throws IOException {
     SourceState state = new SourceState();
-    state.setProp(PropertyCollection.MSTAGE_SSL_KEY_STORE_PATH.getConfig(), "/Users/chrli/certs/chrli/identity.p12");
-    state.setProp(PropertyCollection.MSTAGE_SSL_KEY_PASSWORD.getConfig(), "passphrase");
-    state.setProp(PropertyCollection.MSTAGE_SSL_KEY_STORE_PASSWORD.getConfig(), "passphrase");
+    state.setProp(PropertyCollection.MSTAGE_SSL_KEY_STORE_PATH.getConfig(), "REPLACEME");
+    state.setProp(PropertyCollection.MSTAGE_SSL_KEY_PASSWORD.getConfig(), "REPLACEME");
+    state.setProp(PropertyCollection.MSTAGE_SSL_KEY_STORE_PASSWORD.getConfig(), "REPLACEME");
     state.setProp(PropertyCollection.MSTAGE_SSL_KEY_STORE_TYPE.getConfig(), "pkcs12");
-    state.setProp(PropertyCollection.MSTAGE_SSL_TRUST_STORE_PATH.getConfig(), "/etc/riddler/cacerts");
-    state.setProp(PropertyCollection.MSTAGE_SSL_TRUST_STORE_PASSWORD.getConfig(), "changeit");
+    state.setProp(PropertyCollection.MSTAGE_SSL_TRUST_STORE_PATH.getConfig(), "REPLACEME");
+    state.setProp(PropertyCollection.MSTAGE_SSL_TRUST_STORE_PASSWORD.getConfig(), "REPLACEME");
     HttpClient httpClient = new SecureConnectionClientFactory().getHttpClient(state);
     ((Closeable) httpClient).close();
   }
@@ -35,7 +35,7 @@ public class SecureConnectionClientFactoryTest {
     state.setProp(PropertyCollection.SOURCE_CONN_USERNAME.getConfig(), "REPLACEME");
     state.setProp(PropertyCollection.SOURCE_CONN_PORT.getConfig(), "22");
     state.setProp(PropertyCollection.SOURCE_CONN_PRIVATE_KEY.getConfig(), "REPLACEME");
-    state.setProp(PropertyCollection.MSTAGE_SFTP_CONNECTION_TIMEOUT_MILLIS.getConfig(), "360000");
+    state.setProp(PropertyCollection.MSTAGE_SFTP_CONN_TIMEOUT_MILLIS.getConfig(), "360000");
     ConnectionClientFactory factory = new SecureConnectionClientFactory();
     SftpClient client = factory.getSftpChannelClient(state);
     try {

@@ -82,7 +82,7 @@ public class SftpChannelClient implements SftpClient {
   public ChannelSftp getSftpChannel() throws SftpException {
     try {
       ChannelSftp channelSftp = (ChannelSftp) this.session.openChannel("sftp");
-      channelSftp.connect(MSTAGE_SFTP_CONNECTION_TIMEOUT_MILLIS.get(state));
+      channelSftp.connect(MSTAGE_SFTP_CONN_TIMEOUT_MILLIS.get(state));
       return channelSftp;
     } catch (JSchException e) {
       throw new SftpException(0, "Cannot open a channel to SFTP server", e);
@@ -188,7 +188,7 @@ public class SftpChannelClient implements SftpClient {
   private void configSessionProperties() throws JSchException {
     session.setUserInfo(new MyUserInfo());
     session.setDaemonThread(true);
-    session.setTimeout(MSTAGE_SFTP_CONNECTION_TIMEOUT_MILLIS.get(state));
+    session.setTimeout(MSTAGE_SFTP_CONN_TIMEOUT_MILLIS.get(state));
     session.setConfig("PreferredAuthentications", "publickey,password");
     if (StringUtils.isEmpty(SOURCE_CONN_KNOWN_HOSTS.get(state))) {
       LOG.info("Known hosts path is not set, StrictHostKeyChecking will be turned off");

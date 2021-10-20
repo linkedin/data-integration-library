@@ -216,15 +216,8 @@ public interface PropertyCollection {
   JsonArrayProperties MSTAGE_SECONDARY_INPUT = new JsonArrayProperties("ms.secondary.input");
   JsonObjectProperties MSTAGE_SESSION_KEY_FIELD = new JsonObjectProperties("ms.session.key.field");
 
-  // default: 30seconds, minimum: 0, maximum: -
-  // 0 is interpreted as default
-  IntegerProperties MSTAGE_SFTP_CONNECTION_TIMEOUT_MILLIS = new IntegerProperties("ms.sftp.connection.timeout.millis", 30000) {
-    @Override
-    public Integer get(State state) {
-      int value = super.get(state);
-      return value == 0 ? getDefaultValue() : value;
-    }
-  };
+  // default: 60 seconds, minimum: 0, maximum: -
+  IntegerProperties MSTAGE_SFTP_CONN_TIMEOUT_MILLIS = new IntegerProperties("ms.sftp.conn.timeout.millis", 60000);
 
   StringProperties MSTAGE_SOURCE_DATA_CHARACTER_SET = new StringProperties("ms.source.data.character.set",
       StandardCharsets.UTF_8.toString());
@@ -251,9 +244,6 @@ public interface PropertyCollection {
   StringProperties MSTAGE_SSL_KEY_STORE_PATH = new StringProperties("ms.ssl.key.store.path");
   StringProperties MSTAGE_SSL_KEY_STORE_PASSWORD = new StringProperties("ms.ssl.key.store.password");
   StringProperties MSTAGE_SSL_KEY_STORE_TYPE = new StringProperties("ms.ssl.key.store.type", "pkcs12");
-  StringProperties MSTAGE_SSL_TRUST_STORE_PASSWORD = new StringProperties("ms.ssl.trust.store.password");
-  StringProperties MSTAGE_SSL_TRUST_STORE_PATH = new StringProperties("ms.ssl.trust.store.path");
-  StringProperties MSTAGE_SSL_VERSION = new StringProperties("ms.ssl.version", "TLSv1.2");
 
   // default: 2minutes, minimum: 0, maximum: -
   // 0 is interpreted as default
@@ -265,6 +255,10 @@ public interface PropertyCollection {
       return value == 0 ? getDefaultValue() : value;
     }
   };
+
+  StringProperties MSTAGE_SSL_TRUST_STORE_PASSWORD = new StringProperties("ms.ssl.trust.store.password");
+  StringProperties MSTAGE_SSL_TRUST_STORE_PATH = new StringProperties("ms.ssl.trust.store.path");
+  StringProperties MSTAGE_SSL_VERSION = new StringProperties("ms.ssl.version", "TLSv1.2");
 
   JsonArrayProperties MSTAGE_TARGET_SCHEMA = new JsonArrayProperties("ms.target.schema");
   StringProperties MSTAGE_TARGET_SCHEMA_URN = new StringProperties("ms.target.schema.urn");
@@ -407,12 +401,20 @@ public interface PropertyCollection {
       MSTAGE_S3_LIST_MAX_KEYS,
       MSTAGE_SCHEMA_CLEANSING,
       MSTAGE_SECONDARY_INPUT,
-      MSTAGE_SESSION_KEY_FIELD,
+      MSTAGE_SESSION_KEY_FIELD, MSTAGE_SFTP_CONN_TIMEOUT_MILLIS,
       MSTAGE_SOURCE_DATA_CHARACTER_SET,
       MSTAGE_SOURCE_FILES_PATTERN,
       MSTAGE_SOURCE_S3_PARAMETERS,
       MSTAGE_SOURCE_SCHEMA_URN,
       MSTAGE_SOURCE_URI,
+      MSTAGE_SSL_CONN_TIMEOUT_MILLIS,
+      MSTAGE_SSL_KEY_STORE_PATH,
+      MSTAGE_SSL_KEY_STORE_PASSWORD,
+      MSTAGE_SSL_KEY_STORE_TYPE,
+      MSTAGE_SSL_SOCKET_TIMEOUT_MILLIS,
+      MSTAGE_SSL_TRUST_STORE_PASSWORD,
+      MSTAGE_SSL_TRUST_STORE_PATH,
+      MSTAGE_SSL_VERSION,
       MSTAGE_TARGET_SCHEMA,
       MSTAGE_TARGET_SCHEMA_URN,
       MSTAGE_TOTAL_COUNT_FIELD,
@@ -439,8 +441,12 @@ public interface PropertyCollection {
       JOB_DIR,
       JOB_NAME,
       SOURCE_CLASS,
-      SOURCE_CONN_USERNAME,
+      SOURCE_CONN_HOST,
+      SOURCE_CONN_KNOWN_HOSTS,
       SOURCE_CONN_PASSWORD,
+      SOURCE_CONN_PORT,
+      SOURCE_CONN_PRIVATE_KEY,
+      SOURCE_CONN_USERNAME,
       SOURCE_CONN_USE_PROXY_URL,
       SOURCE_CONN_USE_PROXY_PORT,
       STATE_STORE_DIR,
