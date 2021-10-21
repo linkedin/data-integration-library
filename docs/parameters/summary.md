@@ -359,11 +359,14 @@ store. `ms.target.schema.urn` address the option that defines source schema in m
 
 ## [ms.source.uri](ms.source.uri.md)
 
-`ms.source.uri` defines the integration point, which is called data source for data ingestion or target for data egression. 
+[`ms.source.uri`](ms.source.uri.md) 
+defines the integration point, which is called data source for data ingestion or target for data egression. 
 It follows the [URI format](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier). 
 The only exception is that authority is not supported, because all authority cannot be fit in the URI.
 
 ## [ms.ssl](ms.ssl.md)
+
+[`ms.ssl`](ms.ssl.md) defines SSL parameters. 
 
 ## [ms.target.schema](ms.target.schema.md)
 
