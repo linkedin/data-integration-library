@@ -363,9 +363,7 @@ store. `ms.target.schema.urn` address the option that defines source schema in m
 It follows the [URI format](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier). 
 The only exception is that authority is not supported, because all authority cannot be fit in the URI.
 
-## [ms.ssl.connection.timeout.millis](ms.ssl.connection.timeout.millis.md)
-
-## [ms.ssl.socket.timeout.millis](ms.ssl.socket.timeout.millis.md)
+## [ms.ssl](ms.ssl.md)
 
 ## [ms.target.schema](ms.target.schema.md)
 

@@ -18,12 +18,7 @@ public class SecureConnectionClientFactoryTest {
   @Test (enabled = false)
   public void testHttpConnection() throws IOException {
     SourceState state = new SourceState();
-    state.setProp(PropertyCollection.MSTAGE_SSL_KEY_STORE_PATH.getConfig(), "REPLACEME");
-    state.setProp(PropertyCollection.MSTAGE_SSL_KEY_PASSWORD.getConfig(), "REPLACEME");
-    state.setProp(PropertyCollection.MSTAGE_SSL_KEY_STORE_PASSWORD.getConfig(), "REPLACEME");
-    state.setProp(PropertyCollection.MSTAGE_SSL_KEY_STORE_TYPE.getConfig(), "pkcs12");
-    state.setProp(PropertyCollection.MSTAGE_SSL_TRUST_STORE_PATH.getConfig(), "REPLACEME");
-    state.setProp(PropertyCollection.MSTAGE_SSL_TRUST_STORE_PASSWORD.getConfig(), "REPLACEME");
+    state.setProp(PropertyCollection.MSTAGE_SSL.getConfig(), "REPLACEME");
     HttpClient httpClient = new SecureConnectionClientFactory().getHttpClient(state);
     ((Closeable) httpClient).close();
   }

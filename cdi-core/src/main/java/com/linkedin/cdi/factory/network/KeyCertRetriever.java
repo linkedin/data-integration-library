@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.linkedin.cdi.configuration.PropertyCollection.*;
-import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
 /**
@@ -42,12 +41,12 @@ public class KeyCertRetriever {
 
   public KeyCertRetriever(State state) {
     try {
-      keyStoreFilePath = MSTAGE_SSL_KEY_STORE_PATH.get(state);
-      keyStorePassword = MSTAGE_SSL_KEY_STORE_PASSWORD.get(state);
-      keyStoreType = MSTAGE_SSL_KEY_STORE_TYPE.get(state);
-      keyPassword = MSTAGE_SSL_KEY_PASSWORD.get(state);
-      trustStoreFilePath = MSTAGE_SSL_TRUST_STORE_PATH.get(state);
-      trustStorePassword = MSTAGE_SSL_TRUST_STORE_PASSWORD.get(state);
+      keyStoreFilePath = MSTAGE_SSL.getKeyStorePath(state);
+      keyStorePassword = MSTAGE_SSL.getKeyStorePassword(state);
+      keyStoreType = MSTAGE_SSL.getKeyStoreType(state);
+      keyPassword = MSTAGE_SSL.getKeyPassword(state);
+      trustStoreFilePath = MSTAGE_SSL.getTrustStorePath(state);
+      trustStorePassword = MSTAGE_SSL.getTrustStorePassword(state);
 
       KeyStore keyStore = loadKeyStore(keyStoreFilePath, keyStoreType, keyStorePassword.toCharArray());
       keyAlias = keyStore.aliases().nextElement();

@@ -11,7 +11,6 @@ import com.linkedin.cdi.factory.reader.SchemaReader;
 import com.linkedin.cdi.factory.sftp.SftpChannelClient;
 import com.linkedin.cdi.factory.sftp.SftpClient;
 import java.sql.Connection;
-import javax.net.ssl.SSLContext;
 import org.apache.gobblin.configuration.State;
 import org.apache.http.client.HttpClient;
 import org.slf4j.Logger;
@@ -43,9 +42,9 @@ public class SecureConnectionClientFactory extends DefaultConnectionClientFactor
         MSTAGE_HTTP_CONN_TTL_SECONDS.get(state),
         MSTAGE_HTTP_CONN_PER_ROUTE_MAX.get(state),
         MSTAGE_HTTP_CONN_MAX.get(state),
-        MSTAGE_SSL_CONN_TIMEOUT_MILLIS.get(state),
-        MSTAGE_SSL_SOCKET_TIMEOUT_MILLIS.get(state),
-        MSTAGE_SSL_VERSION.get(state),
+        MSTAGE_SSL.getConnectionTimeoutMillis(state),
+        MSTAGE_SSL.getSocketTimeoutMillis(state),
+        MSTAGE_SSL.getVersion(state),
         null, -1).build();
   }
 
@@ -91,14 +90,5 @@ public class SecureConnectionClientFactory extends DefaultConnectionClientFactor
   @Override
   public SchemaReader getSchemaReader(State state) {
     return new JsonFileReader();
-  }
-
-  protected SSLContext createSslContext(State state) {
-    try {
-      return SecureNetworkUtil.createSSLContext(new KeyCertRetriever(state), MSTAGE_SSL_VERSION.get(state));
-    } catch (Exception e) {
-      LOG.error("Error initializing SSL context.", e);
-      return null;
-    }
   }
 }

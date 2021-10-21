@@ -227,39 +227,7 @@ public interface PropertyCollection {
   StringProperties MSTAGE_SOURCE_SCHEMA_URN = new StringProperties("ms.source.schema.urn");
   StringProperties MSTAGE_SOURCE_URI = new StringProperties("ms.source.uri");
 
-  // default: 10seconds, minimum: 0, maximum: -
-  // 0 is interpreted as default
-  // see org.apache.http.client.config.RequestConfig#connectTimeout
-  IntegerProperties MSTAGE_SSL_CONN_TIMEOUT_MILLIS = new IntegerProperties("ms.ssl.conn.timeout.millis", 10000) {
-    @Override
-    public Integer get(State state) {
-      int value = super.get(state);
-      return value == 0 ? getDefaultValue() : value;
-    }
-  };
-
-  StringProperties MSTAGE_SSL_KEY_PASSWORD = new StringProperties("ms.ssl.key.password") {
-
-  };
-  StringProperties MSTAGE_SSL_KEY_STORE_PATH = new StringProperties("ms.ssl.key.store.path");
-  StringProperties MSTAGE_SSL_KEY_STORE_PASSWORD = new StringProperties("ms.ssl.key.store.password");
-  StringProperties MSTAGE_SSL_KEY_STORE_TYPE = new StringProperties("ms.ssl.key.store.type", "pkcs12");
-
-  // default: 2minutes, minimum: 0, maximum: -
-  // 0 is interpreted as default
-  // see org.apache.http.client.config.RequestConfig#socketTimeout
-  IntegerProperties MSTAGE_SSL_SOCKET_TIMEOUT_MILLIS = new IntegerProperties("ms.ssl.socket.timeout.millis", 120000) {
-    @Override
-    public Integer get(State state) {
-      int value = super.get(state);
-      return value == 0 ? getDefaultValue() : value;
-    }
-  };
-
-  StringProperties MSTAGE_SSL_TRUST_STORE_PASSWORD = new StringProperties("ms.ssl.trust.store.password");
-  StringProperties MSTAGE_SSL_TRUST_STORE_PATH = new StringProperties("ms.ssl.trust.store.path");
-  StringProperties MSTAGE_SSL_VERSION = new StringProperties("ms.ssl.version", "TLSv1.2");
-
+  SslProperties MSTAGE_SSL = new SslProperties("ms.ssl");
   JsonArrayProperties MSTAGE_TARGET_SCHEMA = new JsonArrayProperties("ms.target.schema");
   StringProperties MSTAGE_TARGET_SCHEMA_URN = new StringProperties("ms.target.schema.urn");
   StringProperties MSTAGE_TOTAL_COUNT_FIELD = new StringProperties("ms.total.count.field");
@@ -401,20 +369,14 @@ public interface PropertyCollection {
       MSTAGE_S3_LIST_MAX_KEYS,
       MSTAGE_SCHEMA_CLEANSING,
       MSTAGE_SECONDARY_INPUT,
-      MSTAGE_SESSION_KEY_FIELD, MSTAGE_SFTP_CONN_TIMEOUT_MILLIS,
+      MSTAGE_SESSION_KEY_FIELD,
+      MSTAGE_SFTP_CONN_TIMEOUT_MILLIS,
       MSTAGE_SOURCE_DATA_CHARACTER_SET,
       MSTAGE_SOURCE_FILES_PATTERN,
       MSTAGE_SOURCE_S3_PARAMETERS,
       MSTAGE_SOURCE_SCHEMA_URN,
       MSTAGE_SOURCE_URI,
-      MSTAGE_SSL_CONN_TIMEOUT_MILLIS,
-      MSTAGE_SSL_KEY_STORE_PATH,
-      MSTAGE_SSL_KEY_STORE_PASSWORD,
-      MSTAGE_SSL_KEY_STORE_TYPE,
-      MSTAGE_SSL_SOCKET_TIMEOUT_MILLIS,
-      MSTAGE_SSL_TRUST_STORE_PASSWORD,
-      MSTAGE_SSL_TRUST_STORE_PATH,
-      MSTAGE_SSL_VERSION,
+      MSTAGE_SSL,
       MSTAGE_TARGET_SCHEMA,
       MSTAGE_TARGET_SCHEMA_URN,
       MSTAGE_TOTAL_COUNT_FIELD,
