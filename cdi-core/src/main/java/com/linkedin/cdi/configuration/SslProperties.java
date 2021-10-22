@@ -4,9 +4,13 @@
 
 package com.linkedin.cdi.configuration;
 
+import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
+
+import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
 /**
@@ -24,6 +28,22 @@ public class SslProperties extends JsonObjectProperties{
   final private static String VERSION = "version";
   final private static String VERSION_DEFAULT = "TLSv1.2";
   final private static String KEY_STORE_TYPE_DEFAULT = "pkcs12";
+
+  final private static List<String> allAttributes = Lists.newArrayList(
+      KEY_STORE_TYPE, KEY_STORE_PATH, KEY_STORE_PASSWORD, KEY_PASSWORD,
+      TRUST_STORE_PATH, TRUST_STORE_PASSWORD,
+      CONNECTION_TIMEOUT, SOCKET_TIMEOUT,
+      VERSION
+  );
+
+  @Override
+  public boolean isValid(State state) {
+    if (super.isValid(state) && !super.isBlank(state)) {
+      JsonObject value = GSON.fromJson(state.getProp(getConfig()), JsonObject.class);
+      return value.entrySet().stream().allMatch(p -> allAttributes.contains(p.getKey()));
+    }
+    return super.isValid(state);
+  }
 
   /**
    * Constructor with implicit default value

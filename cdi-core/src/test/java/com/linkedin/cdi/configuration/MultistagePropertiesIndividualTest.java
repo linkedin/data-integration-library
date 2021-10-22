@@ -88,6 +88,29 @@ public class MultistagePropertiesIndividualTest {
   }
 
   @Test
+  public void testSSL() {
+    SourceState state = new SourceState();
+    Assert.assertTrue(MSTAGE_SSL.isValid(state));
+
+    JsonObject ssl = new JsonObject();
+    ssl.addProperty("keyStoreType", "xxx");
+    ssl.addProperty("keyStorePath", "xxx");
+    ssl.addProperty("keyStorePassword", "xxx");
+    ssl.addProperty("keyPassword", "xxx");
+    ssl.addProperty("trustStorePath", "xxx");
+    ssl.addProperty("trustStorePassword", "xxx");
+    ssl.addProperty("connectionTimeoutSeconds", "1");
+    ssl.addProperty("socketTimeoutSeconds", "1");
+    ssl.addProperty("version", "xxx");
+    state.setProp(MSTAGE_SSL.getConfig(), ssl.toString());
+    Assert.assertTrue(MSTAGE_SSL.isValid(state));
+
+    ssl.addProperty("keystorePassword", "xxx");
+    state.setProp(MSTAGE_SSL.getConfig(), ssl.toString());
+    Assert.assertFalse(MSTAGE_SSL.isValid(state));
+  }
+
+  @Test
   public void testWorkUnitParallelismMax() {
     SourceState state = new SourceState();
     Assert.assertTrue(MSTAGE_WORK_UNIT_PARALLELISM_MAX.isValid(state));
