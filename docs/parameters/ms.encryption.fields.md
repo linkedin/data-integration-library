@@ -24,7 +24,9 @@ JsonObject type (with nested structure). For the later, the field
 name can be Json Path.
 
 Fields to be encrypted cannot have null values, and the data type of 
-the fields cannot be nullable (need to have isNullable: false).
+the fields cannot be nullable (need to have isNullable: false). When
+[ms.output.schema](ms.output.schema.md) is defined, this will be
+checked against the definition in it. 
 
 ### Example
 

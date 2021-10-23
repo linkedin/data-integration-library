@@ -124,12 +124,13 @@ public interface PropertyCollection {
     public boolean isValid(State state) {
       if (super.isValid(state) && !isBlank(state)) {
         // Encrypted fields cannot be nullable, required: isNullable = false
-        JsonArray encryptionFields = GSON.fromJson(state.getProp(getConfig()), JsonArray.class);
-        for (JsonElement field : encryptionFields) {
-          if (!field.isJsonPrimitive()
-              || field.getAsString().isEmpty()
-              || SchemaUtils.isNullable(field.getAsString(), MSTAGE_OUTPUT_SCHEMA.get(state))) {
-            return false;
+        if (!MSTAGE_OUTPUT_SCHEMA.isBlank(state)) {
+          JsonArray encryptionFields = GSON.fromJson(state.getProp(getConfig()), JsonArray.class);
+          for (JsonElement field : encryptionFields) {
+            if (!field.isJsonPrimitive() || field.getAsString().isEmpty() || SchemaUtils.isNullable(field.getAsString(),
+                MSTAGE_OUTPUT_SCHEMA.get(state))) {
+              return false;
+            }
           }
         }
       }
