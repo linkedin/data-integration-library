@@ -7,13 +7,10 @@ package com.linkedin.cdi.configuration;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.linkedin.cdi.util.JsonUtils;
 import com.linkedin.cdi.util.SchemaUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
