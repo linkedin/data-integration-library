@@ -126,9 +126,11 @@ public interface PropertyCollection {
         // Encrypted fields cannot be nullable, required: isNullable = false
         JsonArray encryptionFields = GSON.fromJson(state.getProp(getConfig()), JsonArray.class);
         for (JsonElement field : encryptionFields) {
-          return field.isJsonPrimitive()
-              && !field.getAsString().isEmpty()
-              && !SchemaUtils.isNullable(field.getAsString(), MSTAGE_OUTPUT_SCHEMA.get(state));
+          if (!field.isJsonPrimitive()
+              || field.getAsString().isEmpty()
+              || SchemaUtils.isNullable(field.getAsString(), MSTAGE_OUTPUT_SCHEMA.get(state))) {
+            return false;
+          }
         }
       }
       return super.isValid(state);
