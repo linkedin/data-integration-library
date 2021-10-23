@@ -7,9 +7,13 @@ package com.linkedin.cdi.configuration;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.util.JsonUtils;
+import com.linkedin.cdi.util.SchemaUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
@@ -118,7 +122,21 @@ public interface PropertyCollection {
 
   BooleanProperties MSTAGE_ENABLE_DYNAMIC_FULL_LOAD = new BooleanProperties("ms.enable.dynamic.full.load", Boolean.TRUE);
   BooleanProperties MSTAGE_ENABLE_SCHEMA_BASED_FILTERING = new BooleanProperties("ms.enable.schema.based.filtering", Boolean.TRUE);
-  JsonArrayProperties MSTAGE_ENCRYPTION_FIELDS = new JsonArrayProperties("ms.encryption.fields");
+  JsonArrayProperties MSTAGE_ENCRYPTION_FIELDS = new JsonArrayProperties("ms.encryption.fields") {
+    @Override
+    public boolean isValid(State state) {
+      if (super.isValid(state) && !isBlank(state)) {
+        // Encrypted fields cannot be nullable, required: isNullable = false
+        JsonArray encryptionFields = GSON.fromJson(state.getProp(getConfig()), JsonArray.class);
+        for (JsonElement field : encryptionFields) {
+          return field.isJsonPrimitive()
+              && !field.getAsString().isEmpty()
+              && !SchemaUtils.isNullable(field.getAsString(), MSTAGE_OUTPUT_SCHEMA.get(state));
+        }
+      }
+      return super.isValid(state);
+    }
+  };
   StringProperties MSTAGE_EXTRACTOR_CLASS = new StringProperties("ms.extractor.class");
   StringProperties MSTAGE_EXTRACTOR_TARGET_FILE_NAME = new StringProperties("ms.extractor.target.file.name");
   StringProperties MSTAGE_EXTRACTOR_TARGET_FILE_PERMISSION = new StringProperties("ms.extractor.target.file.permission", "755");

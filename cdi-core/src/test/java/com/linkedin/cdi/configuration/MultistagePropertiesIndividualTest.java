@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.configuration;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.linkedin.cdi.keys.JobKeys;
 import org.apache.gobblin.configuration.SourceState;
@@ -86,6 +87,45 @@ public class MultistagePropertiesIndividualTest {
     state.setProp("ms.csv.column.header", "false");
     Assert.assertTrue(MSTAGE_CSV_COLUMN_HEADER.isValid(state));
   }
+
+  @Test
+  public void testEncryptionFields() {
+    SourceState state = new SourceState();
+    Assert.assertTrue(MSTAGE_ENCRYPTION_FIELDS.isValid(state));
+
+    JsonArray fields = new JsonArray();
+    fields.add("access_token");
+    state.setProp(MSTAGE_ENCRYPTION_FIELDS.getConfig(), fields.toString());
+
+    JsonObject schemaColumn = new JsonObject();
+    schemaColumn.addProperty("columnName", "access_token");
+    schemaColumn.addProperty("isNullable", "true");
+    JsonArray schema = new JsonArray();
+    schema.add(schemaColumn);
+    state.setProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), schema.toString());
+
+    Assert.assertFalse(MSTAGE_ENCRYPTION_FIELDS.isValid(state));
+
+    schemaColumn = new JsonObject();
+    schemaColumn.addProperty("columnName", "access_token");
+    schema = new JsonArray();
+    schema.add(schemaColumn);
+    state.setProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), schema.toString());
+
+    Assert.assertFalse(MSTAGE_ENCRYPTION_FIELDS.isValid(state));
+
+    schemaColumn = new JsonObject();
+    schemaColumn.addProperty("columnName", "access_token");
+    schemaColumn.addProperty("isNullable", "false");
+    schema = new JsonArray();
+    schema.add(schemaColumn);
+    state.setProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), schema.toString());
+
+    Assert.assertTrue(MSTAGE_ENCRYPTION_FIELDS.isValid(state));
+
+
+  }
+
 
   @Test
   public void testSSL() {
