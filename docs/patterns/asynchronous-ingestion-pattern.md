@@ -199,5 +199,10 @@ both the request ID and access token.
 See the SFDC bulk API ingestion example:
 ![SFDC bulk API ingestion](../images/sfdc-bulk-ingestion.png)
 
+## Sample Applications
+
+Sample applications of this pattern include:
+- [Salesforce (SFDC) bulk API ingestion](../sample-configs/sfdc-bulk-api-ingestion.md)
+- [Eloqua API ingestion](../sample-configs/eloqua-api-ingestion.md)
   
 [Back to Pattern Summary](summary.md)
