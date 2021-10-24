@@ -48,16 +48,6 @@ allowed by the QPS to avoid QPS violations cross threads.
 ms.connection.client.factory allows vendors specify customized connections with proxy or enhanced security.
 The default factory is com.linkedin.cdi.DefaultConnectionClientFactory. 
 
-## ms.converter.csv.max.failures
-
-Deprecated, use [ms.csv](ms.csv.md)
-
-## ms.converter.keep.null.strings
-
-Deprecated, use [ms.csv](ms.csv.md)
-
-This is for future CSV converter.
-
 ## [ms.csv](ms.csv.md)
 
 [ms.csv](ms.csv.md) defines CSV extraction and conversion parameters. 
@@ -99,37 +89,6 @@ By default, CsvExtractor tries to infer the true type of fields when inferring s
 However, in some cases, the inference is not accurate, and users may prefer to keep all fields as strings.
 In this case `"defaultFieldType": "string"`. 
 Supported types: string | int | long | double | boolean | float.
-
-## [ms.csv.column.header](ms.csv.column.header.md)
-
-Deprecated, use [ms.csv](ms.csv.md)
-
-## [ms.csv.column.header.index](ms.csv.column.header.index.md)
-
-Deprecated, use [ms.csv](ms.csv.md)
-
-## [ms.csv.column.projection](ms.csv.column.projection.md)
-
-Deprecated, use [ms.csv](ms.csv.md)
-
-## [ms.csv.default.field.type](ms.csv.default.field.type.md)
-
-Deprecated, use [ms.csv](ms.csv.md)
-
-## [ms.csv.escape.character](ms.csv.escape.character.md)
-
-Deprecated, use [ms.csv](ms.csv.md)
-
-## [ms.csv.quote.character](ms.csv.quote.character.md)
-
-Deprecated, use [ms.csv](ms.csv.md)
-
-## [ms.csv.separator](ms.csv.separator.md)
-
-Deprecated, use [ms.csv](ms.csv.md)
-
-## [ms.csv.skip.lines](ms.csv.skip.lines.md)
-Deprecated, use [ms.csv](ms.csv.md)
 
 ## [ms.data.default.type](ms.data.default.type.md)
 

@@ -64,6 +64,14 @@ public interface PropertyCollection {
     }
   };
 
+  // Decprecate this legacy property
+  LongProperties CSV_MAX_FAILURES = new LongProperties("csv.max.failures") {
+    @Override
+    public boolean isValid(State state) {
+      return false;
+    }
+  };
+
   CsvProperties MSTAGE_CSV = new CsvProperties("ms.csv");
 
   BooleanProperties MSTAGE_CONVERTER_KEEP_NULL_STRINGS = new BooleanProperties("ms.converter.keep.null.strings", Boolean.FALSE) {
@@ -454,6 +462,7 @@ public interface PropertyCollection {
       MSTAGE_WORK_UNIT_PARTIAL_PARTITION,
       MSTAGE_WORK_UNIT_PARTITION,
       CONVERTER_CLASSES,
+      CSV_MAX_FAILURES,
       DATA_PUBLISHER_FINAL_DIR,
       DATASET_URN,
       ENCRYPT_KEY_LOC,

@@ -25,6 +25,7 @@ When the linesToSkip is not set explicitly, and the columnHeaderIndex is set, li
 When neither linesToSkip and columnHeaderIndex are set, linesToSkip = 0.  
 If more lines need to be skipped after the header, then set this parameter explicitly.
 - **columnHeaderIndex**, specifies the 0-based row index of the header columns if they are available.
+The valid value range is [-1, Integer.MAX_VALUE). The default value is -1, which means no header row.  
 CSV files may have 1 or more descriptive lines before the actual data. These descriptive lines, 
 including the column header line, should be skipped. 
 Note the column header line can be in any place of the skipped lines. 
