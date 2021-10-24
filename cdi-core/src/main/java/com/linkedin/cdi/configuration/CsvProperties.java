@@ -16,7 +16,7 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
 /**
- * SSL Parameters
+ * CSV Parameters
  */
 public class CsvProperties extends JsonObjectProperties{
   final private static String DEFAULT_FIELD_TYPE = "defaultFieldType";

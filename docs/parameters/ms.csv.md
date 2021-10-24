@@ -55,6 +55,7 @@ However, in some cases, the inference is not accurate, and users may prefer to k
 In this case `"defaultFieldType": "string"`. 
 Supported types: string | int | long | double | boolean | float.
 - **maxFailures**, this is for the future CSV converter.
+- **keepNullString**, this is for the future CSV converter.
 
 See [CsvExtractor](https://github.com/linkedin/data-integration-library/blob/master/docs/components/CsvExtractor.md)
 

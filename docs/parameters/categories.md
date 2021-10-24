@@ -55,19 +55,9 @@ The following are related to conversion (converters):
 - [ms.target.schema](ms.target.schema.md)
 - [ms.target.schema.urn](ms.target.schema.urn.md)
 - [ms.validation.attributes](ms.validation.attributes.md)
-- ms.converter.csv.max.failures
-- ms.converter.keep.null.strings
 
 # Extractor Properties
 - [ms.csv](ms.csv.md)
-- [ms.csv.column.header](ms.csv.column.header.md)
-- [ms.csv.column.header.index](ms.csv.column.header.index.md)
-- [ms.csv.column.projection](ms.csv.column.projection.md)
-- [ms.csv.default.field.type](ms.csv.default.field.type.md)
-- [ms.csv.escape.character](ms.csv.escape.character.md)
-- [ms.csv.quote.character](ms.csv.quote.character.md)
-- [ms.csv.separator](ms.csv.separator.md)
-- [ms.csv.skip.lines](ms.csv.skip.lines.md)
 
 # Execution Properties
 - [ms.enable.dynamic.full.load](ms.enable.dynamic.full.load.md)
