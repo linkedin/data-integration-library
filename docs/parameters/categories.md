@@ -58,7 +58,8 @@ The following are related to conversion (converters):
 - ms.converter.csv.max.failures
 - ms.converter.keep.null.strings
 
-# CSV Extractor Properties
+# Extractor Properties
+- [ms.csv](ms.csv.md)
 - [ms.csv.column.header](ms.csv.column.header.md)
 - [ms.csv.column.header.index](ms.csv.column.header.index.md)
 - [ms.csv.column.projection](ms.csv.column.projection.md)

@@ -1,1 +1,3 @@
-This is for future CSV converter.
+## ms.converter.csv.max.failures
+
+**Deprecated, use [ms.csv](ms.csv.md)**

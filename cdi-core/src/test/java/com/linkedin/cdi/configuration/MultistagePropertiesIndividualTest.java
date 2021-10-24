@@ -76,16 +76,50 @@ public class MultistagePropertiesIndividualTest {
 
 
   @Test
-  public void testCsvColumnHeader() {
+  public void testCsv() {
     SourceState state = new SourceState();
-    state.setProp("ms.csv.column.header", "xxx");
-    Assert.assertFalse(MSTAGE_CSV_COLUMN_HEADER.isValid(state));
+    JsonObject csv;
 
-    state.setProp("ms.csv.column.header", "true");
-    Assert.assertTrue(MSTAGE_CSV_COLUMN_HEADER.isValid(state));
+    Assert.assertTrue(MSTAGE_CSV.isValid(state));
+    Assert.assertEquals(MSTAGE_CSV.getEscapeCharacter(state), "\\");
+    Assert.assertEquals(MSTAGE_CSV.getQuoteCharacter(state), "\"");
+    Assert.assertEquals(MSTAGE_CSV.getFieldSeparator(state), ",");
+    Assert.assertEquals(MSTAGE_CSV.getRecordSeparator(state), System.lineSeparator());
 
-    state.setProp("ms.csv.column.header", "false");
-    Assert.assertTrue(MSTAGE_CSV_COLUMN_HEADER.isValid(state));
+    csv = new JsonObject();
+    csv.addProperty("columnHeaderIndex", -1);
+    csv.addProperty("linesToSkip", 0);
+    csv.addProperty("escapeCharacter", "u0003");
+    csv.addProperty("quoteCharacter", "u0003");
+    csv.addProperty("defaultFieldType", "xxx");
+    csv.addProperty("fieldSeparator", "u0003");
+    csv.addProperty("recordSeparator", "u0003");
+    csv.addProperty("columnProjection", "xxx");
+    csv.addProperty("maxFailures", 1);
+    csv.addProperty("keepNullString", true);
+    state.setProp("ms.csv", csv.toString());
+    Assert.assertTrue(MSTAGE_CSV.isValid(state));
+    Assert.assertEquals(MSTAGE_CSV.getEscapeCharacter(state), "\u0003");
+    Assert.assertEquals(MSTAGE_CSV.getQuoteCharacter(state), "\u0003");
+    Assert.assertEquals(MSTAGE_CSV.getFieldSeparator(state), "\u0003");
+    Assert.assertEquals(MSTAGE_CSV.getRecordSeparator(state), "\u0003");
+
+    csv = new JsonObject();
+    csv.addProperty("columnHeaderIndex", -1);
+    state.setProp("ms.csv", csv.toString());
+    Assert.assertTrue(MSTAGE_CSV.isValid(state));
+
+    csv = new JsonObject();
+    csv.addProperty("columnHeaderIndex", 0);
+    state.setProp("ms.csv", csv.toString());
+    Assert.assertTrue(MSTAGE_CSV.isValid(state));
+
+    csv = new JsonObject();
+    csv.addProperty("columnHeaderIndex", 0);
+    csv.addProperty("linesToSkip", 0);
+    state.setProp("ms.csv", csv.toString());
+    Assert.assertFalse(MSTAGE_CSV.isValid(state));
+
   }
 
   @Test

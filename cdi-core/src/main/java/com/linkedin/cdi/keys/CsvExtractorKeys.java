@@ -29,11 +29,6 @@ public class CsvExtractorKeys extends ExtractorKeys {
   private Iterator<String[]> csvIterator = null;
   private long currentPageNumber = 0;
   private Boolean columnHeader = false;
-  private int columnHeaderIndex = 0;
-  private int rowsToSkip = 0;
-  private String separator = MSTAGE_CSV_SEPARATOR.getDefaultValue();
-  private String quoteCharacter = MSTAGE_CSV_QUOTE_CHARACTER.getDefaultValue();
-  private String escapeCharacter = MSTAGE_CSV_ESCAPE_CHARACTER.getDefaultValue();
   // column name --> index mapping created based on the output or inferred schema
   private Map<String, Integer> columnToIndexMap = new HashMap<>();
   // A queue that stores sample rows read in during schema inference
@@ -54,7 +49,6 @@ public class CsvExtractorKeys extends ExtractorKeys {
     LOG.debug("These are values of CsvExtractor regarding to Work Unit: {}",
         workUnit == null ? "testing" : workUnit.getProp(DATASET_URN.toString()));
     LOG.debug("Is column header present: {}", columnHeader);
-    LOG.debug("Total rows to skip: {}", rowsToSkip);
   }
 
   public Iterator<String[]> getCsvIterator() {
@@ -79,46 +73,6 @@ public class CsvExtractorKeys extends ExtractorKeys {
 
   public void setColumnHeader(Boolean columnHeader) {
     this.columnHeader = columnHeader;
-  }
-
-  public int getColumnHeaderIndex() {
-    return columnHeaderIndex;
-  }
-
-  public void setColumnHeaderIndex(int columnHeaderIndex) {
-    this.columnHeaderIndex = columnHeaderIndex;
-  }
-
-  public int getRowsToSkip() {
-    return rowsToSkip;
-  }
-
-  public void setRowsToSkip(int rowsToSkip) {
-    this.rowsToSkip = rowsToSkip;
-  }
-
-  public String getSeparator() {
-    return separator;
-  }
-
-  public void setSeparator(String separator) {
-    this.separator = separator;
-  }
-
-  public String getQuoteCharacter() {
-    return quoteCharacter;
-  }
-
-  public void setQuoteCharacter(String quoteCharacter) {
-    this.quoteCharacter = quoteCharacter;
-  }
-
-  public String getEscapeCharacter() {
-    return escapeCharacter;
-  }
-
-  public void setEscapeCharacter(String escapeCharacter) {
-    this.escapeCharacter = escapeCharacter;
   }
 
   public Map<String, Integer> getColumnToIndexMap() {

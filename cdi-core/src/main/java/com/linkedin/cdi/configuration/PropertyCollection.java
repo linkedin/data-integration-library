@@ -57,32 +57,76 @@ public interface PropertyCollection {
           "com.linkedin.cdi.factory.DefaultConnectionClientFactory");
 
   // default: 0, minimum: 0, maximum: -
-  LongProperties MSTAGE_CONVERTER_CSV_MAX_FAILURES = new LongProperties("ms.converter.csv.max.failures");
+  LongProperties MSTAGE_CONVERTER_CSV_MAX_FAILURES = new LongProperties("ms.converter.csv.max.failures") {
+    @Override
+    public boolean isValid(State state) {
+      return false;
+    }
+  };
 
-  BooleanProperties MSTAGE_CONVERTER_KEEP_NULL_STRINGS = new BooleanProperties("ms.converter.keep.null.strings", Boolean.FALSE);
-  BooleanProperties MSTAGE_CSV_COLUMN_HEADER = new BooleanProperties("ms.csv.column.header", Boolean.FALSE);
+  CsvProperties MSTAGE_CSV = new CsvProperties("ms.csv");
+
+  BooleanProperties MSTAGE_CONVERTER_KEEP_NULL_STRINGS = new BooleanProperties("ms.converter.keep.null.strings", Boolean.FALSE) {
+    @Override
+    public boolean isValid(State state) {
+      return false;
+    }
+  };
+
+  BooleanProperties MSTAGE_CSV_COLUMN_HEADER = new BooleanProperties("ms.csv.column.header", Boolean.FALSE) {
+    @Override
+    public boolean isValid(State state) {
+      return false;
+    }
+  };
 
   // default: 0, minimum: 0, maximum: -
-  IntegerProperties MSTAGE_CSV_COLUMN_HEADER_INDEX = new IntegerProperties("ms.csv.column.header.index");
+  IntegerProperties MSTAGE_CSV_COLUMN_HEADER_INDEX = new IntegerProperties("ms.csv.column.header.index") {
+    @Override
+    public boolean isValid(State state) {
+      return false;
+    }
+  };
 
   StringProperties MSTAGE_CSV_COLUMN_PROJECTION = new StringProperties("ms.csv.column.projection") {
     @Override
     public boolean isValid(State state) {
-      if (super.isValid(state) && !super.isBlank(state)) {
-        String columnProjections = state.getProp(getConfig());
-        return columnProjections != null && columnProjections.split(KEY_WORD_COMMA).length > 0;
-      }
-      return super.isValid(state);
+      return false;
     }
   };
 
-  StringProperties MSTAGE_CSV_DEFAULT_FIELD_TYPE = new StringProperties("ms.csv.default.field.type");
-  StringProperties MSTAGE_CSV_ESCAPE_CHARACTER = new StringProperties("ms.csv.escape.character", "u005C");
-  StringProperties MSTAGE_CSV_QUOTE_CHARACTER = new StringProperties("ms.csv.quote.character", "\"");
-  StringProperties MSTAGE_CSV_SEPARATOR = new StringProperties("ms.csv.separator", KEY_WORD_COMMA);
+  StringProperties MSTAGE_CSV_DEFAULT_FIELD_TYPE = new StringProperties("ms.csv.default.field.type") {
+    @Override
+    public boolean isValid(State state) {
+      return false;
+    }
+  };
+  StringProperties MSTAGE_CSV_ESCAPE_CHARACTER = new StringProperties("ms.csv.escape.character", "u005C") {
+    @Override
+    public boolean isValid(State state) {
+      return false;
+    }
+  };
+  StringProperties MSTAGE_CSV_QUOTE_CHARACTER = new StringProperties("ms.csv.quote.character", "\"") {
+    @Override
+    public boolean isValid(State state) {
+      return false;
+    }
+  };
+  StringProperties MSTAGE_CSV_SEPARATOR = new StringProperties("ms.csv.separator", KEY_WORD_COMMA) {
+    @Override
+    public boolean isValid(State state) {
+      return false;
+    }
+  };
 
   // default: 0, minimum: 0, maximum: -
-  IntegerProperties MSTAGE_CSV_SKIP_LINES = new IntegerProperties("ms.csv.skip.lines");
+  IntegerProperties MSTAGE_CSV_SKIP_LINES = new IntegerProperties("ms.csv.skip.lines") {
+    @Override
+    public boolean isValid(State state) {
+      return false;
+    }
+  };
 
   BooleanProperties MSTAGE_DATA_EXPLICIT_EOF = new BooleanProperties("ms.data.explicit.eof", Boolean.FALSE);
   JsonObjectProperties MSTAGE_DATA_DEFAULT_TYPE = new JsonObjectProperties("ms.data.default.type");

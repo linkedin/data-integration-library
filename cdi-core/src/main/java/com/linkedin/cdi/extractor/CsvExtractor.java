@@ -20,7 +20,6 @@ import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.preprocessor.InputStreamProcessor;
 import com.linkedin.cdi.preprocessor.StreamProcessor;
-import com.linkedin.cdi.util.CsvUtils;
 import com.linkedin.cdi.util.JsonIntermediateSchema;
 import com.linkedin.cdi.util.JsonUtils;
 import com.linkedin.cdi.util.SchemaBuilder;
@@ -79,35 +78,15 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
   @Override
   protected void initialize(ExtractorKeys keys) {
     csvExtractorKeys.logUsage(state);
-    csvExtractorKeys.setColumnHeader(MSTAGE_CSV_COLUMN_HEADER.get(state));
-    csvExtractorKeys.setRowsToSkip(MSTAGE_CSV_SKIP_LINES.get(state));
-    if (csvExtractorKeys.getColumnHeader()) {
-      // only set the columnHeaderIndex if ms.csv.column.header is true
-      csvExtractorKeys.setColumnHeaderIndex(
-          MSTAGE_CSV_COLUMN_HEADER_INDEX.get(state));
-      // if no explicit number of lines to skip is set, skip all lines up to the header by default
-      if (csvExtractorKeys.getRowsToSkip() == 0) {
-        csvExtractorKeys.setRowsToSkip(csvExtractorKeys.getColumnHeaderIndex() + 1);
-      } else if (csvExtractorKeys.getRowsToSkip() <= csvExtractorKeys.getColumnHeaderIndex()) {
-        failWorkUnit(String.format("Header index out of bound: index is %d but the number of skipped lines is %d",
-            csvExtractorKeys.getColumnHeaderIndex(), csvExtractorKeys.getRowsToSkip()));
-      }
-    }
-    csvExtractorKeys.setSeparator(
-        CsvUtils.unescape(MSTAGE_CSV_SEPARATOR.get(state)));
-    csvExtractorKeys.setQuoteCharacter(
-        CsvUtils.unescape(MSTAGE_CSV_QUOTE_CHARACTER.get(state)));
-    csvExtractorKeys.setEscapeCharacter(
-        CsvUtils.unescape(MSTAGE_CSV_ESCAPE_CHARACTER.get(state)));
-    csvExtractorKeys.setDefaultFieldType(
-        MSTAGE_CSV_DEFAULT_FIELD_TYPE.get(state).toString().toLowerCase());
+    csvExtractorKeys.setColumnHeader(MSTAGE_CSV.getColumnHeaderIndex(state) >= 0);
+    csvExtractorKeys.setDefaultFieldType(MSTAGE_CSV.getDefaultFieldType(state).toLowerCase());
     csvExtractorKeys.setSampleRows(new ArrayDeque<>());
 
     // check if user has defined the output schema
     if (jobKeys.hasOutputSchema()) {
       JsonArray outputSchema = jobKeys.getOutputSchema();
-      csvExtractorKeys.setColumnProjection(expandColumnProjection(MSTAGE_CSV_COLUMN_PROJECTION
-          .get(state), outputSchema.size()));
+      csvExtractorKeys.setColumnProjection(expandColumnProjection(MSTAGE_CSV.getColumnProjection(state),
+          outputSchema.size()));
       // initialize the column name to index map based on the schema when derived fields are present
       if (jobKeys.getDerivedFields().entrySet().size() > 0) {
         buildColumnToIndexMap(outputSchema);
@@ -232,9 +211,9 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
           }
         }
 
-        CSVParser parser = new CSVParserBuilder().withSeparator(csvExtractorKeys.getSeparator().charAt(0))
-            .withQuoteChar(csvExtractorKeys.getQuoteCharacter().charAt(0))
-            .withEscapeChar(csvExtractorKeys.getEscapeCharacter().charAt(0))
+        CSVParser parser = new CSVParserBuilder().withSeparator(MSTAGE_CSV.getFieldSeparator(state).charAt(0))
+            .withQuoteChar(MSTAGE_CSV.getQuoteCharacter(state).charAt(0))
+            .withEscapeChar(MSTAGE_CSV.getEscapeCharacter(state).charAt(0))
             .build();
         CSVReader reader = new CSVReaderBuilder(new InputStreamReader(input, Charset.forName(
             MSTAGE_SOURCE_DATA_CHARACTER_SET.get(state)))).withCSVParser(parser)
@@ -402,10 +381,10 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
    */
   private void skipRowAndSaveHeader(Iterator<String[]> readerIterator) {
     int linesRead = 0;
-    while (readerIterator.hasNext() && linesRead < csvExtractorKeys.getRowsToSkip()) {
+    while (readerIterator.hasNext() && linesRead < MSTAGE_CSV.getLinesToSkip(state)) {
       String[] line = getNextLineWithCleansing(readerIterator);
       // save the column header
-      if (linesRead == csvExtractorKeys.getColumnHeaderIndex() && csvExtractorKeys.getColumnHeader()) {
+      if (linesRead == MSTAGE_CSV.getColumnHeaderIndex(state) && csvExtractorKeys.getColumnHeader()) {
         csvExtractorKeys.setHeaderRow(line);
         // check if header has all columns in schema
         if (jobKeys.hasOutputSchema()) {

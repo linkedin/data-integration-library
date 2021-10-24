@@ -50,62 +50,86 @@ The default factory is com.linkedin.cdi.DefaultConnectionClientFactory.
 
 ## ms.converter.csv.max.failures
 
-This is for future CSV converter.
+Deprecated, use [ms.csv](ms.csv.md)
 
 ## ms.converter.keep.null.strings
 
+Deprecated, use [ms.csv](ms.csv.md)
+
 This is for future CSV converter.
+
+## [ms.csv](ms.csv.md)
+
+[ms.csv](ms.csv.md) defines CSV extraction and conversion parameters. 
+It can have the following parameters:
+
+- **linesToSkip**, specifies how many lines of data to skip in the CSV payload.
+The linesToSkip need to be more than the columnHeaderIndex. 
+For example, if columnHeaderIndex = 0, the number of lines to skip need to be at least 1. 
+When the linesToSkip is not set explicitly, and the columnHeaderIndex is set, linesToSkip = columnHeaderIndex + 1.
+When neither linesToSkip and columnHeaderIndex are set, linesToSkip = 0.  
+If more lines need to be skipped after the header, then set this parameter explicitly.
+- **columnHeaderIndex**, specifies the 0-based row index of the header columns if they are available.
+CSV files may have 1 or more descriptive lines before the actual data. These descriptive lines, 
+including the column header line, should be skipped. 
+Note the column header line can be in any place of the skipped lines. 
+- **escapeCharacter**, specifies how characters can be escaped. Default is "u005C" (backslash \). 
+This can be specified as a variation of unicode without a backslash (\) before 'u'.
+For example: \ can be specified as "u005c".
+- **quoteCharacter**, specifies how source data are enclosed by columns. Default is double-quote (").
+This can be specified as a variation of unicode without a backslash (\) before 'u'.
+For example: | can be specified as "u007C".
+- **fieldSeparator**, specifies the field delimiter in the source csv data. The default is comma.
+This can be specified as a variation of unicode without a backslash (\) before 'u'.
+For example: tab (\t) can be specified as "u0009".
+- **recordSeparator**, also called line separator, specifies the line or record
+delimiter. The default is system line separator. 
+This can be specified as a variation of unicode without a backslash (\) before 'u'.
+- **columnProjection**, defines how CSV columns should be arranged and filtered after parse,
+before being sent to converter and writer to persist. 
+This feature is primarily used to extract selected columns from csv source without a header.
+Column projection definition is a comma-separated string, where each value is either an 
+integer or a range, with each number representing the 0 based index of the field.
+Column projection definition is inclusive, i.e., only the selected fields are included
+in the final dataset, if a column projection is defined.  
+For example, to include the 0th, 2nd, 3rd, and 4th column from a source that has 6 columns, 
+set the value to: `"columnProjection": "0,2-4"`
+- **defaultFieldType**, specifies a default type to supersede field type inference.
+By default, CsvExtractor tries to infer the true type of fields when inferring schema
+However, in some cases, the inference is not accurate, and users may prefer to keep all fields as strings.
+In this case `"defaultFieldType": "string"`. 
+Supported types: string | int | long | double | boolean | float.
 
 ## [ms.csv.column.header](ms.csv.column.header.md)
 
-ms.csv.column.header specifies whether the CSV data contains a header row.
+Deprecated, use [ms.csv](ms.csv.md)
 
 ## [ms.csv.column.header.index](ms.csv.column.header.index.md)
 
-ms.csv.column.header.index specifies the 0-based row index of the header columns if they are available.
+Deprecated, use [ms.csv](ms.csv.md)
 
 ## [ms.csv.column.projection](ms.csv.column.projection.md)
 
-`ms.csv.column.projection` defines how CSV columns should be arranged and filtered after parse,
-before being sent to converter and writer to persist.
-This feature is primarily used to extract selected columns from csv source without a header.
-
-Column projection definition is a comma-separated string, where each value is either an 
-integer or a range, with each number representing the 0 based index of the field.
-
-Column projection definition is inclusive, i.e., only the selected fields are included
-in the final dataset, if a column projection is defined.  
+Deprecated, use [ms.csv](ms.csv.md)
 
 ## [ms.csv.default.field.type](ms.csv.default.field.type.md)
 
-ms.csv.default.field.type specifies a default type to supersede field type inference.
-
-By default, CsvExtractor tries to infer the true type of fields when inferring schema
-However, in some cases, the inference is not accurate, and users may prefer to keep all fields as strings.
-In this case `ms.csv.default.field.type = string`
+Deprecated, use [ms.csv](ms.csv.md)
 
 ## [ms.csv.escape.character](ms.csv.escape.character.md)
 
-ms.csv.escape.character specifies how characters can be escaped.
-Default is "u005C" (backslash '\'). 
-see [CsvExtractor](https://github.com/linkedin/data-integration-library/blob/master/docs/components/CsvExtractor.md)
+Deprecated, use [ms.csv](ms.csv.md)
 
 ## [ms.csv.quote.character](ms.csv.quote.character.md)
 
-ms.csv.quote.character specifies how source data are enclosed by columns.
-Default is double-quote. 
-see [CsvExtractor](https://github.com/linkedin/data-integration-library/blob/master/docs/components/CsvExtractor.md)
+Deprecated, use [ms.csv](ms.csv.md)
 
 ## [ms.csv.separator](ms.csv.separator.md)
 
-`ms.csv.separator` specifies the delimiter in the source csv file. 
-Default is comma. 
-see [CsvExtractor](https://github.com/linkedin/data-integration-library/blob/master/docs/components/CsvExtractor.md)
+Deprecated, use [ms.csv](ms.csv.md)
 
 ## [ms.csv.skip.lines](ms.csv.skip.lines.md)
-
-`ms.csv.skip.lines` is a CsvExtractor property, it specifies how many 
-lines of data to skip in the CSV payload. see [CsvExtractor](https://github.com/linkedin/data-integration-library/blob/master/docs/components/CsvExtractor.md)
+Deprecated, use [ms.csv](ms.csv.md)
 
 ## [ms.data.default.type](ms.data.default.type.md)
 
