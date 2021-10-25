@@ -51,8 +51,8 @@ public interface StaticConstants {
   String KEY_WORD_SOURCE_TYPE = "source.type";
   String KEY_WORD_STRING = "string";
   String KEY_WORD_SYMBOLS = "symbols";
-  String KEY_WORD_RANGE_TO = "to";
   String KEY_WORD_TIMESTAMP = "timestamp";
+  String KEY_WORD_TO = "to";
   String KEY_WORD_TYPE = "type";
   String KEY_WORD_UNITS = "units";
   String KEY_WORD_UNKNOWN = "unknown";

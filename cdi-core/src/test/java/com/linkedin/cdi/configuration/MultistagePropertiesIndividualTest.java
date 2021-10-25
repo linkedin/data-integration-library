@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.configuration;
 
+import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.linkedin.cdi.keys.JobKeys;
@@ -189,11 +190,40 @@ public class MultistagePropertiesIndividualTest {
     SourceState state = new SourceState();
     Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
 
+    // not a JsonArray
     state.setProp("ms.watermark", "string");
     Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
 
+    // array item is not a JsonObject
     state.setProp("ms.watermark", "[\"string\"]");
     Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+
+    // no "name"
+    state.setProp("ms.watermark", "[{\"type\": \"datetime\",\"range\": {\"from\": \"2019-01-01\", \"to\": \"-\"}}]");
+    Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+
+    // unknown type
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"unknown\"}]");
+    Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+
+    // no "range"
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\"}]");
+    Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+
+    // no "units"
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"unit\"}]");
+    Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+
+    // normal datetime watermark
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\",\"range\": {\"from\": \"2019-01-01\", \"to\": \"-\"}}]");
+    Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
+    Assert.assertEquals(MSTAGE_WATERMARK.getRanges(state).getRight(), "-");
+
+    // normal datetime watermark and normal unit watermark
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"2021-08-21\", \"to\": \"-\"}}, {\"name\": \"bucketId\", \"type\": \"unit\", \"units\": \"null,0,1,2,3,4,5,6,7,8,9\"}]");
+    Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
+    Assert.assertEquals(MSTAGE_WATERMARK.getRanges(state).getLeft(), "2021-08-21");
+    Assert.assertEquals(MSTAGE_WATERMARK.getUnits(state), Lists.newArrayList("null,0,1,2,3,4,5,6,7,8,9".split(",")));
   }
 
 
