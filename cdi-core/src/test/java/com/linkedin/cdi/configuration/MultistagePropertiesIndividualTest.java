@@ -185,6 +185,19 @@ public class MultistagePropertiesIndividualTest {
   }
 
   @Test
+  public void testWatermark() {
+    SourceState state = new SourceState();
+    Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
+
+    state.setProp("ms.watermark", "string");
+    Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+
+    state.setProp("ms.watermark", "[\"string\"]");
+    Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+  }
+
+
+    @Test
   public void testWorkUnitParallelismMax() {
     SourceState state = new SourceState();
     Assert.assertTrue(MSTAGE_WORK_UNIT_PARALLELISM_MAX.isValid(state));
