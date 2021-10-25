@@ -116,6 +116,9 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
     jobKeys.logUsage(state);
     if (!jobKeys.validate(state)) {
       LOG.error("Some parameters are invalid, job will do nothing until they are fixed.");
+      if (MSTAGE_WORK_UNIT_MIN_UNITS.get(state) > 0) {
+        throw new RuntimeException(String.format(EXCEPTION_WORK_UNIT_MINIMUM, MSTAGE_WORK_UNIT_MIN_UNITS.get(state), 0));
+      }
       return new ArrayList<>();
     }
 

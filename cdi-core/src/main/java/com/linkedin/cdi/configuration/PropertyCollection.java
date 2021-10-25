@@ -320,7 +320,33 @@ public interface PropertyCollection {
     }
   };
 
-  JsonArrayProperties MSTAGE_WATERMARK = new JsonArrayProperties("ms.watermark");
+  JsonArrayProperties MSTAGE_WATERMARK = new JsonArrayProperties("ms.watermark") {
+    @Override
+    public boolean isValid(State state) {
+      final List<String> types = Lists.newArrayList("unit", "datetime");
+      if (super.isValid(state) && !isBlank(state)) {
+        // Derived fields should meet general JsonArray configuration requirements
+        // and contain only JsonObject items that each has a "name" element and a "formula" element
+        JsonArray value = GSON.fromJson(state.getProp(getConfig()), JsonArray.class);
+        if (value.size() == 0) {
+          return false;
+        }
+        if (!value.get(0).isJsonObject()) {
+          return false;
+        }
+
+        if (!value.get(0).getAsJsonObject().has(KEY_WORD_NAME) || !value.get(0).getAsJsonObject().has(KEY_WORD_TYPE)) {
+          return false;
+        }
+
+        String type = value.get(0).getAsJsonObject().get(KEY_WORD_TYPE).getAsString();
+        if (types.stream().noneMatch(t -> t.equalsIgnoreCase(type))) {
+          return false;
+        }
+      }
+      return super.isValid(state);
+    }
+  };
   JsonArrayProperties MSTAGE_WATERMARK_GROUPS = new JsonArrayProperties("ms.watermark.groups");
 
   // default: 0, minimum: 0, maximum: -
