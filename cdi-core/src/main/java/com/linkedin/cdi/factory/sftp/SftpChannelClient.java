@@ -174,7 +174,7 @@ public class SftpChannelClient implements SftpClient {
     }
   }
 
-  private void setIdentityStrategy(JSch jsch) {
+  protected void setIdentityStrategy(JSch jsch) {
     String privateKey = Credentials.getPrivateKey(state);
     if (StringUtils.isNotEmpty(privateKey)) {
       for (IdentityStrategy strategy : STRATEGIES) {
@@ -185,7 +185,7 @@ public class SftpChannelClient implements SftpClient {
     }
   }
 
-  private void configSessionProperties() throws JSchException {
+  protected void configSessionProperties() throws JSchException {
     session.setUserInfo(new MyUserInfo());
     session.setDaemonThread(true);
     session.setTimeout(MSTAGE_SFTP_CONN_TIMEOUT_MILLIS.get(state));
