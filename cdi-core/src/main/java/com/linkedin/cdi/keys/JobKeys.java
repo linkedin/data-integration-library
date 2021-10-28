@@ -225,6 +225,16 @@ public class JobKeys {
       }
     }
 
+    for (String deprecatedKey: deprecatedProperties.keySet()) {
+      if (state.contains(deprecatedKey) &&
+          StringUtils.isNotBlank(state.getProp(deprecatedKey, StringUtils.EMPTY)))  {
+        LOG.error(String.format(EXCEPTION_DEPRECATED_CONFIGURATION, deprecatedKey,
+            deprecatedProperties.get(deprecatedKey).getConfig(),
+            deprecatedProperties.get(deprecatedKey).getDocUrl()));
+        allValid = false;
+      }
+    }
+
     if(!allValid) {
       return false;
     }

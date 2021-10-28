@@ -20,9 +20,6 @@ public class JdbcKeys extends JobKeys {
   private static final Logger LOG = LoggerFactory.getLogger(JdbcKeys.class);
   private String jdbcStatement = null;
   private JsonObject initialParameterValues = new JsonObject();
-  private String separator = MSTAGE_CSV_SEPARATOR.getDefaultValue();
-  private String quoteCharacter = MSTAGE_CSV_QUOTE_CHARACTER.getDefaultValue();
-  private String escapeCharacter = MSTAGE_CSV_ESCAPE_CHARACTER.getDefaultValue();
   private String schemaRefactorFunction = MSTAGE_JDBC_SCHEMA_REFACTOR.getDefaultValue();
 
   @Override
@@ -47,30 +44,6 @@ public class JdbcKeys extends JobKeys {
 
   public void setInitialParameterValues(JsonObject initialParameterValues) {
     this.initialParameterValues = initialParameterValues;
-  }
-
-  public String getSeparator() {
-    return separator;
-  }
-
-  public void setSeparator(String separator) {
-    this.separator = separator;
-  }
-
-  public String getQuoteCharacter() {
-    return quoteCharacter;
-  }
-
-  public void setQuoteCharacter(String quoteCharacter) {
-    this.quoteCharacter = quoteCharacter;
-  }
-
-  public String getEscapeCharacter() {
-    return escapeCharacter;
-  }
-
-  public void setEscapeCharacter(String escapeCharacter) {
-    this.escapeCharacter = escapeCharacter;
   }
 
   public String getSchemaRefactorFunction() {
