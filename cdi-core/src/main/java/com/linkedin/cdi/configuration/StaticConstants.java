@@ -51,8 +51,8 @@ public interface StaticConstants {
   String KEY_WORD_SOURCE_TYPE = "source.type";
   String KEY_WORD_STRING = "string";
   String KEY_WORD_SYMBOLS = "symbols";
-  String KEY_WORD_RANGE_TO = "to";
   String KEY_WORD_TIMESTAMP = "timestamp";
+  String KEY_WORD_TO = "to";
   String KEY_WORD_TYPE = "type";
   String KEY_WORD_UNITS = "units";
   String KEY_WORD_UNKNOWN = "unknown";
@@ -77,6 +77,7 @@ public interface StaticConstants {
   String EXCEPTION_WORK_UNIT_MINIMUM = "Job requires a minimum of %s work unit(s) to proceed because ms.work.unit.min.units = %s.";
   String EXCEPTION_RECORD_MINIMUM = "Work unit requires a minimum of %s record(s) to succeed because ms.work.unit.min.records = %s.";
   String EXCEPTION_INCORRECT_CONFIGURATION = "Property %s has incorrect configuration: %s, see: %s";
+  String EXCEPTION_DEPRECATED_CONFIGURATION = "Property %s has been deprecated, and the replacement is: %s, see: %s";
 
   String MSG_ROWS_PROCESSED = "Processed %s records, work unit: %s";
   String MSG_WORK_UNIT_ALWAYS = "There should be a work unit.";

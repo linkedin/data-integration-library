@@ -38,7 +38,7 @@ public abstract class MultistageProperties<T> {
     if (get(state).equals(getDefaultValue())) {
       return String.format("Property %s has default value %s", getConfig(), get(state));
     }
-    return String.format("Property %s has none default value %s", getConfig(), get(state));
+    return String.format("Property %s has non-default value %s", getConfig(), get(state));
   }
 
   final public String getConfig() {

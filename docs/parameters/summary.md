@@ -316,8 +316,7 @@ status for session control and the condition for termination.
 
 ## [ms.sftp.conn.timeout.millis](ms.sftp.conn.timeout.millis.md)
 
-`ms.sftp.conn.timeout.millis` defines maximum wait time after a read() operation. 
-The default is 60 seconds. 
+`ms.sftp.conn.timeout.millis` defines maximum allowed inactive time. The default is 60 seconds.
 
 ## [ms.source.data.character.set](ms.source.data.character.set.md)
 

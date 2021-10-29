@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.configuration;
 
+import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.linkedin.cdi.keys.JobKeys;
@@ -53,8 +54,6 @@ public class MultistagePropertiesIndividualTest {
     SourceState state = new SourceState();
     Assert.assertEquals(EXTRACT_IS_FULL.get(state), Boolean.FALSE);
     Assert.assertEquals(MSTAGE_BACKFILL.get(state), Boolean.FALSE);
-    Assert.assertEquals(MSTAGE_CONVERTER_KEEP_NULL_STRINGS.get(state), Boolean.FALSE);
-    Assert.assertEquals(MSTAGE_CSV_COLUMN_HEADER .get(state), Boolean.FALSE);
     Assert.assertEquals(MSTAGE_DATA_EXPLICIT_EOF.get(state), Boolean.FALSE);
     Assert.assertEquals(MSTAGE_ENABLE_CLEANSING.get(state), Boolean.TRUE);
     Assert.assertEquals(MSTAGE_ENABLE_DYNAMIC_FULL_LOAD.get(state), Boolean.TRUE);
@@ -65,9 +64,6 @@ public class MultistagePropertiesIndividualTest {
     Assert.assertEquals(MSTAGE_S3_LIST_MAX_KEYS.get(state).intValue(), 1000);
     Assert.assertEquals(MSTAGE_NORMALIZER_BATCH_SIZE.get(state).longValue(), 500L);
     Assert.assertEquals(MSTAGE_WAIT_TIMEOUT_SECONDS.get(state).longValue(), 600L);
-    Assert.assertEquals(MSTAGE_CSV_ESCAPE_CHARACTER.get(state), "u005C");
-    Assert.assertEquals(MSTAGE_CSV_QUOTE_CHARACTER.get(state), "\"");
-    Assert.assertEquals(MSTAGE_CSV_SEPARATOR.get(state), KEY_WORD_COMMA);
     Assert.assertEquals(MSTAGE_JDBC_SCHEMA_REFACTOR.get(state), "none");
     Assert.assertEquals(MSTAGE_SOURCE_DATA_CHARACTER_SET.get(state), "UTF-8");
     Assert.assertEquals(MSTAGE_SOURCE_FILES_PATTERN.get(state), REGEXP_DEFAULT_PATTERN);
@@ -185,6 +181,48 @@ public class MultistagePropertiesIndividualTest {
   }
 
   @Test
+  public void testWatermark() {
+    SourceState state = new SourceState();
+    Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
+
+    // not a JsonArray
+    state.setProp("ms.watermark", "string");
+    Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+
+    // array item is not a JsonObject
+    state.setProp("ms.watermark", "[\"string\"]");
+    Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+
+    // no "name"
+    state.setProp("ms.watermark", "[{\"type\": \"datetime\",\"range\": {\"from\": \"2019-01-01\", \"to\": \"-\"}}]");
+    Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+
+    // unknown type
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"unknown\"}]");
+    Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+
+    // no "range"
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\"}]");
+    Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+
+    // no "units"
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"unit\"}]");
+    Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+
+    // normal datetime watermark
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\",\"range\": {\"from\": \"2019-01-01\", \"to\": \"-\"}}]");
+    Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
+    Assert.assertEquals(MSTAGE_WATERMARK.getRanges(state).getRight(), "-");
+
+    // normal datetime watermark and normal unit watermark
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"2021-08-21\", \"to\": \"-\"}}, {\"name\": \"bucketId\", \"type\": \"unit\", \"units\": \"null,0,1,2,3,4,5,6,7,8,9\"}]");
+    Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
+    Assert.assertEquals(MSTAGE_WATERMARK.getRanges(state).getLeft(), "2021-08-21");
+    Assert.assertEquals(MSTAGE_WATERMARK.getUnits(state), Lists.newArrayList("null,0,1,2,3,4,5,6,7,8,9".split(",")));
+  }
+
+
+    @Test
   public void testWorkUnitParallelismMax() {
     SourceState state = new SourceState();
     Assert.assertTrue(MSTAGE_WORK_UNIT_PARALLELISM_MAX.isValid(state));

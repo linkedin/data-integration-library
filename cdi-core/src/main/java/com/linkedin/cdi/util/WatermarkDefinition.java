@@ -206,7 +206,7 @@ public class WatermarkDefinition {
       this.setType(WatermarkTypes.DATETIME);
       this.setRange(new ImmutablePair<>(
           definition.get(KEY_WORD_RANGE).getAsJsonObject().get(KEY_WORD_FROM).getAsString(),
-          definition.get(KEY_WORD_RANGE).getAsJsonObject().get(KEY_WORD_RANGE_TO).getAsString()));
+          definition.get(KEY_WORD_RANGE).getAsJsonObject().get(KEY_WORD_TO).getAsString()));
       this.setWorkUnitPartitionType(workUnitPartitionType);
     } else if (definition.get(KEY_WORD_TYPE).getAsString().equalsIgnoreCase(WatermarkTypes.UNIT.name)) {
       this.setType(WatermarkTypes.UNIT);
