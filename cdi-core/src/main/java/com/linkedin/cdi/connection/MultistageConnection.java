@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.connection;
 
+import com.beust.jcommander.internal.Lists;
 import com.google.gson.JsonObject;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.extractor.CsvExtractor;
@@ -152,11 +153,15 @@ public class MultistageConnection implements Connection {
    * @param entries list of files or keys
    * @return the wrapped InputStream
    */
-  protected InputStream wrap(List<String> entries) {
+  protected InputStream wrap(final List<String> entries) {
+    List<String> list = Lists.newArrayList(entries);
+    if (list.size() == 0) {
+      list.add("#####dummy#file#name#or#prefix#####");
+    }
     if (MSTAGE_EXTRACTOR_CLASS.get(getState()).equals(CsvExtractor.class.getName())) {
-      return InputStreamUtils.convertListToInputStream(entries);
+      return InputStreamUtils.convertListToInputStream(list);
     } else if (MSTAGE_EXTRACTOR_CLASS.get(getState()).equals(JsonExtractor.class.getName())) {
-      return InputStreamUtils.convertListToInputStream(KEY_WORD_VALUES, entries);
+      return InputStreamUtils.convertListToInputStream(KEY_WORD_VALUES, list);
     } else {
       return null;
     }
