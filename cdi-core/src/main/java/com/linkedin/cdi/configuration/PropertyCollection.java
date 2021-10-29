@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.configuration;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -11,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.linkedin.cdi.util.SchemaUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import org.apache.gobblin.configuration.State;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
@@ -56,85 +58,8 @@ public interface PropertyCollection {
   StringProperties MSTAGE_CONNECTION_CLIENT_FACTORY = new StringProperties("ms.connection.client.factory",
           "com.linkedin.cdi.factory.DefaultConnectionClientFactory");
 
-  // default: 0, minimum: 0, maximum: -
-  LongProperties MSTAGE_CONVERTER_CSV_MAX_FAILURES = new LongProperties("ms.converter.csv.max.failures") {
-    @Override
-    public boolean isValid(State state) {
-      return false;
-    }
-  };
-
-  // Decprecate this legacy property
-  LongProperties CSV_MAX_FAILURES = new LongProperties("csv.max.failures") {
-    @Override
-    public boolean isValid(State state) {
-      return false;
-    }
-  };
 
   CsvProperties MSTAGE_CSV = new CsvProperties("ms.csv");
-
-  BooleanProperties MSTAGE_CONVERTER_KEEP_NULL_STRINGS = new BooleanProperties("ms.converter.keep.null.strings", Boolean.FALSE) {
-    @Override
-    public boolean isValid(State state) {
-      return false;
-    }
-  };
-
-  BooleanProperties MSTAGE_CSV_COLUMN_HEADER = new BooleanProperties("ms.csv.column.header", Boolean.FALSE) {
-    @Override
-    public boolean isValid(State state) {
-      return false;
-    }
-  };
-
-  // default: 0, minimum: 0, maximum: -
-  IntegerProperties MSTAGE_CSV_COLUMN_HEADER_INDEX = new IntegerProperties("ms.csv.column.header.index") {
-    @Override
-    public boolean isValid(State state) {
-      return false;
-    }
-  };
-
-  StringProperties MSTAGE_CSV_COLUMN_PROJECTION = new StringProperties("ms.csv.column.projection") {
-    @Override
-    public boolean isValid(State state) {
-      return false;
-    }
-  };
-
-  StringProperties MSTAGE_CSV_DEFAULT_FIELD_TYPE = new StringProperties("ms.csv.default.field.type") {
-    @Override
-    public boolean isValid(State state) {
-      return false;
-    }
-  };
-  StringProperties MSTAGE_CSV_ESCAPE_CHARACTER = new StringProperties("ms.csv.escape.character", "u005C") {
-    @Override
-    public boolean isValid(State state) {
-      return false;
-    }
-  };
-  StringProperties MSTAGE_CSV_QUOTE_CHARACTER = new StringProperties("ms.csv.quote.character", "\"") {
-    @Override
-    public boolean isValid(State state) {
-      return false;
-    }
-  };
-  StringProperties MSTAGE_CSV_SEPARATOR = new StringProperties("ms.csv.separator", KEY_WORD_COMMA) {
-    @Override
-    public boolean isValid(State state) {
-      return false;
-    }
-  };
-
-  // default: 0, minimum: 0, maximum: -
-  IntegerProperties MSTAGE_CSV_SKIP_LINES = new IntegerProperties("ms.csv.skip.lines") {
-    @Override
-    public boolean isValid(State state) {
-      return false;
-    }
-  };
 
   BooleanProperties MSTAGE_DATA_EXPLICIT_EOF = new BooleanProperties("ms.data.explicit.eof", Boolean.FALSE);
   JsonObjectProperties MSTAGE_DATA_DEFAULT_TYPE = new JsonObjectProperties("ms.data.default.type");
@@ -320,7 +245,8 @@ public interface PropertyCollection {
     }
   };
 
-  JsonArrayProperties MSTAGE_WATERMARK = new JsonArrayProperties("ms.watermark");
+
+  WatermarkProperties MSTAGE_WATERMARK = new WatermarkProperties("ms.watermark");
   JsonArrayProperties MSTAGE_WATERMARK_GROUPS = new JsonArrayProperties("ms.watermark.groups");
 
   // default: 0, minimum: 0, maximum: -
@@ -392,16 +318,7 @@ public interface PropertyCollection {
       MSTAGE_BACKFILL,
       MSTAGE_CALL_INTERVAL_MILLIS,
       MSTAGE_CONNECTION_CLIENT_FACTORY,
-      MSTAGE_CONVERTER_CSV_MAX_FAILURES,
-      MSTAGE_CONVERTER_KEEP_NULL_STRINGS,
-      MSTAGE_CSV_COLUMN_HEADER,
-      MSTAGE_CSV_COLUMN_HEADER_INDEX,
-      MSTAGE_CSV_COLUMN_PROJECTION,
-      MSTAGE_CSV_DEFAULT_FIELD_TYPE,
-      MSTAGE_CSV_ESCAPE_CHARACTER,
-      MSTAGE_CSV_QUOTE_CHARACTER,
-      MSTAGE_CSV_SEPARATOR,
-      MSTAGE_CSV_SKIP_LINES,
+      MSTAGE_CSV,
       MSTAGE_DATA_EXPLICIT_EOF,
       MSTAGE_DATA_DEFAULT_TYPE,
       MSTAGE_DATA_FIELD,
@@ -462,7 +379,6 @@ public interface PropertyCollection {
       MSTAGE_WORK_UNIT_PARTIAL_PARTITION,
       MSTAGE_WORK_UNIT_PARTITION,
       CONVERTER_CLASSES,
-      CSV_MAX_FAILURES,
       DATA_PUBLISHER_FINAL_DIR,
       DATASET_URN,
       ENCRYPT_KEY_LOC,
@@ -488,4 +404,25 @@ public interface PropertyCollection {
       TASK_MAXRETRIES,
       TASKEXECUTOR_THREADPOOL_SIZE
   );
+  Map<String, MultistageProperties<?>> deprecatedProperties =
+      new ImmutableMap.Builder<String, MultistageProperties<?>>()
+          .put("ms.csv.column.header", MSTAGE_CSV)
+          .put("ms.csv.column.header.index", MSTAGE_CSV)
+          .put("ms.csv.column.projection", MSTAGE_CSV)
+          .put("ms.csv.default.field.type", MSTAGE_CSV)
+          .put("ms.csv.escape.character", MSTAGE_CSV)
+          .put("ms.csv.quote.character", MSTAGE_CSV)
+          .put("ms.csv.separator", MSTAGE_CSV)
+          .put("ms.csv.skip.lines", MSTAGE_CSV)
+          .put("ms.converter.csv.max.failures", MSTAGE_CSV)
+          .put("ms.converter.keep.null.strings", MSTAGE_CSV)
+          .put("csv.max.failures", MSTAGE_CSV)
+          .put("sftpConn.timeout", MSTAGE_SFTP_CONN_TIMEOUT_MILLIS)
+          .put("gaap.http.maxConnectionsPerRoute", MSTAGE_HTTP_CONN_PER_ROUTE_MAX)
+          .put("gaap.http.maxConnections", MSTAGE_HTTP_CONN_MAX)
+          .put("gaap.trustStorePath", MSTAGE_SSL)
+          .put("gaap.authType", MSTAGE_CONNECTION_CLIENT_FACTORY)
+          .put("ms.kraken.enabled", MSTAGE_CONNECTION_CLIENT_FACTORY)
+          .put("gobblinGaapHttpClientFactory.authType", MSTAGE_CONNECTION_CLIENT_FACTORY)
+          .build();
 }

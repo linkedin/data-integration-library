@@ -229,7 +229,7 @@ public class JdbcConnection extends MultistageConnection {
       for (int i = 0; i < resultSetMetadata.getColumnCount(); i++) {
         builder.append(StringEscapeUtils.escapeCsv(JdbcUtils.parseColumnAsString(resultSet, resultSetMetadata, i + 1)));
         if (i < resultSetMetadata.getColumnCount() - 1) {
-          builder.append(jdbcSourceKeys.getSeparator());
+          builder.append(MSTAGE_CSV.getFieldSeparator(getState()));
         } else {
           builder.append(System.lineSeparator());
         }

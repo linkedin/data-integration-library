@@ -7,7 +7,6 @@ package com.linkedin.cdi.source;
 import com.linkedin.cdi.connection.JdbcConnection;
 import com.linkedin.cdi.extractor.MultistageExtractor;
 import com.linkedin.cdi.keys.JdbcKeys;
-import com.linkedin.cdi.util.CsvUtils;
 import java.sql.Connection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -56,12 +55,6 @@ public class JdbcSource extends MultistageSource<Schema, GenericRecord> {
   protected void initialize(State state) {
     super.initialize(state);
     jdbcSourceKeys.setJdbcStatement(MSTAGE_JDBC_STATEMENT.get(state));
-    jdbcSourceKeys.setSeparator(CsvUtils.unescape(MSTAGE_CSV_SEPARATOR
-        .get(state)));
-    jdbcSourceKeys.setQuoteCharacter(CsvUtils.unescape(MSTAGE_CSV_QUOTE_CHARACTER
-        .get(state)));
-    jdbcSourceKeys.setEscapeCharacter(CsvUtils.unescape(MSTAGE_CSV_ESCAPE_CHARACTER
-        .get(state)));
     jdbcSourceKeys.setSchemaRefactorFunction(MSTAGE_JDBC_SCHEMA_REFACTOR
         .get(state));
     jdbcSourceKeys.logDebugAll();

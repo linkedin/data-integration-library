@@ -107,6 +107,25 @@ so on, hence no repeated download although the server keeps 7-day's files.
 If Abstinent days is 0, then on 2020-01-16, the effective range would be 
 [2020-01-15, 2020-01-16), and it will repeat downloading file file20200115.
 
+### Cut Off Date
+
+`cut off date` is calculated during runtime. It is based on job configuration
+and state store records. `cut off date` is calculated at milliseconds level.  
+The `effective cut off date` is the `cut off date` after considering execution history, which 
+is tracked in state store. 
+
+- `effective cut off date = last highest watermark + abstinent period - grace period`
+- If it is the first job execution and last highest watermark is not present, 
+  then `effective cut off date` is the same as `from` 
+
+Each job has an `overall cut off date` and each partition has a `partition cut off date`.
+
+In runtime, the `overall effective cut off date` is calculated by considering all partitions. 
+The `overall effective cut off date` is used to decide whether to execute a partition. A partition
+executes if its `partition cut off date` is larger than the `overall effective cut off date`. 
+A partition without execution history, including when the partition failed in its first execution,
+has practically no `partition cut off date`; therefore, it always executes. 
+  
 ### Partitioning
 
 Time watermark can be partitioned into different periods: monthly, weekly, 
