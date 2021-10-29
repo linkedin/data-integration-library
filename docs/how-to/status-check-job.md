@@ -55,6 +55,21 @@ until time out.
 
 - `ms.session.key.field={"name": "result.status", "condition": {"regexp": "^complete$"}, "failCondition": {"regexp": "^failed$"}}`
 
+Triggering by session control is also available in 2-step file down from 
+S3 or SFTP. For example, the following wait for today's file to be ready, and
+it tries to check it every 5 minutes for up to 4 hours. 
+
+`source.class=com.linkedin.cdi.source.SftpSource`
+`job.commit.policy=full`
+`ms.extractor.class=com.linkedin.cdi.extractor.JsonExtractor`
+`converter.classes=org.apache.gobblin.converter.avro.JsonIntermediateToAvroConverter`
+`ms.parameters=[{"name":"dt","type":"watermark","watermark":"system","value":"high","format":"datetime","pattern":"yyyyMMdd"}]`
+`ms.output.schema=[{"columnName":"values","isNullable":"true","dataType":{"type":"string"}}]`
+`ms.call.interval.millis=300000`
+`ms.wait.timeout.seconds=14400`
+`ms.session.key.field={"name": "values", "condition": {"regexp": "^.*txt.gpg$"}}`
+`ms.source.uri={{fileDirectory}}*{{dt}}*.txt.gpg`
+
 ## Minimum Record Validation
 
 Status checking can be achieved through minimum record count validation. 
