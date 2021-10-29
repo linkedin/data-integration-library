@@ -58,6 +58,7 @@ public interface PropertyCollection {
   StringProperties MSTAGE_CONNECTION_CLIENT_FACTORY = new StringProperties("ms.connection.client.factory",
           "com.linkedin.cdi.factory.DefaultConnectionClientFactory");
 
+
   CsvProperties MSTAGE_CSV = new CsvProperties("ms.csv");
 
   BooleanProperties MSTAGE_DATA_EXPLICIT_EOF = new BooleanProperties("ms.data.explicit.eof", Boolean.FALSE);
@@ -244,8 +245,8 @@ public interface PropertyCollection {
     }
   };
 
-  WatermarkProperties MSTAGE_WATERMARK = new WatermarkProperties("ms.watermark");
 
+  WatermarkProperties MSTAGE_WATERMARK = new WatermarkProperties("ms.watermark");
   JsonArrayProperties MSTAGE_WATERMARK_GROUPS = new JsonArrayProperties("ms.watermark.groups");
 
   // default: 0, minimum: 0, maximum: -
@@ -403,7 +404,6 @@ public interface PropertyCollection {
       TASK_MAXRETRIES,
       TASKEXECUTOR_THREADPOOL_SIZE
   );
-
   Map<String, MultistageProperties<?>> deprecatedProperties =
       new ImmutableMap.Builder<String, MultistageProperties<?>>()
           .put("ms.csv.column.header", MSTAGE_CSV)

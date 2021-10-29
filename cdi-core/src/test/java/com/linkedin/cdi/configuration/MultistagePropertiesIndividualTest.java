@@ -221,8 +221,7 @@ public class MultistagePropertiesIndividualTest {
     Assert.assertEquals(MSTAGE_WATERMARK.getUnits(state), Lists.newArrayList("null,0,1,2,3,4,5,6,7,8,9".split(",")));
   }
 
-
-    @Test
+  @Test
   public void testWorkUnitParallelismMax() {
     SourceState state = new SourceState();
     Assert.assertTrue(MSTAGE_WORK_UNIT_PARALLELISM_MAX.isValid(state));
