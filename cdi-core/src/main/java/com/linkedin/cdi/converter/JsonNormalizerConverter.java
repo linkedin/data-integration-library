@@ -4,19 +4,20 @@
 
 package com.linkedin.cdi.converter;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.util.JsonUtils;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.converter.Converter;
 import org.apache.gobblin.converter.SingleRecordIterable;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.util.JsonUtils;
 import org.apache.gobblin.util.EmptyIterable;
 
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -49,8 +50,8 @@ public class JsonNormalizerConverter extends Converter<JsonArray, JsonArray, Jso
 
   @Override
   public Converter<JsonArray, JsonArray, JsonObject, JsonObject> init(WorkUnitState workUnit) {
-    maxRecordsPerBatch = MultistageProperties.MSTAGE_NORMALIZER_BATCH_SIZE.getValidNonblankWithDefault(workUnit);
-    targetSchema = MultistageProperties.MSTAGE_TARGET_SCHEMA.getValidNonblankWithDefault(workUnit);
+    maxRecordsPerBatch = MSTAGE_NORMALIZER_BATCH_SIZE.get(workUnit);
+    targetSchema = MSTAGE_TARGET_SCHEMA.get(workUnit);
     return this;
   }
 
@@ -58,12 +59,14 @@ public class JsonNormalizerConverter extends Converter<JsonArray, JsonArray, Jso
   public JsonArray convertSchema(JsonArray inputSchema, WorkUnitState workUnit) {
     for (JsonElement element : targetSchema) {
       String columnName = element.getAsJsonObject().get(KEY_WORD_COLUMN_NAME).getAsString();
+      boolean isNullable = element.getAsJsonObject().get(KEY_WORD_IS_NULLABLE).getAsBoolean();
       outputFields.add(columnName);
-      if (normalizedField == null && !schemaSearch(inputSchema, columnName)) {
+      if (normalizedField == null && !schemaSearch(inputSchema, columnName) && !isNullable) {
         normalizedField = columnName;
       }
     }
-    assert normalizedField != null;
+
+    Preconditions.checkNotNull(normalizedField, "Normalized field is NULL.");
     JsonObject dataType = JsonUtils.get(KEY_WORD_COLUMN_NAME,
         normalizedField, KEY_WORD_DATA_TYPE, targetSchema).getAsJsonObject();
     String trueType = JsonUtils.get(KEY_WORD_TYPE, dataType).getAsString();
@@ -87,7 +90,7 @@ public class JsonNormalizerConverter extends Converter<JsonArray, JsonArray, Jso
       // only output when there's at least one record
       return outputIterable(1);
     }
-    // note: the common fields among records will have the same value, so we only need to retain one record
+    // note: the common fields within each batch will have the same value, so we only need to retain one record
     if (firstRecord == null) {
       firstRecord = inputRecord;
     }
@@ -138,13 +141,17 @@ public class JsonNormalizerConverter extends Converter<JsonArray, JsonArray, Jso
 
     String columnType = JsonUtils.get(KEY_WORD_COLUMN_NAME,
         normalizedField, KEY_WORD_DATA_TYPE_TYPE, targetSchema).getAsString();
-    if (columnType.equalsIgnoreCase(KEY_WORD_MAP) || columnType.equalsIgnoreCase(KEY_WORD_RECORD)) {
+    // filter out null values for map type
+    if (columnType.equalsIgnoreCase(KEY_WORD_MAP)) {
+      newRecord.add(normalizedField, JsonUtils.filterNull(normalized.get(0).getAsJsonObject()));
+    } else if (columnType.equalsIgnoreCase(KEY_WORD_RECORD)) {
       newRecord.add(normalizedField, normalized.get(0));
     } else {
       newRecord.add(normalizedField, normalized);
     }
-    // reset the buffer
+    // reset the buffer and first record
     normalized = new JsonArray();
+    firstRecord = null;
     return newRecord;
   }
 

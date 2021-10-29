@@ -5,16 +5,15 @@
 package com.linkedin.cdi.preprocessor;
 
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.configuration.PropertyCollection;
+import com.linkedin.cdi.util.EncryptionUtils;
 import java.io.IOException;
 import java.io.InputStream;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.gobblin.annotation.Alias;
 import org.apache.gobblin.codec.StreamCodec;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.util.EncryptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -23,15 +22,22 @@ import com.linkedin.cdi.util.EncryptionUtils;
  *
  * This is backwards compatible with PGP algorithms
  */
-@Slf4j
 @Alias("GpgProcessor")
 public class GpgDecryptProcessor extends InputStreamProcessor {
-  @Getter
-  @Setter
+  private static final Logger LOG = LoggerFactory.getLogger(GpgDecryptProcessor.class);
+
+  public StreamCodec getCodec() {
+    return codec;
+  }
+
+  public void setCodec(StreamCodec codec) {
+    this.codec = codec;
+  }
+
   private StreamCodec codec;
 
   /**
-   * @param params See {@link MultistageProperties}
+   * @param params See {@link PropertyCollection}
    */
   public GpgDecryptProcessor(JsonObject params) {
     super(params);

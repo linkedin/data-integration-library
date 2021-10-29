@@ -11,13 +11,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 
 
 /**
@@ -27,9 +29,8 @@ import org.joda.time.format.DateTimeFormatter;
  *
  * @author chrli
  */
-@Slf4j
 public class JsonParameter {
-
+  private static final Logger LOG = LoggerFactory.getLogger(JsonParameter.class);
   private JsonObject paramJson;
   private State state;
   final private static String DEFAULT_TIMEZONE = "America/Los_Angeles";
@@ -180,7 +181,7 @@ public class JsonParameter {
 
           Long watermarkLow = values.get("watermark").getAsJsonObject().get("low").getAsLong();
           Long watermarkHigh = values.get("watermark").getAsJsonObject().get("high").getAsLong();
-          log.debug("found watermark pair: {}, {} in replacement values.", watermarkLow, watermarkHigh);
+          LOG.debug("found watermark pair: {}, {} in replacement values.", watermarkLow, watermarkHigh);
 
           // ignore default watermarks
           if (watermarkLow < 0) {
@@ -289,7 +290,7 @@ public class JsonParameter {
     if (listValue.isJsonPrimitive()) {
       listValueString = listValue.getAsString();
     } else if (listValue.isJsonArray() && listValue.getAsJsonArray().size() > 0) {
-      if (MultistageProperties.EXTRACT_IS_FULL.getValidNonblankWithDefault(state)) {
+      if (EXTRACT_IS_FULL.get(state)) {
         listValueString = listValue.getAsJsonArray().get(0).getAsString();
       } else {
         listValueString = listValue.getAsJsonArray().size() > 1
@@ -298,7 +299,7 @@ public class JsonParameter {
       }
     } else {
       listValueString = "";
-      log.warn("Unable to parse LIST parameter {}, will use a BLANK string", listValue.toString());
+      LOG.warn("Unable to parse LIST parameter {}, will use a BLANK string", listValue.toString());
     }
     return listValueString;
   }

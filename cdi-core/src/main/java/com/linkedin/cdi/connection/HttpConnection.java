@@ -9,34 +9,33 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.exception.RetriableAuthenticationException;
+import com.linkedin.cdi.factory.ConnectionClientFactory;
+import com.linkedin.cdi.keys.ExtractorKeys;
+import com.linkedin.cdi.keys.HttpKeys;
+import com.linkedin.cdi.keys.JobKeys;
+import com.linkedin.cdi.factory.http.HttpRequestMethod;
+import com.linkedin.cdi.util.JsonUtils;
+import com.linkedin.cdi.util.WorkUnitStatus;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.exception.RetriableAuthenticationException;
-import com.linkedin.cdi.factory.HttpClientFactory;
-import com.linkedin.cdi.keys.ExtractorKeys;
-import com.linkedin.cdi.keys.HttpKeys;
-import com.linkedin.cdi.keys.JobKeys;
-import com.linkedin.cdi.util.HttpRequestMethod;
-import com.linkedin.cdi.util.JsonUtils;
-import com.linkedin.cdi.util.WorkUnitStatus;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -46,15 +45,31 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
  *
  * @author Chris Li
  */
-@Slf4j
 public class HttpConnection extends MultistageConnection {
-  @Getter (AccessLevel.PACKAGE)
+  private static final Logger LOG = LoggerFactory.getLogger(HttpConnection.class);
   final private HttpKeys httpSourceKeys;
-
-  @Setter (AccessLevel.PACKAGE)
   private HttpClient httpClient;
-  @Setter (AccessLevel.PACKAGE)
   private CloseableHttpResponse response;
+
+  public HttpKeys getHttpSourceKeys() {
+    return httpSourceKeys;
+  }
+
+  public HttpClient getHttpClient() {
+    return httpClient;
+  }
+
+  public void setHttpClient(HttpClient httpClient) {
+    this.httpClient = httpClient;
+  }
+
+  public CloseableHttpResponse getResponse() {
+    return response;
+  }
+
+  public void setResponse(CloseableHttpResponse response) {
+    this.response = response;
+  }
 
   public HttpConnection(State state, JobKeys jobKeys, ExtractorKeys extractorKeys) {
     super(state, jobKeys, extractorKeys);
@@ -77,11 +92,11 @@ public class HttpConnection extends MultistageConnection {
     if (httpClient == null) {
       try {
         Class<?> factoryClass = Class.forName(
-            MultistageProperties.MSTAGE_HTTP_CLIENT_FACTORY.getValidNonblankWithDefault(state));
-        HttpClientFactory factory = (HttpClientFactory) factoryClass.newInstance();
-        httpClient = factory.get(state);
+            MSTAGE_CONNECTION_CLIENT_FACTORY.get(state));
+        ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.newInstance();
+        httpClient = factory.getHttpClient(state);
       } catch (Exception e) {
-        log.error("Error creating HttpClient: {}", e.getMessage());
+        LOG.error("Error creating HttpClient: {}", e.getMessage());
       }
     }
     return httpClient;
@@ -100,7 +115,6 @@ public class HttpConnection extends MultistageConnection {
   }
 
   @VisibleForTesting
-  @SneakyThrows
   WorkUnitStatus execute(HttpRequestMethod command, WorkUnitStatus status) throws RetriableAuthenticationException {
     Preconditions.checkNotNull(status, "WorkUnitStatus is not initialized.");
     try {
@@ -109,7 +123,7 @@ public class HttpConnection extends MultistageConnection {
     } catch (RetriableAuthenticationException e) {
       throw e;
     } catch (Exception e) {
-      log.error(e.getMessage(), e);
+      LOG.error(e.getMessage(), e);
       return null;
     }
 
@@ -130,21 +144,20 @@ public class HttpConnection extends MultistageConnection {
       // Log but ignore errors when getting content and content type
       // These errors will lead to a NULL buffer in work unit status
       // And that situation will be handled in extractor accordingly
-      log.error(e.getMessage());
+      LOG.error(e.getMessage());
     }
 
     return status;
   }
 
-  @SneakyThrows
   private CloseableHttpResponse retryExecuteHttpRequest(
       final HttpRequestMethod command,
       final JsonObject parameters
   ) throws RetriableAuthenticationException {
-    log.debug("Execute Http {} with parameters:", command.toString());
+    LOG.debug("Execute Http {} with parameters:", command.toString());
     for (Map.Entry<String, JsonElement> entry: parameters.entrySet()) {
       if (!entry.getKey().equalsIgnoreCase(KEY_WORD_PAYLOAD)) {
-        log.debug("parameter: {} value: {}", entry.getKey(), entry.getValue());
+        LOG.debug("parameter: {} value: {}", entry.getKey(), entry.getValue());
       }
     }
     Pair<String, CloseableHttpResponse> response = executeHttpRequest(command,
@@ -153,7 +166,7 @@ public class HttpConnection extends MultistageConnection {
         httpSourceKeys.getHttpRequestHeadersWithAuthentication());
 
     if (response.getLeft().equalsIgnoreCase(KEY_WORD_HTTP_OK)) {
-      log.info("Request was successful, return HTTP response");
+      LOG.info("Request was successful, return HTTP response");
       return response.getRight();
     }
 
@@ -165,7 +178,7 @@ public class HttpConnection extends MultistageConnection {
     // by returning NULL, the task will complete without failure
     if (status < 400 && !httpSourceKeys.getHttpStatuses().getOrDefault("error", Lists.newArrayList()).contains(status)
         || httpSourceKeys.getHttpStatuses().getOrDefault("warning", Lists.newArrayList()).contains(status)) {
-      log.warn("Request was successful with warnings, return NULL response");
+      LOG.warn("Request was successful with warnings, return NULL response");
       return null;
     }
 
@@ -174,8 +187,8 @@ public class HttpConnection extends MultistageConnection {
     List<Integer> paginationErrors = httpSourceKeys.getHttpStatuses().getOrDefault(
         "pagination_error", Lists.newArrayList());
     if (getJobKeys().getIsSecondaryAuthenticationEnabled() && paginationErrors.contains(status)) {
-      log.info("Request was unsuccessful, and needed retry with new authentication credentials");
-      log.info("Sleep {} seconds, waiting for credentials to refresh", getJobKeys().getRetryDelayInSec());
+      LOG.info("Request was unsuccessful, and needed retry with new authentication credentials");
+      LOG.info("Sleep {} seconds, waiting for credentials to refresh", getJobKeys().getRetryDelayInSec());
       throw new RetriableAuthenticationException("Stale authentication token.");
     }
 
@@ -212,6 +225,7 @@ public class HttpConnection extends MultistageConnection {
     // trying to make a Http request, capture the client side error and
     // fail the task if any encoding exception or IO exception
     CloseableHttpResponse response;
+    HttpClientContext context = HttpClientContext.create();
     try {
       JsonObject payloads = new JsonObject();
       JsonObject queryParameters = new JsonObject();
@@ -222,8 +236,9 @@ public class HttpConnection extends MultistageConnection {
           queryParameters.add(entry.getKey(), entry.getValue());
         }
       }
-      response = (CloseableHttpResponse) httpClient.execute(
-          command.getHttpRequest(httpUriTemplate, queryParameters, headers, payloads));
+      HttpUriRequest request = command.getHttpRequest(httpUriTemplate, queryParameters, headers, payloads);
+      response = (CloseableHttpResponse) httpClient.execute(request, context);
+      LOG.debug(context.toString());
     } catch (Exception e) {
       throw new RuntimeException(e.getMessage(), e);
     }
@@ -236,10 +251,10 @@ public class HttpConnection extends MultistageConnection {
     // it will retry accessing the token by passing the response object back).
     Integer status = response.getStatusLine().getStatusCode();
     String reason = response.getStatusLine().getReasonPhrase();
-    log.info("processing status: {} and reason: {}", status, reason);
+    LOG.info("processing status: {} and reason: {}", status, reason);
     if (httpSourceKeys.getHttpStatuses().getOrDefault("success", Lists.newArrayList()).contains(status)
         && !httpSourceKeys.getHttpStatusReasons().getOrDefault("error", Lists.newArrayList()).contains(reason)) {
-      log.info("Request was successful, returning OK and HTTP response.");
+      LOG.info("Request was successful, returning OK and HTTP response.");
       return Pair.of(KEY_WORD_HTTP_OK, response);
     }
 
@@ -248,13 +263,13 @@ public class HttpConnection extends MultistageConnection {
     if (null != response.getEntity()) {
       try {
         reason += StringUtils.LF + EntityUtils.toString(response.getEntity());
-        log.error("Status code: {}, reason: {}", status, reason);
+        LOG.error("Status code: {}, reason: {}", status, reason);
         response.close();
       } catch (IOException e) {
         throw new RuntimeException(e.getMessage(), e);
       }
     }
-    log.warn("Request was unsuccessful, returning NOTOK and HTTP response");
+    LOG.warn("Request was unsuccessful, returning NOTOK and HTTP response");
     return Pair.of(KEY_WORD_HTTP_NOTOK, response);
   }
 
@@ -291,13 +306,13 @@ public class HttpConnection extends MultistageConnection {
 
   @Override
   public boolean closeStream() {
-    log.info("Closing InputStream for {}", getExtractorKeys().getSignature());
+    LOG.info("Closing InputStream for {}", getExtractorKeys().getSignature());
     try {
       if (response != null) {
         response.close();
       }
     } catch (Exception e) {
-      log.warn("Error closing the input stream", e);
+      LOG.warn("Error closing the input stream", e);
       return false;
     }
     return true;
@@ -312,7 +327,7 @@ public class HttpConnection extends MultistageConnection {
         httpClient = null;
       }
     } catch (IOException e) {
-      log.error("error closing HttpSource {}", e.getMessage());
+      LOG.error("error closing HttpSource {}", e.getMessage());
       return false;
     }
     return true;

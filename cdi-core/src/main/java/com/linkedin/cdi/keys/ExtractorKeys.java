@@ -7,17 +7,17 @@ package com.linkedin.cdi.keys;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import java.util.ArrayList;
-import java.util.List;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.gobblin.configuration.State;
 import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.preprocessor.StreamProcessor;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.source.workunit.WorkUnit;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 
 
 /**
@@ -28,15 +28,13 @@ import org.joda.time.DateTime;
  *
  * @author chrli
  */
-@Slf4j
-@Getter (AccessLevel.PUBLIC)
-@Setter
 public class ExtractorKeys {
-  final static private List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      MultistageProperties.EXTRACT_TABLE_NAME_KEY,
-      MultistageProperties.MSTAGE_ACTIVATION_PROPERTY,
-      MultistageProperties.MSTAGE_PARAMETERS
-  );
+  private static final Logger LOG = LoggerFactory.getLogger(ExtractorKeys.class);
+  final static private List<MultistageProperties<?>> WORK_UNIT_PARAMETERS = Lists.newArrayList(
+      MSTAGE_ACTIVATION_PROPERTY,
+      MSTAGE_PAYLOAD_PROPERTY,
+      MSTAGE_WATERMARK_GROUPS,
+      MSTAGE_WORK_UNIT_SCHEDULING_STARTTIME);
 
   private JsonObject activationParameters = new JsonObject();
   private long startTime = DateTime.now().getMillis();
@@ -48,24 +46,122 @@ public class ExtractorKeys {
   private JsonObject dynamicParameters = new JsonObject();
   private Boolean explictEof;
   private JsonArray payloads = new JsonArray();
+  private long processedCount = 0;
 
-  public void logDebugAll(WorkUnit workUnit) {
-    log.debug("These are values in MultistageExtractor regarding to Work Unit: {}",
-        workUnit == null ? "testing" : workUnit.getProp(MultistageProperties.DATASET_URN_KEY.toString()));
-    log.debug("Activation parameters: {}", activationParameters);
-    log.debug("Payload size: {}", payloads.size());
-    log.debug("Starting time: {}", startTime);
-    log.debug("Signature of the work unit: {}", signature);
-    if (inferredSchema != null) {
-      log.info("Inferred schema: {}", inferredSchema.toString());
-      log.info("Avro-flavor schema: {}", inferredSchema.toString());
-    }
-    log.debug("Session Status: {}", sessionKeyValue);
+  public void incrProcessedCount() {
+    processedCount++;
   }
 
-  public void logUsage(State state) {
-    for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      log.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
+  public void logDebugAll(WorkUnit workUnit) {
+    LOG.debug("These are values in MultistageExtractor regarding to Work Unit: {}",
+        workUnit == null ? "testing" : workUnit.getProp(DATASET_URN.toString()));
+    LOG.debug("Activation parameters: {}", activationParameters);
+    LOG.debug("Payload size: {}", payloads.size());
+    LOG.debug("Starting time: {}", startTime);
+    LOG.debug("Signature of the work unit: {}", signature);
+    if (inferredSchema != null) {
+      LOG.info("Inferred schema: {}", inferredSchema.toString());
+      LOG.info("Avro-flavor schema: {}", inferredSchema.toString());
     }
+    LOG.debug("Session Status: {}", sessionKeyValue);
+    LOG.debug("Total rows processed: {}", processedCount);
+  }
+
+  /**
+   * Log work unit specific property values
+   * @param state work unit states
+   */
+  public void logUsage(State state) {
+    for (MultistageProperties<?> p: WORK_UNIT_PARAMETERS) {
+      LOG.info(p.info(state));
+    }
+  }
+
+  public JsonObject getActivationParameters() {
+    return activationParameters;
+  }
+
+  public void setActivationParameters(JsonObject activationParameters) {
+    this.activationParameters = activationParameters;
+  }
+
+  public long getStartTime() {
+    return startTime;
+  }
+
+  public void setStartTime(long startTime) {
+    this.startTime = startTime;
+  }
+
+  public long getDelayStartTime() {
+    return delayStartTime;
+  }
+
+  public void setDelayStartTime(long delayStartTime) {
+    this.delayStartTime = delayStartTime;
+  }
+
+  public String getSignature() {
+    return signature;
+  }
+
+  public void setSignature(String signature) {
+    this.signature = signature;
+  }
+
+  public JsonArray getInferredSchema() {
+    return inferredSchema;
+  }
+
+  public void setInferredSchema(JsonArray inferredSchema) {
+    this.inferredSchema = inferredSchema;
+  }
+
+  public String getSessionKeyValue() {
+    return sessionKeyValue;
+  }
+
+  public void setSessionKeyValue(String sessionKeyValue) {
+    this.sessionKeyValue = sessionKeyValue;
+  }
+
+  public List<StreamProcessor<?>> getPreprocessors() {
+    return preprocessors;
+  }
+
+  public void setPreprocessors(List<StreamProcessor<?>> preprocessors) {
+    this.preprocessors = preprocessors;
+  }
+
+  public JsonObject getDynamicParameters() {
+    return dynamicParameters;
+  }
+
+  public void setDynamicParameters(JsonObject dynamicParameters) {
+    this.dynamicParameters = dynamicParameters;
+  }
+
+  public Boolean getExplictEof() {
+    return explictEof;
+  }
+
+  public void setExplictEof(Boolean explictEof) {
+    this.explictEof = explictEof;
+  }
+
+  public JsonArray getPayloads() {
+    return payloads;
+  }
+
+  public void setPayloads(JsonArray payloads) {
+    this.payloads = payloads;
+  }
+
+  public long getProcessedCount() {
+    return processedCount;
+  }
+
+  public void setProcessedCount(long processedCount) {
+    this.processedCount = processedCount;
   }
 }

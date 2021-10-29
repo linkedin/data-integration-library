@@ -5,27 +5,50 @@
 package com.linkedin.cdi.connection;
 
 import com.google.gson.JsonObject;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.gobblin.configuration.State;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.util.VariableUtils;
 import com.linkedin.cdi.util.WorkUnitStatus;
+import org.apache.gobblin.configuration.State;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * MultistageConnection is a basic implementation of Connection interface.
  *
  * @author Chris Li
  */
-@Slf4j
 public class MultistageConnection implements Connection {
-  @Getter @Setter private State state = null;
-  @Getter @Setter private JobKeys jobKeys = null;
-  @Getter @Setter private ExtractorKeys extractorKeys = null;
+  private static final Logger LOG = LoggerFactory.getLogger(MultistageConnection.class);
+  private State state = null;
+  private JobKeys jobKeys = null;
+  private ExtractorKeys extractorKeys = null;
+
+  public State getState() {
+    return state;
+  }
+
+  public void setState(State state) {
+    this.state = state;
+  }
+
+  public JobKeys getJobKeys() {
+    return jobKeys;
+  }
+
+  public void setJobKeys(JobKeys jobKeys) {
+    this.jobKeys = jobKeys;
+  }
+
+  public ExtractorKeys getExtractorKeys() {
+    return extractorKeys;
+  }
+
+  public void setExtractorKeys(ExtractorKeys extractorKeys) {
+    this.extractorKeys = extractorKeys;
+  }
 
   public MultistageConnection(State state, JobKeys jobKeys, ExtractorKeys extractorKeys) {
     this.setJobKeys(jobKeys);
@@ -73,7 +96,6 @@ public class MultistageConnection implements Connection {
    * @param workUnitStatus prior work unit status
    * @return new work unit status
    */
-  @SneakyThrows
   public WorkUnitStatus executeFirst(final WorkUnitStatus workUnitStatus) throws RetriableAuthenticationException {
     return WorkUnitStatus.builder().build();
   }
@@ -82,11 +104,11 @@ public class MultistageConnection implements Connection {
     try {
       Thread.sleep(jobKeys.getCallInterval());
     } catch (Exception e) {
-      log.warn(e.getMessage());
+      LOG.warn(e.getMessage());
     }
-    log.info("Starting a new request to the source, work unit = {}", extractorKeys.getSignature());
-    log.debug("Prior parameters: {}", extractorKeys.getDynamicParameters().toString());
-    log.debug("Prior work unit status: {}", workUnitStatus.toString());
+    LOG.info("Starting a new request to the source, work unit = {}", extractorKeys.getSignature());
+    LOG.debug("Prior parameters: {}", extractorKeys.getDynamicParameters().toString());
+    LOG.debug("Prior work unit status: {}", workUnitStatus.toString());
     return workUnitStatus;
   }
 
@@ -107,9 +129,9 @@ public class MultistageConnection implements Connection {
           parameters,
           false).getKey();
     } catch (Exception e) {
-      log.error("Error getting work unit specific string " + e);
+      LOG.error("Error getting work unit specific string " + e);
     }
-    log.info("Final work unit specific string: {}", finalString);
+    LOG.info("Final work unit specific string: {}", finalString);
     return finalString;
   }
 }

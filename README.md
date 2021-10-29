@@ -17,17 +17,53 @@ LinkedIn Data Integration Library (DIL) is a collection of generic data integrat
 - Ingest data from one Rest API and egress to another (Rest API) on cloud
 
 # Requirements
-* Java >= 1.8
+* JDK 1.8
 
 If building the distribution with tests turned on:
 * Maven version 3.5.3 
 
 # Instructions to build the distribution
 1. Extract the archive file to your local directory.
-2. Set JAVA_HOME
+2. Set JAVA_HOME to use JDK 1.8 (JDK 11+ not supported)
 3. Build
-* Skip tests and build the distribution
-> `./gradlew build -x findbugsMain -x test -x rat -x checkstyleMain` 
-
-* Tests and build the distribution (requires Maven): 
 > `./gradlew build` 
+
+# Instructions to contribute 
+To contribute, please use submit Pull Request (PR) for committers to merge. 
+1. Create your own fork on GitHub off the main repository
+2. Clone your fork to your local computer
+    - `git clone https://github.com/<<your-github-login>>/data-integration-library.git`
+3. Add upstream and verify
+    - `git remote add upstream https://github.com/linkedin/data-integration-library.git`
+    - `git remote -v`
+4. Change, test, commit, and push to your fork
+    - `git status`
+    - `git add .`
+    - `git commit -m "comments"`
+    - `git push origin master`
+5. Create Pull Request on GitHub with the following details
+    - Title 
+    - Detailed description
+    - Document the tests done
+    - Links to the updated documents
+6. Publish to local Maven repository
+    - `./gradlew publishToMavenLocal`
+7. Refresh your fork
+    - if upstream has no conflict with your fork, you can go to your forked
+    repository, and use "Fetch upstream" function to sync up your fork.
+    - if upstream has conflicts with your fork, GitHub will ask you to create
+    a pull request to merge. 
+        - if the conflicts are too significant, it is better to just copy
+        everything from upstream (the main repository) to your fork; that can
+        be done with the following procedure:
+            - Follow step 2 and step 3 above
+            - `git fetch upstream`
+            - `git reset --hard upstream/master`
+            - `git push origin +master`
+            - check your fork should be in sync with the main repository
+
+# Detailed Documents
+
+- [Job Properties](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+- [Job Properties by Category](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md)
+- [Deprecated Job Properties](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/deprecated.md)

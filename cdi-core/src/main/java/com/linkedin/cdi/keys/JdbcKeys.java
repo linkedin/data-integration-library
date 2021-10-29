@@ -4,15 +4,11 @@
 
 package com.linkedin.cdi.keys;
 
-import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
-import java.util.List;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.configuration.MultistageProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 
 
 /**
@@ -20,35 +16,41 @@ import com.linkedin.cdi.configuration.MultistageProperties;
  *
  * @author chrli
  */
-@Slf4j
-@Getter (AccessLevel.PUBLIC)
-@Setter(AccessLevel.PUBLIC)
 public class JdbcKeys extends JobKeys {
-  final private static List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      MultistageProperties.MSTAGE_JDBC_STATEMENT,
-      MultistageProperties.SOURCE_CONN_USERNAME,
-      MultistageProperties.SOURCE_CONN_PASSWORD);
-
+  private static final Logger LOG = LoggerFactory.getLogger(JdbcKeys.class);
   private String jdbcStatement = null;
   private JsonObject initialParameterValues = new JsonObject();
-  private String separator = MultistageProperties.MSTAGE_CSV_SEPARATOR.getDefaultValue();
-  private String quoteCharacter = MultistageProperties.MSTAGE_CSV_QUOTE_CHARACTER.getDefaultValue();
-  private String escapeCharacter = MultistageProperties.MSTAGE_CSV_ESCAPE_CHARACTER.getDefaultValue();
-  private String schemaRefactorFunction = MultistageProperties.MSTAGE_JDBC_SCHEMA_REFACTOR.getDefaultValue();
+  private String schemaRefactorFunction = MSTAGE_JDBC_SCHEMA_REFACTOR.getDefaultValue();
 
   @Override
   public void logDebugAll() {
     super.logDebugAll();
-    log.debug("These are values in JdbcSource");
-    log.debug("JDBC statement: {}", jdbcStatement);
-    log.debug("Initial values of dynamic parameters: {}", initialParameterValues);
+    LOG.debug("These are values in JdbcSource");
+    LOG.debug("JDBC statement: {}", jdbcStatement);
+    LOG.debug("Initial values of dynamic parameters: {}", initialParameterValues);
   }
 
-  @Override
-  public void logUsage(State state) {
-    super.logUsage(state);
-    for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      log.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
-    }
+  public String getJdbcStatement() {
+    return jdbcStatement;
+  }
+
+  public void setJdbcStatement(String jdbcStatement) {
+    this.jdbcStatement = jdbcStatement;
+  }
+
+  public JsonObject getInitialParameterValues() {
+    return initialParameterValues;
+  }
+
+  public void setInitialParameterValues(JsonObject initialParameterValues) {
+    this.initialParameterValues = initialParameterValues;
+  }
+
+  public String getSchemaRefactorFunction() {
+    return schemaRefactorFunction;
+  }
+
+  public void setSchemaRefactorFunction(String schemaRefactorFunction) {
+    this.schemaRefactorFunction = schemaRefactorFunction;
   }
 }

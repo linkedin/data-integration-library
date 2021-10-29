@@ -11,7 +11,19 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.configuration.StaticConstants;
+import com.linkedin.cdi.filter.CsvSchemaBasedFilter;
+import com.linkedin.cdi.keys.CsvExtractorKeys;
+import com.linkedin.cdi.keys.ExtractorKeys;
+import com.linkedin.cdi.keys.JobKeys;
+import com.linkedin.cdi.preprocessor.InputStreamProcessor;
+import com.linkedin.cdi.preprocessor.StreamProcessor;
+import com.linkedin.cdi.util.JsonIntermediateSchema;
+import com.linkedin.cdi.util.JsonUtils;
+import com.linkedin.cdi.util.SchemaBuilder;
+import com.linkedin.cdi.util.SchemaUtils;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -30,25 +42,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.WorkUnitState;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.filter.CsvSchemaBasedFilter;
-import com.linkedin.cdi.keys.CsvExtractorKeys;
-import com.linkedin.cdi.keys.ExtractorKeys;
-import com.linkedin.cdi.keys.JobKeys;
-import com.linkedin.cdi.preprocessor.InputStreamProcessor;
-import com.linkedin.cdi.preprocessor.StreamProcessor;
-import com.linkedin.cdi.util.CsvUtils;
-import com.linkedin.cdi.util.JsonIntermediateSchema;
-import com.linkedin.cdi.util.SchemaBuilder;
-import com.linkedin.cdi.util.SchemaUtils;
-import com.linkedin.cdi.util.VariableUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
+import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
 /**
@@ -59,11 +60,14 @@ import org.testng.Assert;
  *
  * @author chrli, esong
  */
-@Slf4j
 public class CsvExtractor extends MultistageExtractor<String, String[]> {
+  private static final Logger LOG = LoggerFactory.getLogger(CsvExtractor.class);
   private final static Long SCHEMA_INFER_MAX_SAMPLE_SIZE = 100L;
-  @Getter
   private CsvExtractorKeys csvExtractorKeys = new CsvExtractorKeys();
+
+  public CsvExtractorKeys getCsvExtractorKeys() {
+    return csvExtractorKeys;
+  }
 
   public CsvExtractor(WorkUnitState state, JobKeys jobKeys) {
     super(state, jobKeys);
@@ -74,26 +78,15 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
   @Override
   protected void initialize(ExtractorKeys keys) {
     csvExtractorKeys.logUsage(state);
-    csvExtractorKeys.setColumnHeader(
-        MultistageProperties.MSTAGE_CSV_COLUMN_HEADER.validateNonblank(state) ? MultistageProperties.MSTAGE_CSV_COLUMN_HEADER.getProp(
-            state) : false);
-    csvExtractorKeys.setRowsToSkip(MultistageProperties.MSTAGE_CSV_SKIP_LINES.getValidNonblankWithDefault(state));
-    if (csvExtractorKeys.getColumnHeader() && csvExtractorKeys.getRowsToSkip() == 0) {
-      csvExtractorKeys.setRowsToSkip(1);
-    }
-    csvExtractorKeys.setSeparator(
-        CsvUtils.unescape(MultistageProperties.MSTAGE_CSV_SEPARATOR.getValidNonblankWithDefault(state)));
-    csvExtractorKeys.setQuoteCharacter(
-        CsvUtils.unescape(MultistageProperties.MSTAGE_CSV_QUOTE_CHARACTER.getValidNonblankWithDefault(state)));
-    csvExtractorKeys.setEscapeCharacter(
-        CsvUtils.unescape(MultistageProperties.MSTAGE_CSV_ESCAPE_CHARACTER.getValidNonblankWithDefault(state)));
+    csvExtractorKeys.setColumnHeader(MSTAGE_CSV.getColumnHeaderIndex(state) >= 0);
+    csvExtractorKeys.setDefaultFieldType(MSTAGE_CSV.getDefaultFieldType(state).toLowerCase());
     csvExtractorKeys.setSampleRows(new ArrayDeque<>());
 
     // check if user has defined the output schema
     if (jobKeys.hasOutputSchema()) {
       JsonArray outputSchema = jobKeys.getOutputSchema();
-      csvExtractorKeys.setColumnProjection(expandColumnProjection(MultistageProperties.MSTAGE_CSV_COLUMN_PROJECTION
-          .getValidNonblankWithDefault(state), outputSchema.size()));
+      csvExtractorKeys.setColumnProjection(expandColumnProjection(MSTAGE_CSV.getColumnProjection(state),
+          outputSchema.size()));
       // initialize the column name to index map based on the schema when derived fields are present
       if (jobKeys.getDerivedFields().entrySet().size() > 0) {
         buildColumnToIndexMap(outputSchema);
@@ -120,10 +113,11 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
    */
   @Override
   public String getSchema() {
-    log.debug("Retrieving schema definition");
+    LOG.debug("Retrieving schema definition");
     JsonArray schemaArray = super.getOrInferSchema();
     Assert.assertNotNull(schemaArray);
-    if (jobKeys.getDerivedFields().size() > 0) {
+    if (jobKeys.getDerivedFields().size() > 0 && JsonUtils.get(StaticConstants.KEY_WORD_COLUMN_NAME,
+        jobKeys.getDerivedFields().keySet().iterator().next(), StaticConstants.KEY_WORD_COLUMN_NAME, schemaArray) == JsonNull.INSTANCE) {
       schemaArray.addAll(addDerivedFieldsToAltSchema());
     }
     return schemaArray.toString();
@@ -142,8 +136,10 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
   @Nullable
   @Override
   public String[] readRecord(String[] reuse) {
+    super.readRecord(reuse);
+
     if (csvExtractorKeys.getCsvIterator() == null && !processInputStream(0)) {
-      return null;
+      return (String[]) endProcessingAndValidateCount();
     }
 
     Iterator<String[]> readerIterator = csvExtractorKeys.getCsvIterator();
@@ -177,7 +173,7 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
         return readRecord(reuse);
       }
     }
-    return null;
+    return (String[]) endProcessingAndValidateCount();
   }
 
   /**
@@ -194,7 +190,7 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
 
     // if Content-Type is provided, but not text/csv, the response can have
     // useful error information
-    JsonObject expectedContentType = MultistageProperties.MSTAGE_HTTP_RESPONSE_TYPE.getValidNonblankWithDefault(state);
+    JsonObject expectedContentType = MSTAGE_HTTP_RESPONSE_TYPE.get(state);
     HashSet<String> expectedContentTypeSet = new LinkedHashSet<>(Arrays.asList("text/csv", "application/gzip"));
     if (expectedContentType.has(CONTENT_TYPE_KEY) || expectedContentType.has(CONTENT_TYPE_KEY.toLowerCase())) {
       for (Map.Entry<String, JsonElement> entry: expectedContentType.entrySet()) {
@@ -215,29 +211,32 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
           }
         }
 
-        CSVParser parser = new CSVParserBuilder().withSeparator(csvExtractorKeys.getSeparator().charAt(0))
-            .withQuoteChar(csvExtractorKeys.getQuoteCharacter().charAt(0))
-            .withEscapeChar(csvExtractorKeys.getEscapeCharacter().charAt(0))
+        CSVParser parser = new CSVParserBuilder().withSeparator(MSTAGE_CSV.getFieldSeparator(state).charAt(0))
+            .withQuoteChar(MSTAGE_CSV.getQuoteCharacter(state).charAt(0))
+            .withEscapeChar(MSTAGE_CSV.getEscapeCharacter(state).charAt(0))
             .build();
         CSVReader reader = new CSVReaderBuilder(new InputStreamReader(input, Charset.forName(
-            MultistageProperties.MSTAGE_SOURCE_DATA_CHARACTER_SET.getValidNonblankWithDefault(state)))).withCSVParser(parser)
+            MSTAGE_SOURCE_DATA_CHARACTER_SET.get(state)))).withCSVParser(parser)
             .build();
         Iterator<String[]> readerIterator = reader.iterator();
+
+        // header row can be in the front of informational rows or after them
+        skipRowAndSaveHeader(readerIterator);
+
         // convert some sample data to json to infer the schema
         if (!jobKeys.hasOutputSchema() && starting == 0) {
           // initialize a reader without skipping lines since header might be used
           JsonArray inferredSchema = inferSchemaWithSample(readerIterator);
           extractorKeys.setInferredSchema(inferredSchema);
+
           // build the columnToIndexMap for derived fields based on the inferred schema
           if (jobKeys.getDerivedFields().entrySet().size() != 0) {
             buildColumnToIndexMap(inferredSchema);
           }
-        } else {
-          skipRowAndSaveHeader(readerIterator);
         }
         csvExtractorKeys.setCsvIterator(readerIterator);
       } catch (Exception e) {
-        log.error("Error reading the input stream: {}", e.getMessage());
+        LOG.error("Error reading the input stream: {}", e.getMessage());
         return false;
       }
     }
@@ -262,7 +261,7 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
   @Override
   protected void setRowFilter(JsonArray schemaArray) {
     if (rowFilter == null) {
-      if (MultistageProperties.MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.getValidNonblankWithDefault(state)) {
+      if (MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.get(state)) {
         rowFilter = new CsvSchemaBasedFilter(new JsonIntermediateSchema(schemaArray), csvExtractorKeys);
       }
     }
@@ -330,34 +329,18 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
    * @param derivedFieldDef map {type: type1, source: source1, format: format1}
    * @return String value of the derived field
    */
-  private String processDerivedFieldSource(String[] row, Map<String, String> derivedFieldDef) {
-    String source = derivedFieldDef.get("source");
-    String strValue = "";
-    DateTimeZone timeZone = DateTimeZone.forID(timezone.isEmpty() ? DEFAULT_TIMEZONE : timezone);
+  private String processDerivedFieldSource(String[] row, String name, Map<String, String> derivedFieldDef) {
+    String source = derivedFieldDef.getOrDefault("source", StringUtils.EMPTY);
+    String inputValue = derivedFieldDef.getOrDefault("value", StringUtils.EMPTY);
+    boolean isInputValueFromSource = false;
 
-    // get the base value from various sources
-    if (source.equalsIgnoreCase("currentdate")) {
-      strValue = String.valueOf(DateTime.now().getMillis());
-    } else if (source.matches("P\\d+D")) {
-      Period period = Period.parse(source);
-      strValue =
-          String.valueOf(DateTime.now().withZone(timeZone).minus(period).dayOfMonth().roundFloorCopy().getMillis());
-    } else if (csvExtractorKeys.getColumnToIndexMap().containsKey(source)) {
+    if (csvExtractorKeys.getColumnToIndexMap().containsKey(source)) {
       int sourceIndex = csvExtractorKeys.getColumnToIndexMap().get(source);
-      strValue = row[sourceIndex];
-    } else if (VariableUtils.PATTERN.matcher(source).matches()) {
-      strValue = replaceVariable(source);
-    } else {
-      failWorkUnit("Unsupported source for derived fields: " + source);
+      inputValue = row[sourceIndex];
+      isInputValueFromSource = true;
     }
 
-    // further processing required for specific types
-    String type = derivedFieldDef.get("type");
-    if (type.equals("epoc") && !(source.equalsIgnoreCase(CURRENT_DATE) || source.matches(PXD))
-        && derivedFieldDef.containsKey("format")) {
-      strValue = deriveEpoc(derivedFieldDef.get("format"), strValue);
-    }
-    return strValue;
+    return generateDerivedFieldValue(name, derivedFieldDef, inputValue, isInputValueFromSource);
   }
 
   /**
@@ -378,8 +361,9 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
 
     int index = originalLength;
     for (Map.Entry<String, Map<String, String>> derivedField : derivedFields) {
+      String name = derivedField.getKey();
       Map<String, String> derivedFieldDef = derivedField.getValue();
-      String strValue = processDerivedFieldSource(row, derivedFieldDef);
+      String strValue = processDerivedFieldSource(row, name, derivedFieldDef);
       String type = derivedFieldDef.get("type");
       if (SUPPORTED_DERIVED_FIELD_TYPES.contains(type)) {
         row[index] = strValue;
@@ -397,20 +381,20 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
    */
   private void skipRowAndSaveHeader(Iterator<String[]> readerIterator) {
     int linesRead = 0;
-    while (readerIterator.hasNext() && linesRead < csvExtractorKeys.getRowsToSkip()) {
+    while (readerIterator.hasNext() && linesRead < MSTAGE_CSV.getLinesToSkip(state)) {
       String[] line = getNextLineWithCleansing(readerIterator);
-      if (linesRead == 0 && csvExtractorKeys.getColumnHeader()) {
-        // if header is present, the first row will be used as header
+      // save the column header
+      if (linesRead == MSTAGE_CSV.getColumnHeaderIndex(state) && csvExtractorKeys.getColumnHeader()) {
         csvExtractorKeys.setHeaderRow(line);
         // check if header has all columns in schema
         if (jobKeys.hasOutputSchema()) {
-            List<String> schemaColumns = new ArrayList<>(new JsonIntermediateSchema(jobKeys.getOutputSchema())
-                .getColumns().keySet());
-            List<String> headerRow = Arrays.asList(csvExtractorKeys.getHeaderRow());
-            csvExtractorKeys.setIsValidOutputSchema(SchemaUtils.isValidOutputSchema(schemaColumns, headerRow));
+          List<String> schemaColumns =
+              new ArrayList<>(new JsonIntermediateSchema(jobKeys.getOutputSchema()).getColumns().keySet());
+          List<String> headerRow = Arrays.asList(csvExtractorKeys.getHeaderRow());
+          csvExtractorKeys.setIsValidOutputSchema(SchemaUtils.isValidOutputSchema(schemaColumns, headerRow));
         }
-        linesRead++;
       }
+      linesRead++;
     }
   }
 
@@ -418,7 +402,6 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
    * Perform limited cleansing so that data can be processed by converters
    *
    * @param input the input data to be cleansed
-   * @return the cleansed data
    */
   private void limitedCleanse(String[] input) {
     for (int i = 0; i < input.length; i++) {
@@ -445,7 +428,6 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
    * @return inferred schema
    */
   private JsonArray inferSchemaWithSample(Iterator<String[]> readerIterator) {
-    skipRowAndSaveHeader(readerIterator);
     String[] header = csvExtractorKeys.getHeaderRow();
     JsonArray sample = new JsonArray();
     int linesRead = 0;
@@ -464,30 +446,35 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
       sample.add(row);
       linesRead++;
     }
-    return SchemaBuilder.fromJsonData(sample).buildAltSchema(jobKeys.getDefaultFieldTypes(),
-        jobKeys.isEnableCleansing(),
-        jobKeys.getSchemaCleansingPattern(),
-        jobKeys.getSchemaCleansingReplacement(),
-        jobKeys.getSchemaCleansingNullable()).getAsJsonArray();
+    return SchemaBuilder.fromJsonData(sample)
+        .buildAltSchema(jobKeys.getDefaultFieldTypes(), jobKeys.isEnableCleansing(),
+            jobKeys.getSchemaCleansingPattern(), jobKeys.getSchemaCleansingReplacement(),
+            jobKeys.getSchemaCleansingNullable())
+        .getAsJsonArray();
   }
 
   /**
    * Helper function for creating sample json data for schema inference
    * Type conversion is required as all data will be parsed as string otherwise
+   * Users can specify the default type for all fields using ms.csv.default.field.type or
+   * specify the default for a specific field using ms.default.data.type.
    * @param key name of the column
    * @param data original data from a column
    * @param row json form of the row
    */
   private void addParsedCSVData(String key, String data, JsonObject row) {
-    if (Ints.tryParse(data) != null) {
+    String defaultFieldType = csvExtractorKeys.getDefaultFieldType();
+    if (defaultFieldType.equals(KEY_WORD_STRING)) {
+      row.addProperty(key, data);
+    } else if (defaultFieldType.equals(KEY_WORD_INT) || Ints.tryParse(data) != null) {
       row.addProperty(key, Integer.valueOf(data));
-    } else if (Longs.tryParse(data) != null) {
+    } else if (defaultFieldType.equals(KEY_WORD_LONG) || Longs.tryParse(data) != null) {
       row.addProperty(key, Long.valueOf(data));
-    } else if (Doubles.tryParse(data) != null) {
+    } else if (defaultFieldType.equals(KEY_WORD_DOUBLE) || Doubles.tryParse(data) != null) {
       row.addProperty(key, Double.valueOf(data));
-    } else if (data.toLowerCase().matches("(true|false)")) {
+    } else if (defaultFieldType.equals(KEY_WORD_BOOLEAN) || data.toLowerCase().matches("(true|false)")) {
       row.addProperty(key, Boolean.valueOf(data));
-    } else if (Floats.tryParse(data) != null) {
+    } else if (defaultFieldType.equals(KEY_WORD_FLOAT) || Floats.tryParse(data) != null) {
       row.addProperty(key, Float.valueOf(data));
     } else {
       row.addProperty(key, data);

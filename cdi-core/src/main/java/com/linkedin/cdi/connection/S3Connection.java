@@ -5,24 +5,22 @@
 package com.linkedin.cdi.connection;
 
 import com.google.common.collect.Lists;
-import java.net.URI;
-import java.time.Duration;
-import java.util.List;
-import java.util.stream.Collectors;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
-import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
-import com.linkedin.cdi.factory.S3ClientFactory;
+import com.linkedin.cdi.factory.ConnectionClientFactory;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.keys.S3Keys;
 import com.linkedin.cdi.util.EncryptionUtils;
 import com.linkedin.cdi.util.InputStreamUtils;
 import com.linkedin.cdi.util.WorkUnitStatus;
+import java.net.URI;
+import java.time.Duration;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
+import org.apache.gobblin.configuration.State;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
@@ -37,6 +35,7 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.utils.AttributeMap;
 
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static software.amazon.awssdk.http.SdkHttpConfigurationOption.*;
 
 /**
@@ -45,10 +44,22 @@ import static software.amazon.awssdk.http.SdkHttpConfigurationOption.*;
  *
  * @author Chris Li
  */
-@Slf4j
 public class S3Connection extends MultistageConnection {
-  @Getter final private S3Keys s3SourceV2Keys;
-  @Setter private S3Client s3Client = null;
+  private static final Logger LOG = LoggerFactory.getLogger(S3Connection.class);
+  final private S3Keys s3SourceV2Keys;
+  private S3Client s3Client = null;
+
+  public S3Keys getS3SourceV2Keys() {
+    return s3SourceV2Keys;
+  }
+
+  public S3Client getS3Client() {
+    return s3Client;
+  }
+
+  public void setS3Client(S3Client s3Client) {
+    this.s3Client = s3Client;
+  }
 
   public S3Connection(State state, JobKeys jobKeys, ExtractorKeys extractorKeys) {
     super(state, jobKeys, extractorKeys);
@@ -66,64 +77,48 @@ public class S3Connection extends MultistageConnection {
     return true;
   }
 
-  /*
-  Below is the logic of when to download a file and when to list similar files based on the uri and pattern
-  ms.source.file.pattern
-      if Is not blank:
-            List the S3 keys and output as CSV
-
-      if Is blank:
-            ms.extract.target.file.name?
-                  If is blank:
-                        List the S3 keys and output as CSV
-                  If is not blank:
-                        If ms.source.uri prefix produces only 1 file:
-                              dump the S3 object into the given output file name
-                        If ms.source.uir prefix produces more than 1 file:
-                              dump only the file where prefix = object key, and ignore all other objects
- */
+  /**
+   * @param workUnitStatus prior work unit status
+   * @return new work unit status
+   * @throws RetriableAuthenticationException
+   */
   @Override
   public WorkUnitStatus executeFirst(WorkUnitStatus workUnitStatus) throws RetriableAuthenticationException {
     WorkUnitStatus status = super.executeFirst(workUnitStatus);
     s3Client = getS3HttpClient(getState());
 
     String finalPrefix = getWorkUnitSpecificString(s3SourceV2Keys.getPrefix(), getExtractorKeys().getDynamicParameters());
-    log.debug("Final Prefix to get files list: {}", finalPrefix);
+    LOG.debug("Final Prefix to get files list: {}", finalPrefix);
     try {
-      List<String> files = getFilesList(finalPrefix);
-      boolean isObjectWithPrefixExist = files.stream().anyMatch(objectKey -> objectKey.equals(finalPrefix));
-      log.debug("Number of files identified: {}", files.size());
+      List<String> files = getFilesList(finalPrefix).stream()
+          .filter(objectKey -> objectKey.matches(s3SourceV2Keys.getFilesPattern()))
+          .collect(Collectors.toList());
 
-      if (StringUtils.isNotBlank(s3SourceV2Keys.getFilesPattern())) {
-        List<String> filteredFiles = files.stream()
-            .filter(fileName -> fileName.matches(s3SourceV2Keys.getFilesPattern()))
-            .collect(Collectors.toList());
-        status.setBuffer(InputStreamUtils.convertListToInputStream(filteredFiles));
+      LOG.debug("Number of files identified: {}", files.size());
+
+      if (StringUtils.isBlank(s3SourceV2Keys.getTargetFilePattern())) {
+        status.setBuffer(InputStreamUtils.convertListToInputStream(files));
       } else {
-        if (StringUtils.isBlank(s3SourceV2Keys.getTargetFilePattern())) {
-          status.setBuffer(InputStreamUtils.convertListToInputStream(files));
+        // Multiple files are returned, then only process the exact match
+        String fileToDownload = files.size() == 0
+            ? StringUtils.EMPTY : files.size() == 1
+            ? files.get(0) : finalPrefix;
+
+        if (StringUtils.isNotBlank(fileToDownload)) {
+          LOG.debug("Downloading file: {}", fileToDownload);
+          GetObjectRequest getObjectRequest =
+              GetObjectRequest.builder().bucket(s3SourceV2Keys.getBucket()).key(fileToDownload).build();
+          ResponseInputStream<GetObjectResponse> response =
+              s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
+          status.setBuffer(response);
         } else {
-          String fileToDownload = "";
-          if (files.size() == 1) {
-            fileToDownload = files.get(0);
-          } else if (isObjectWithPrefixExist) {
-            fileToDownload = finalPrefix;
-          }
-          if (StringUtils.isNotBlank(fileToDownload)) {
-            log.debug("Downloading file: {}", files.get(0));
-            GetObjectRequest getObjectRequest =
-                GetObjectRequest.builder().bucket(s3SourceV2Keys.getBucket()).key(files.get(0)).build();
-            ResponseInputStream<GetObjectResponse> response =
-                s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
-            status.setBuffer(response);
-          } else {
-            log.warn("Invalid set of parameters. To list down files from a bucket, pattern "
-                + "parameter is needed and to get object from s3 source target file name is needed.");
-          }
+          LOG.warn("Invalid set of parameters. "
+              + "To list down files from a bucket, pattern parameter is needed,"
+              + ", and to get object from s3 source target file name is needed.");
         }
       }
     } catch (Exception e) {
-      log.error("Unexpected Exception", e);
+      LOG.error("Unexpected Exception", e);
       return null;
     }
     return status;
@@ -135,8 +130,8 @@ public class S3Connection extends MultistageConnection {
   synchronized S3Client getS3HttpClient(State state) {
     if (s3Client == null) {
       try {
-        Class<?> factoryClass = Class.forName(MultistageProperties.MSTAGE_S3_CLIENT_FACTORY.getValidNonblankWithDefault(state));
-        S3ClientFactory factory = (S3ClientFactory) factoryClass.newInstance();
+        Class<?> factoryClass = Class.forName(MSTAGE_CONNECTION_CLIENT_FACTORY.get(state));
+        ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.getDeclaredConstructor().newInstance();
 
         Integer connectionTimeout = s3SourceV2Keys.getConnectionTimeout();
         AttributeMap config = connectionTimeout == null ? GLOBAL_HTTP_DEFAULTS
@@ -147,11 +142,11 @@ public class S3Connection extends MultistageConnection {
         s3Client = S3Client.builder()
             .region(this.s3SourceV2Keys.getRegion())
             .endpointOverride(URI.create(s3SourceV2Keys.getEndpoint()))
-            .httpClient(factory.getHttpClient(state, config))
+            .httpClient(factory.getS3Client(state, config))
             .credentialsProvider(getCredentialsProvider(state))
             .build();
       } catch (Exception e) {
-        log.error("Error creating S3 Client: {}", e.getMessage());
+        LOG.error("Error creating S3 Client: {}", e.getMessage());
       }
     }
     return s3Client;
@@ -172,7 +167,7 @@ public class S3Connection extends MultistageConnection {
     ListObjectsV2Request request = builder.build();
     ListObjectsV2Response listObjectsV2Response = null;
 
-    log.debug("Listing object by prefix: {}", finalPrefix);
+    LOG.debug("Listing object by prefix: {}", finalPrefix);
     do {
       if (listObjectsV2Response != null) {
         request = builder.continuationToken(listObjectsV2Response.continuationToken()).build();

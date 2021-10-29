@@ -4,7 +4,6 @@
 
 package com.linkedin.cdi.filter;
 
-
 /**
  * Base filter interface
  *

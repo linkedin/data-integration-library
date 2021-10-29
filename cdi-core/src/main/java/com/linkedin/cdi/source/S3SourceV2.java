@@ -8,33 +8,40 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.connection.S3Connection;
+import com.linkedin.cdi.extractor.MultistageExtractor;
+import com.linkedin.cdi.keys.S3Keys;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import okhttp3.HttpUrl;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.configuration.WorkUnitState;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.connection.S3Connection;
-import com.linkedin.cdi.extractor.MultistageExtractor;
-import com.linkedin.cdi.keys.S3Keys;
-import com.linkedin.cdi.util.EndecoUtils;
 import org.apache.gobblin.source.extractor.Extractor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
 
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 
-@Slf4j
+
 public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
+  private static final Logger LOG = LoggerFactory.getLogger(S3SourceV2.class);
   private static final String KEY_REGION = "region";
   private static final String KEY_CONNECTION_TIMEOUT = "connection_timeout";
   private static final HashSet<String> S3_REGIONS_SET =
       Region.regions().stream().map(region -> region.toString()).collect(Collectors.toCollection(HashSet::new));
-  @Getter
   private S3Keys s3SourceV2Keys = new S3Keys();
+
+  public S3Keys getS3SourceV2Keys() {
+    return s3SourceV2Keys;
+  }
+
+  public void setS3SourceV2Keys(S3Keys s3SourceV2Keys) {
+    this.s3SourceV2Keys = s3SourceV2Keys;
+  }
 
   public S3SourceV2() {
     s3SourceV2Keys = new S3Keys();
@@ -42,16 +49,23 @@ public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
   }
   protected void initialize(State state) {
     super.initialize(state);
-    s3SourceV2Keys.logUsage(state);
-    HttpUrl url = HttpUrl.parse(MultistageProperties.MSTAGE_SOURCE_URI.getValidNonblankWithDefault(state));
-    if (url == null || url.host().isEmpty()) {
+
+    URL url = null;
+    try {
+      String sourceUri = MSTAGE_SOURCE_URI.get(state);
+      url = new URL(sourceUri.replaceAll("(s3|S3)://", "https://"));
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+    if (url == null || url.getHost().isEmpty()) {
       throw new RuntimeException("Incorrect configuration in " +
-          MultistageProperties.MSTAGE_SOURCE_URI.toString());
+          MSTAGE_SOURCE_URI.toString());
     }
 
     // set region, note that aws SDK won't raise an error here if region is invalid,
     // later on, an exception will be raised when the actual request is issued
-    JsonObject parameters = MultistageProperties.MSTAGE_SOURCE_S3_PARAMETERS.getValidNonblankWithDefault(state);
+    JsonObject parameters = MSTAGE_SOURCE_S3_PARAMETERS.get(state);
     if (parameters.has(KEY_REGION)) {
       String region = parameters.get(KEY_REGION).getAsString();
       if (!S3_REGIONS_SET.contains(region)) {
@@ -73,21 +87,18 @@ public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
     }
 
     // separate the endpoint, which should be a URL without bucket name, from the domain name
-    s3SourceV2Keys.setEndpoint("https://" + getEndpointFromHost(url.host()));
-
-    // URL path might have variables, by default HttpUrl will encode '{' and '}'
-    // Here we decode those back to their plain form
-    s3SourceV2Keys.setPrefix(EndecoUtils.decode(url.encodedPath().substring(1)));
+    s3SourceV2Keys.setEndpoint("https://" + getEndpointFromHost(url.getHost()));
+    s3SourceV2Keys.setPrefix(url.getPath().substring(1));
 
     // separate the bucket name from URI domain name
-    s3SourceV2Keys.setBucket(url.host().split("\\.")[0]);
+    s3SourceV2Keys.setBucket(url.getHost().split("\\.")[0]);
 
-    s3SourceV2Keys.setFilesPattern(MultistageProperties.MSTAGE_SOURCE_FILES_PATTERN.getProp(state));
-    s3SourceV2Keys.setMaxKeys(MultistageProperties.MSTAGE_S3_LIST_MAX_KEYS.getValidNonblankWithDefault(state));
-    s3SourceV2Keys.setAccessKey(MultistageProperties.SOURCE_CONN_USERNAME.getValidNonblankWithDefault(state));
-    s3SourceV2Keys.setSecretId(MultistageProperties.SOURCE_CONN_PASSWORD.getValidNonblankWithDefault(state));
+    s3SourceV2Keys.setFilesPattern(MSTAGE_SOURCE_FILES_PATTERN.get(state));
+    s3SourceV2Keys.setMaxKeys(MSTAGE_S3_LIST_MAX_KEYS.get(state));
+    s3SourceV2Keys.setAccessKey(SOURCE_CONN_USERNAME.get(state));
+    s3SourceV2Keys.setSecretId(SOURCE_CONN_PASSWORD.get(state));
     s3SourceV2Keys.setTargetFilePattern(
-        MultistageProperties.MSTAGE_EXTRACTOR_TARGET_FILE_NAME.getValidNonblankWithDefault(state));
+        MSTAGE_EXTRACTOR_TARGET_FILE_NAME.get(state));
     s3SourceV2Keys.logDebugAll();
   }
 

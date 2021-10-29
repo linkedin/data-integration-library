@@ -83,7 +83,6 @@ ext.externalDependency = [
     "influxdbJava": "org.influxdb:influxdb-java:2.1",
     "kryo": "com.esotericsoftware.kryo:kryo:2.22",
     "libthrift":"org.apache.thrift:libthrift:0.9.3",
-    "lombok":"org.projectlombok:lombok:1.16.8",
     "mockRunnerJdbc":"com.mockrunner:mockrunner-jdbc:1.0.8",
     "xerces":"xerces:xercesImpl:2.11.0",
     "typesafeConfig": "com.typesafe:config:1.2.1",
@@ -166,7 +165,6 @@ ext.externalDependency = [
     "gobblin-crypto": "org.apache.gobblin:gobblin-crypto:" + gobblinVersion,
     "gobblin-crypto-provider": "org.apache.gobblin:gobblin-crypto-provider:" + gobblinVersion,
     "gobblin-data-management": "org.apache.gobblin:gobblin-data-management:" + gobblinVersion,
-    "gobblin-flow-config-service-api": "org.apache.gobblin:gobblin-data-management:" + gobblinVersion,
     "gobblin-helix": "org.apache.gobblin:gobblin-hive-registration:" + gobblinVersion,
     "gobblin-hive-registration": "org.apache.gobblin:gobblin-hive-registration:" + gobblinVersion,
     "gobblin-http": "org.apache.gobblin:gobblin-http:" + gobblinVersion,
@@ -179,10 +177,7 @@ ext.externalDependency = [
     "gobblin-rest-api": "org.apache.gobblin:gobblin-rest-api:" + gobblinVersion,
     "gobblin-rest-api-data-template": "org.apache.gobblin:gobblin-rest-api-data-template:" + gobblinVersion,
     "gobblin-runtime": "org.apache.gobblin:gobblin-runtime:" + gobblinVersion,
-    "gobblin-salesforce": "org.apache.gobblin:gobblin-runtime:" + gobblinVersion,
-    "gobblin-sql": "org.apache.gobblin:gobblin-runtime:" + gobblinVersion,
+    "gobblin-sql": "org.apache.gobblin:gobblin-sql:" + gobblinVersion,
     "gobblin-utility": "org.apache.gobblin:gobblin-utility:" + gobblinVersion,
-
-    "okhttp": "com.squareup.okhttp3:okhttp:4.8.0",
     "commonsValidator": "commons-validator:commons-validator:1.6"
 ]

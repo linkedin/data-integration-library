@@ -10,24 +10,24 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.linkedin.cdi.connection.HttpConnection;
+import com.linkedin.cdi.extractor.MultistageExtractor;
+import com.linkedin.cdi.keys.HttpKeys;
+import com.linkedin.cdi.util.EncryptionUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.configuration.WorkUnitState;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.connection.HttpConnection;
-import com.linkedin.cdi.extractor.MultistageExtractor;
-import com.linkedin.cdi.keys.HttpKeys;
-import com.linkedin.cdi.util.EncryptionUtils;
 import org.apache.gobblin.source.extractor.Extractor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 
 
 /**
@@ -37,18 +37,23 @@ import org.apache.gobblin.source.extractor.Extractor;
  *
  * @author chrli
  */
-@Slf4j
 @SuppressWarnings("unchecked")
 public class HttpSource extends MultistageSource<Schema, GenericRecord> {
+  private static final Logger LOG = LoggerFactory.getLogger(HttpSource.class);
   private final static Gson GSON = new Gson();
   private final static String BASIC_TOKEN_PREFIX = "Basic";
   private final static String BEARER_TOKEN_PREFIX = "Bearer";
   final static String OAUTH_TOKEN_PREFIX = "OAuth";
   final static String TOKEN_PREFIX_SEPARATOR = " ";
-  @VisibleForTesting
-
-  @Getter @Setter
   private HttpKeys httpSourceKeys;
+
+  public HttpKeys getHttpSourceKeys() {
+    return httpSourceKeys;
+  }
+
+  public void setHttpSourceKeys(HttpKeys httpSourceKeys) {
+    this.httpSourceKeys = httpSourceKeys;
+  }
 
   public HttpSource() {
     httpSourceKeys = new HttpKeys();
@@ -57,10 +62,9 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
 
   protected void initialize(State state) {
     super.initialize(state);
-    httpSourceKeys.logUsage(state);
     httpSourceKeys.setHttpRequestHeaders(getRequestHeader(state));
-    httpSourceKeys.setHttpRequestMethod(MultistageProperties.MSTAGE_HTTP_REQUEST_METHOD.getProp(state));
-    httpSourceKeys.setAuthentication(MultistageProperties.MSTAGE_AUTHENTICATION.getValidNonblankWithDefault(state));
+    httpSourceKeys.setHttpRequestMethod(MSTAGE_HTTP_REQUEST_METHOD.get(state));
+    httpSourceKeys.setAuthentication(MSTAGE_AUTHENTICATION.get(state));
     httpSourceKeys.setHttpRequestHeadersWithAuthentication(getHeadersWithAuthentication(state));
     httpSourceKeys.setHttpStatuses(getHttpStatuses(state));
     httpSourceKeys.setHttpStatusReasons(getHttpStatusReasons(state));
@@ -101,7 +105,7 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
 
     String authMethod = httpSourceKeys.getAuthentication().get("method").getAsString();
     if (!authMethod.toLowerCase().matches("basic|bearer|oauth|custom")) {
-      log.warn("Unsupported authentication type: " + authMethod);
+      LOG.warn("Unsupported authentication type: " + authMethod);
       return new HashMap<>();
     }
 
@@ -109,8 +113,8 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
     if (httpSourceKeys.getAuthentication().has("token")) {
       token = EncryptionUtils.decryptGobblin(httpSourceKeys.getAuthentication().get("token").getAsString(), state);
     } else {
-      String u = EncryptionUtils.decryptGobblin(MultistageProperties.SOURCE_CONN_USERNAME.getProp(state), state);
-      String p = EncryptionUtils.decryptGobblin(MultistageProperties.SOURCE_CONN_PASSWORD.getProp(state), state);
+      String u = EncryptionUtils.decryptGobblin(SOURCE_CONN_USERNAME.get(state), state);
+      String p = EncryptionUtils.decryptGobblin(SOURCE_CONN_PASSWORD.get(state), state);
       token = u + ":" + p;
     }
 
@@ -145,7 +149,7 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
 
   private Map<String, List<Integer>> getHttpStatuses(State state) {
     Map<String, List<Integer>> statuses = new HashMap<>();
-    JsonObject jsonObject = MultistageProperties.MSTAGE_HTTP_STATUSES.getValidNonblankWithDefault(state);
+    JsonObject jsonObject = MSTAGE_HTTP_STATUSES.get(state);
     for (Map.Entry<String, JsonElement> entry: jsonObject.entrySet()) {
       String key = entry.getKey();
       JsonElement value = jsonObject.get(key);
@@ -158,7 +162,7 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
 
   private Map<String, List<String>> getHttpStatusReasons(State state) {
     Map<String, List<String>> reasons = new HashMap<>();
-    JsonObject jsonObject = MultistageProperties.MSTAGE_HTTP_STATUS_REASONS.getValidNonblankWithDefault(state);
+    JsonObject jsonObject = MSTAGE_HTTP_STATUS_REASONS.get(state);
     for (Map.Entry<String, JsonElement> entry: jsonObject.entrySet()) {
       String key = entry.getKey();
       JsonElement value = jsonObject.get(key);
@@ -175,7 +179,7 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
    * @return the decrypted http request headers
    */
   private JsonObject getRequestHeader(State state) {
-    JsonObject headers = MultistageProperties.MSTAGE_HTTP_REQUEST_HEADERS.getValidNonblankWithDefault(state);
+    JsonObject headers = MSTAGE_HTTP_REQUEST_HEADERS.get(state);
     JsonObject decrypted = new JsonObject();
     for (Map.Entry<String, JsonElement> entry: headers.entrySet()) {
       String key = entry.getKey();

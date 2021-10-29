@@ -7,15 +7,16 @@ package com.linkedin.cdi.util;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.fs.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * a collection of encoding and decoding functions
  */
-@Slf4j
 public class EndecoUtils {
+  private static final Logger LOG = LoggerFactory.getLogger(EndecoUtils.class);
   private EndecoUtils() {
     // hide constructor
   }
@@ -33,7 +34,7 @@ public class EndecoUtils {
     try {
       return URLDecoder.decode(encoded, enc);
     } catch (Exception e) {
-      log.error("URL decoding error: " + e);
+      LOG.error("URL decoding error: " + e);
       return encoded;
     }
   }
@@ -51,7 +52,7 @@ public class EndecoUtils {
     try {
       return URLEncoder.encode(plainUrl, enc);
     } catch (Exception e) {
-      log.error("URL encoding error: " + e);
+      LOG.error("URL encoding error: " + e);
       return plainUrl;
     }
   }
@@ -71,7 +72,7 @@ public class EndecoUtils {
       // we don't encode the whole string intentionally so that the state file name is more readable
       return fileName.replace(Path.SEPARATOR, encodedSeparator);
     } catch (Exception e) {
-      log.error("Hadoop FS encoding error: " + e);
+      LOG.error("Hadoop FS encoding error: " + e);
       return fileName;
     }
   }
@@ -90,7 +91,7 @@ public class EndecoUtils {
       String encodedSeparator = URLEncoder.encode(Path.SEPARATOR, enc);
       return encodedFileName.replace(encodedSeparator, Path.SEPARATOR);
     } catch (Exception e) {
-      log.error("Hadoop FS decoding error: " + e);
+      LOG.error("Hadoop FS decoding error: " + e);
       return encodedFileName;
     }
   }

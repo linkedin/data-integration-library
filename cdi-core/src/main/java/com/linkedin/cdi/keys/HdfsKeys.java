@@ -4,14 +4,8 @@
 
 package com.linkedin.cdi.keys;
 
-import com.google.common.collect.Lists;
-import java.util.List;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.configuration.MultistageProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -20,20 +14,6 @@ import com.linkedin.cdi.configuration.MultistageProperties;
  *
  * @author chrli
  */
-
-@Slf4j
-@Getter(AccessLevel.PUBLIC)
-@Setter(AccessLevel.PUBLIC)
 public class HdfsKeys extends JobKeys {
-  final private static List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      // HDFS essential parameters
-  );
-
-  @Override
-  public void logUsage(State state) {
-    super.logUsage(state);
-    for (MultistageProperties p : ESSENTIAL_PARAMETERS) {
-      log.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
-    }
-  }
+  private static final Logger LOG = LoggerFactory.getLogger(HdfsKeys.class);
 }

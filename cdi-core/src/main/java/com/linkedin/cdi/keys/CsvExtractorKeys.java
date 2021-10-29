@@ -4,22 +4,19 @@
 
 package com.linkedin.cdi.keys;
 
-import com.google.common.collect.Lists;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.gobblin.configuration.State;
-import com.linkedin.cdi.configuration.MultistageProperties;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.source.workunit.WorkUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 
 
 /**
@@ -27,25 +24,11 @@ import org.apache.gobblin.source.workunit.WorkUnit;
  *
  * @author chrli
  */
-@Slf4j
-@Getter(AccessLevel.PUBLIC)
-@Setter
 public class CsvExtractorKeys extends ExtractorKeys {
-  final private static List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      MultistageProperties.MSTAGE_CSV_COLUMN_HEADER,
-      MultistageProperties.MSTAGE_CSV_SEPARATOR,
-      MultistageProperties.MSTAGE_CSV_SKIP_LINES,
-      MultistageProperties.MSTAGE_CSV_QUOTE_CHARACTER,
-      MultistageProperties.MSTAGE_CSV_ESCAPE_CHARACTER);
-
+  private static final Logger LOG = LoggerFactory.getLogger(CsvExtractorKeys.class);
   private Iterator<String[]> csvIterator = null;
-  private long processedCount = 0;
   private long currentPageNumber = 0;
   private Boolean columnHeader = false;
-  private int rowsToSkip = 0;
-  private String separator = MultistageProperties.MSTAGE_CSV_SEPARATOR.getDefaultValue();
-  private String quoteCharacter = MultistageProperties.MSTAGE_CSV_QUOTE_CHARACTER.getDefaultValue();
-  private String escapeCharacter = MultistageProperties.MSTAGE_CSV_ESCAPE_CHARACTER.getDefaultValue();
   // column name --> index mapping created based on the output or inferred schema
   private Map<String, Integer> columnToIndexMap = new HashMap<>();
   // A queue that stores sample rows read in during schema inference
@@ -54,28 +37,89 @@ public class CsvExtractorKeys extends ExtractorKeys {
   private String[] headerRow;
   private Set<Integer> columnProjection = new HashSet<>();
   private Boolean isValidOutputSchema = true;
+  private String defaultFieldType = StringUtils.EMPTY;
 
   public void incrCurrentPageNumber() {
     currentPageNumber++;
-  }
-  public void incrProcessedCount() {
-    processedCount++;
   }
 
   @Override
   public void logDebugAll(WorkUnit workUnit) {
     super.logDebugAll(workUnit);
-    log.debug("These are values of CsvExtractor regarding to Work Unit: {}",
-        workUnit == null ? "testing" : workUnit.getProp(MultistageProperties.DATASET_URN_KEY.toString()));
-    log.debug("Is column header present: {}", columnHeader);
-    log.debug("Total rows to skip: {}", rowsToSkip);
+    LOG.debug("These are values of CsvExtractor regarding to Work Unit: {}",
+        workUnit == null ? "testing" : workUnit.getProp(DATASET_URN.toString()));
+    LOG.debug("Is column header present: {}", columnHeader);
   }
 
-  @Override
-  public void logUsage(State state) {
-    super.logUsage(state);
-    for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      log.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
-    }
+  public Iterator<String[]> getCsvIterator() {
+    return csvIterator;
+  }
+
+  public void setCsvIterator(Iterator<String[]> csvIterator) {
+    this.csvIterator = csvIterator;
+  }
+
+  public long getCurrentPageNumber() {
+    return currentPageNumber;
+  }
+
+  public void setCurrentPageNumber(long currentPageNumber) {
+    this.currentPageNumber = currentPageNumber;
+  }
+
+  public Boolean getColumnHeader() {
+    return columnHeader;
+  }
+
+  public void setColumnHeader(Boolean columnHeader) {
+    this.columnHeader = columnHeader;
+  }
+
+  public Map<String, Integer> getColumnToIndexMap() {
+    return columnToIndexMap;
+  }
+
+  public void setColumnToIndexMap(Map<String, Integer> columnToIndexMap) {
+    this.columnToIndexMap = columnToIndexMap;
+  }
+
+  public Deque<String[]> getSampleRows() {
+    return sampleRows;
+  }
+
+  public void setSampleRows(Deque<String[]> sampleRows) {
+    this.sampleRows = sampleRows;
+  }
+
+  public String[] getHeaderRow() {
+    return headerRow;
+  }
+
+  public void setHeaderRow(String[] headerRow) {
+    this.headerRow = headerRow;
+  }
+
+  public Set<Integer> getColumnProjection() {
+    return columnProjection;
+  }
+
+  public void setColumnProjection(Set<Integer> columnProjection) {
+    this.columnProjection = columnProjection;
+  }
+
+  public Boolean getIsValidOutputSchema() {
+    return isValidOutputSchema;
+  }
+
+  public void setIsValidOutputSchema(Boolean validOutputSchema) {
+    isValidOutputSchema = validOutputSchema;
+  }
+
+  public String getDefaultFieldType() {
+    return defaultFieldType;
+  }
+
+  public void setDefaultFieldType(String defaultFieldType) {
+    this.defaultFieldType = defaultFieldType;
   }
 }

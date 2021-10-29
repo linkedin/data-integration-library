@@ -7,6 +7,7 @@ package com.linkedin.cdi.converter;
 import com.google.common.base.Optional;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.linkedin.cdi.util.AvroSchemaUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,12 +19,10 @@ import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.converter.Converter;
 import org.apache.gobblin.converter.SchemaConversionException;
 import org.apache.gobblin.converter.SingleRecordIterable;
-import org.apache.gobblin.converter.avro.UnsupportedDateTypeException;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.util.AvroSchemaUtils;
 import org.apache.gobblin.util.AvroUtils;
 import org.apache.gobblin.util.EmptyIterable;
 
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -68,12 +67,12 @@ public class AvroNormalizerConverter extends Converter<Schema, Schema, GenericRe
     // Avro Array's max capacity is max int. In case of overflow, use the default value 500.
     try {
       maxRecordsPerBatch =
-          Math.toIntExact(MultistageProperties.MSTAGE_NORMALIZER_BATCH_SIZE.getValidNonblankWithDefault(workUnit));
+          Math.toIntExact(MSTAGE_NORMALIZER_BATCH_SIZE.get(workUnit));
     } catch (ArithmeticException e) {
       maxRecordsPerBatch = 500;
     }
 
-    targetSchema = MultistageProperties.MSTAGE_TARGET_SCHEMA.getValidNonblankWithDefault(workUnit);
+    targetSchema = MSTAGE_TARGET_SCHEMA.get(workUnit);
     return this;
   }
 
@@ -92,11 +91,7 @@ public class AvroNormalizerConverter extends Converter<Schema, Schema, GenericRe
       buildIntermediateSchemas(schema);
     }
 
-    try {
-      finalSchema = AvroSchemaUtils.fromJsonSchema(targetSchema, workUnitState);
-    } catch (UnsupportedDateTypeException e) {
-      throw new SchemaConversionException(e);
-    }
+    finalSchema = AvroSchemaUtils.fromJsonSchema(targetSchema, workUnitState);
     return finalSchema;
   }
 

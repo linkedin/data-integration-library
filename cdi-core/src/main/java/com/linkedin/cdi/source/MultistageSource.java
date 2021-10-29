@@ -11,6 +11,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.extractor.MultistageExtractor;
+import com.linkedin.cdi.keys.JobKeys;
+import com.linkedin.cdi.util.EndecoUtils;
+import com.linkedin.cdi.util.HdfsReader;
+import com.linkedin.cdi.util.WatermarkDefinition;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,23 +25,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.gobblin.configuration.ConfigurationKeys;
 import org.apache.gobblin.configuration.SourceState;
 import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.configuration.WorkUnitState;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.extractor.MultistageExtractor;
-import com.linkedin.cdi.keys.JobKeys;
-import com.linkedin.cdi.util.EndecoUtils;
-import com.linkedin.cdi.util.HdfsReader;
-import com.linkedin.cdi.util.WatermarkDefinition;
 import org.apache.gobblin.source.extractor.Extractor;
 import org.apache.gobblin.source.extractor.WatermarkInterval;
 import org.apache.gobblin.source.extractor.extract.AbstractSource;
@@ -44,8 +38,11 @@ import org.apache.gobblin.source.extractor.extract.LongWatermark;
 import org.apache.gobblin.source.workunit.Extract;
 import org.apache.gobblin.source.workunit.WorkUnit;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -70,10 +67,9 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
  * @param <S> The schema class
  * @param <D> The data class
  */
-
-@Slf4j
 @SuppressWarnings("unchecked")
 public class MultistageSource<S, D> extends AbstractSource<S, D> {
+  private static final Logger LOG = LoggerFactory.getLogger(MultistageSource.class);
   final static private Gson GSON = new Gson();
   final static private String PROPERTY_SEPARATOR = ".";
   final static private String DUMMY_DATETIME_WATERMARK_START = "2019-01-01";
@@ -82,14 +78,24 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
   // Avoid too many partition created from misconfiguration, Months * Days * Hours
   final private static int MAX_DATETIME_PARTITION = 3 * 30 * 24;
 
-  @Getter(AccessLevel.PUBLIC)
-  @Setter(AccessLevel.MODULE)
   protected SourceState sourceState = null;
-  @Getter(AccessLevel.PUBLIC)
-  @Setter(AccessLevel.PUBLIC)
   JobKeys jobKeys = new JobKeys();
-  @Getter(AccessLevel.PUBLIC)
-  @Setter(AccessLevel.MODULE)
+
+  public SourceState getSourceState() {
+    return sourceState;
+  }
+
+  public void setSourceState(SourceState sourceState) {
+    this.sourceState = sourceState;
+  }
+
+  public JobKeys getJobKeys() {
+    return jobKeys;
+  }
+
+  public void setJobKeys(JobKeys jobKeys) {
+    this.jobKeys = jobKeys;
+  }
 
   final private ConcurrentHashMap<MultistageExtractor<S, D>, WorkUnitState> extractorState =
       new ConcurrentHashMap<>();
@@ -102,13 +108,17 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
    * getWorkUnits() is the first place to receive the Source State object, therefore
    * initialization of parameters cannot be complete in constructor.
    */
-  @SneakyThrows
   @Override
   public List<WorkUnit> getWorkunits(SourceState state) {
     sourceState = state;
     initialize(state);
 
+    jobKeys.logUsage(state);
     if (!jobKeys.validate(state)) {
+      LOG.error("Some parameters are invalid, job will do nothing until they are fixed.");
+      if (MSTAGE_WORK_UNIT_MIN_UNITS.get(state) > 0) {
+        throw new RuntimeException(String.format(EXCEPTION_WORK_UNIT_MINIMUM, MSTAGE_WORK_UNIT_MIN_UNITS.get(state), 0));
+      }
       return new ArrayList<>();
     }
 
@@ -143,14 +153,22 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
 
     // generated work units based on watermarks defined and previous high watermarks
     List<WorkUnit> wuList = generateWorkUnits(definedWatermarks, previousHighWatermarks);
+
+    // abort (fail) the job when the number of work units is below require threshold
+    if (wuList.size() < jobKeys.getMinWorkUnits()) {
+      throw new RuntimeException(String.format(EXCEPTION_WORK_UNIT_MINIMUM,
+          jobKeys.getMinWorkUnits(),
+          jobKeys.getMinWorkUnits()));
+    }
+
     if (authentications != null && authentications.size() == 1) {
       for (WorkUnit wu : wuList) {
-        wu.setProp(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.toString(),
+        wu.setProp(MSTAGE_ACTIVATION_PROPERTY.toString(),
             getUpdatedWorkUnitActivation(wu, authentications.get(0).getAsJsonObject()));
 
         // unlike activation secondary inputs, payloads will be processed in each work unit
         // and payloads will not be loaded until the Connection executes the command
-        wu.setProp(MultistageProperties.MSTAGE_PAYLOAD_PROPERTY.toString(), payloads);
+        wu.setProp(MSTAGE_PAYLOAD_PROPERTY.toString(), payloads);
       }
     }
     return wuList;
@@ -161,21 +179,24 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
    * In case the token is missing, it will retry accessing the tokens as per the retry parameters
    * ("delayInSec", "retryCount")
    */
-  private Map<String, JsonArray> readSecondaryInputs(State state, final long retries)
-      throws InterruptedException {
-    log.info("Trying to read secondary input with retry = {}", retries);
+  private Map<String, JsonArray> readSecondaryInputs(State state, final long retries) {
+    LOG.info("Trying to read secondary input with retry = {}", retries);
     Map<String, JsonArray> secondaryInputs = readContext(state);
 
     // Check if authentication is ready, and if not, whether retry is required
     JsonArray authentications = secondaryInputs.get(KEY_WORD_AUTHENTICATION);
     if ((authentications == null || authentications.size() == 0)
         && jobKeys.getIsSecondaryAuthenticationEnabled() && retries > 0) {
-      log.info("Authentication tokens are expected from secondary input, but not ready");
-      log.info("Will wait for {} seconds and then retry reading the secondary input", jobKeys.getRetryDelayInSec());
-      TimeUnit.SECONDS.sleep(jobKeys.getRetryDelayInSec());
+      LOG.info("Authentication tokens are expected from secondary input, but not ready");
+      LOG.info("Will wait for {} seconds and then retry reading the secondary input", jobKeys.getRetryDelayInSec());
+      try {
+        TimeUnit.SECONDS.sleep(jobKeys.getRetryDelayInSec());
+      } catch (Exception e) {
+        throw new RuntimeException("Sleep() interrupted", e);
+      }
       return readSecondaryInputs(state, retries - 1);
     }
-    log.info("Successfully read secondary input, no more retry");
+    LOG.info("Successfully read secondary input, no more retry");
     return secondaryInputs;
   }
 
@@ -188,7 +209,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
   public Extractor<S, D> getExtractor(WorkUnitState state) {
     try {
       ClassLoader loader = this.getClass().getClassLoader();
-      Class<?> extractorClass = loader.loadClass(MultistageProperties.MSTAGE_EXTRACTOR_CLASS.getValidNonblankWithDefault(state));
+      Class<?> extractorClass = loader.loadClass(MSTAGE_EXTRACTOR_CLASS.get(state));
       Constructor<MultistageExtractor<?, ?>> constructor = (Constructor<MultistageExtractor<?, ?>>)
           extractorClass.getConstructor(WorkUnitState.class, JobKeys.class);
       MultistageExtractor<S, D> extractor = (MultistageExtractor<S, D>) constructor.newInstance(state, this.jobKeys);
@@ -206,7 +227,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
    */
   @Override
   public void shutdown(SourceState state) {
-    log.info("MultistageSource Shutdown() called, instructing extractors to close connections");
+    LOG.info("MultistageSource Shutdown() called, instructing extractors to close connections");
     for (MultistageExtractor<S, D> extractor: extractorState.keySet()) {
       extractor.closeConnection();
     }
@@ -234,6 +255,13 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
     }
     // Set default unit watermark
     if (unitWatermark == null) {
+      // abort (fail) the job when at least some work units are expected
+      if (jobKeys.getMinWorkUnits() > 0) {
+        throw new RuntimeException(String.format(EXCEPTION_WORK_UNIT_MINIMUM,
+            jobKeys.getMinWorkUnits(),
+            jobKeys.getMinWorkUnits()));
+      }
+
       JsonArray unitArray = new JsonArray();
       unitArray.add(new JsonObject());
       unitWatermark = new WatermarkDefinition("unit", unitArray);
@@ -258,19 +286,19 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
     // cutoff time is moved backward by GRACE_PERIOD
     // cutoff time is moved forward by ABSTINENT_PERIOD
     Long cutoffTime = previousHighWatermarks.size() == 0 ? -1 : Collections.max(previousHighWatermarks.values())
-        - MultistageProperties.MSTAGE_GRACE_PERIOD_DAYS.getMillis(sourceState);
-    log.debug("Overall cutoff time: {}", cutoffTime);
+        - MSTAGE_GRACE_PERIOD_DAYS.getMillis(sourceState);
+    LOG.debug("Overall cutoff time: {}", cutoffTime);
 
     for (ImmutablePair<Long, Long> dtPartition : datetimePartitions) {
-      log.debug("dtPartition: {}", dtPartition);
+      LOG.debug("dtPartition: {}", dtPartition);
       for (String unitPartition: unitPartitions) {
 
         // adding the date time partition and unit partition combination to work units until
         // it reaches ms.work.unit.parallelism.max. a combination is not added if its prior
         // watermark doesn't require a rerun.
         // a work unit signature is a date time partition and unit partition combination.
-        if (MultistageProperties.MSTAGE_WORK_UNIT_PARALLELISM_MAX.validateNonblank(sourceState)
-            && workUnits.size() >= (Integer) MultistageProperties.MSTAGE_WORK_UNIT_PARALLELISM_MAX.getProp(sourceState)) {
+        if (MSTAGE_WORK_UNIT_PARALLELISM_MAX.isValidNonblank(sourceState)
+            && workUnits.size() >= (Integer) MSTAGE_WORK_UNIT_PARALLELISM_MAX.get(sourceState)) {
           break;
         }
 
@@ -279,16 +307,16 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
         String wuSignature = getWorkUnitSignature(
             datetimeWatermarkName, dtPartition.getLeft(),
             unitWatermarkName, unitPartition);
-        log.debug("Checking work unit: {}", wuSignature);
+        LOG.debug("Checking work unit: {}", wuSignature);
 
         // if a work unit exists in state store, manage its watermark independently
         long unitCutoffTime = -1L;
         if (previousHighWatermarks.containsKey(wuSignature)) {
           unitCutoffTime = previousHighWatermarks.get(wuSignature)
-              - MultistageProperties.MSTAGE_GRACE_PERIOD_DAYS.getMillis(sourceState)
-              + MultistageProperties.MSTAGE_ABSTINENT_PERIOD_DAYS.getMillis(sourceState);
+              - MSTAGE_GRACE_PERIOD_DAYS.getMillis(sourceState)
+              + MSTAGE_ABSTINENT_PERIOD_DAYS.getMillis(sourceState);
         }
-        log.debug(String.format("previousHighWatermarks.get(wuSignature): %s, unitCutoffTime: %s",
+        LOG.debug(String.format("previousHighWatermarks.get(wuSignature): %s, unitCutoffTime: %s",
             previousHighWatermarks.get(wuSignature), unitCutoffTime));
 
         // for a dated work unit partition, we only need to redo it when its previous
@@ -297,15 +325,13 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
         // grace period logic, which is controlled by cut off time
         if (unitCutoffTime == -1L
             || dtPartition.getRight() >= Longs.max(unitCutoffTime, cutoffTime)) {
-          // prune the date range only if it is not partitioned
+          // prune the date range only if the unit is not in first execution
           // note the nominal date range low boundary had been saved in signature
-          ImmutablePair<Long, Long> dtPartitionModified = dtPartition;
-          if (datetimePartitions.size() == 1 && dtPartition.left < cutoffTime) {
-            dtPartitionModified = new ImmutablePair<>(cutoffTime, dtPartition.right);
-          }
-          log.debug("dtPartitionModified: {}", dtPartitionModified);
+          ImmutablePair<Long, Long> dtPartitionModified = unitCutoffTime == -1L
+              ? dtPartition : previousHighWatermarks.get(wuSignature).equals(dtPartition.left)
+              ? dtPartition : new ImmutablePair<>(Long.max(unitCutoffTime, dtPartition.left), dtPartition.right);
 
-          log.info("Generating Work Unit: {}, watermark: {}", wuSignature, dtPartitionModified);
+          LOG.info(String.format(MSG_WORK_UNIT_INFO, wuSignature, dtPartitionModified));
           WorkUnit workUnit = WorkUnit.create(extract,
               new WatermarkInterval(
                   new LongWatermark(dtPartitionModified.getLeft()),
@@ -313,33 +339,33 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
 
           // save work unit signature for identification
           // because each dataset URN key will have a state file on Hadoop, it cannot contain path separator
-          workUnit.setProp(MultistageProperties.MSTAGE_WATERMARK_GROUPS.toString(),
+          workUnit.setProp(MSTAGE_WATERMARK_GROUPS.toString(),
               watermarkGroups.toString());
-          workUnit.setProp(MultistageProperties.DATASET_URN_KEY.toString(), EndecoUtils.getHadoopFsEncoded(wuSignature));
+          workUnit.setProp(DATASET_URN.toString(), EndecoUtils.getHadoopFsEncoded(wuSignature));
 
           // save the lower number of datetime watermark partition and the unit watermark partition
           workUnit.setProp(datetimeWatermarkName, dtPartition.getLeft());
           workUnit.setProp(unitWatermarkName, unitPartition);
 
-          workUnit.setProp(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.toString(), unitPartition);
-          workUnit.setProp(MultistageProperties.MSTAGE_WORKUNIT_STARTTIME_KEY.toString(),
+          workUnit.setProp(MSTAGE_ACTIVATION_PROPERTY.toString(), unitPartition);
+          workUnit.setProp(MSTAGE_WORK_UNIT_SCHEDULING_STARTTIME.toString(),
               DateTime.now().getMillis()
-                  + workUnits.size() * MultistageProperties.MSTAGE_WORK_UNIT_PACING_SECONDS.getMillis(sourceState));
+                  + workUnits.size() * MSTAGE_WORK_UNIT_PACING_SECONDS.getMillis(sourceState));
 
-          if (!MultistageProperties.MSTAGE_OUTPUT_SCHEMA.validateNonblank(sourceState)
+          if (!MSTAGE_OUTPUT_SCHEMA.isValidNonblank(sourceState)
             && this.jobKeys.hasOutputSchema()) {
             // populate the output schema read from URN reader to sub tasks
             // so that the URN reader will not be called again
-            log.info("Populating output schema to work units:");
-            log.info("Output schema: {}", this.jobKeys.getOutputSchema().toString());
-            workUnit.setProp(MultistageProperties.MSTAGE_OUTPUT_SCHEMA.getConfig(),
+            LOG.info("Populating output schema to work units:");
+            LOG.info("Output schema: {}", this.jobKeys.getOutputSchema().toString());
+            workUnit.setProp(MSTAGE_OUTPUT_SCHEMA.getConfig(),
                 this.jobKeys.getOutputSchema().toString());
 
             // populate the target schema read from URN reader to sub tasks
             // so that the URN reader will not be called again
-            log.info("Populating target schema to work units:");
-            log.info("Target schema: {}", jobKeys.getTargetSchema().toString());
-            workUnit.setProp(MultistageProperties.MSTAGE_TARGET_SCHEMA.getConfig(),
+            LOG.info("Populating target schema to work units:");
+            LOG.info("Target schema: {}", jobKeys.getTargetSchema().toString());
+            workUnit.setProp(MSTAGE_TARGET_SCHEMA.getConfig(),
                 jobKeys.getTargetSchema().toString());
           }
           workUnits.add(workUnit);
@@ -359,7 +385,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
     List<ImmutablePair<Long, Long>> partitions = Lists.newArrayList();
     if (jobKeys.getWorkUnitPartitionType() != null) {
       partitions = jobKeys.getWorkUnitPartitionType().getRanges(datetimeRange,
-          MultistageProperties.MSTAGE_WORK_UNIT_PARTIAL_PARTITION.getValidNonblankWithDefault(sourceState));
+          MSTAGE_WORK_UNIT_PARTIAL_PARTITION.get(sourceState));
     } else {
       partitions.add(new ImmutablePair<>(datetimeRange.getLeft().getMillis(), datetimeRange.getRight().getMillis()));
     }
@@ -367,7 +393,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
     if (partitions.size() > MAX_DATETIME_PARTITION) {
       // Preserve the last N partitions
       partitions = partitions.subList(partitions.size() - MAX_DATETIME_PARTITION, partitions.size());
-      log.warn("Too many partitions, created {}, only processing the last {}", partitions.size(), MAX_DATETIME_PARTITION);
+      LOG.warn("Too many partitions, created {}, only processing the last {}", partitions.size(), MAX_DATETIME_PARTITION);
     }
     return partitions;
   }
@@ -428,7 +454,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
       // Unit watermarks might contain encoded file separator,
       // in such case, we will decode the watermark name so that it can be compared with
       // work unit signatures
-      log.debug("Dataset Signature: {}, High Watermark: {}", EndecoUtils.getHadoopFsDecoded(entry.getKey()), highWatermark);
+      LOG.debug("Dataset Signature: {}, High Watermark: {}", EndecoUtils.getHadoopFsDecoded(entry.getKey()), highWatermark);
       watermarks.put(EndecoUtils.getHadoopFsDecoded(entry.getKey()), highWatermark);
     }
     return ImmutableMap.copyOf(watermarks);
@@ -436,9 +462,9 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
 
   Extract createExtractObject(final boolean isFull) {
     Extract extract = createExtract(
-        Extract.TableType.valueOf(MultistageProperties.EXTRACT_TABLE_TYPE_KEY.getValidNonblankWithDefault(sourceState)),
-        MultistageProperties.EXTRACT_NAMESPACE_NAME_KEY.getProp(sourceState),
-        MultistageProperties.EXTRACT_TABLE_NAME_KEY.getProp(sourceState));
+        Extract.TableType.valueOf(EXTRACT_TABLE_TYPE.get(sourceState)),
+        EXTRACT_NAMESPACE.get(sourceState),
+        EXTRACT_TABLE_NAME.get(sourceState));
     extract.setProp(ConfigurationKeys.EXTRACT_IS_FULL_KEY, isFull);
     return extract;
   }
@@ -459,8 +485,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
    * @param retries number of retries remaining
    * @return the authentication JsonObject
    */
-  @SneakyThrows
-  protected JsonObject readSecondaryAuthentication(State state, final long retries) {
+  protected JsonObject readSecondaryAuthentication(State state, final long retries) throws InterruptedException {
     Map<String, JsonArray> secondaryInputs = readSecondaryInputs(state, retries);
     if (secondaryInputs.containsKey(KEY_WORD_ACTIVATION)
         && secondaryInputs.get(KEY_WORD_AUTHENTICATION).isJsonArray()
@@ -478,17 +503,17 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
    * @return the updated work unit configuration
    */
   protected String getUpdatedWorkUnitActivation(WorkUnit wu, JsonObject authentication) {
-    log.debug("Activation property (origin): {}", wu.getProp(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.toString(), ""));
-    if (!wu.getProp(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.toString(), StringUtils.EMPTY).isEmpty()) {
-      JsonObject existing = GSON.fromJson(wu.getProp(MultistageProperties.MSTAGE_ACTIVATION_PROPERTY.toString()), JsonObject.class);
+    LOG.debug("Activation property (origin): {}", wu.getProp(MSTAGE_ACTIVATION_PROPERTY.toString(), ""));
+    if (!wu.getProp(MSTAGE_ACTIVATION_PROPERTY.toString(), StringUtils.EMPTY).isEmpty()) {
+      JsonObject existing = GSON.fromJson(wu.getProp(MSTAGE_ACTIVATION_PROPERTY.toString()), JsonObject.class);
       for (Map.Entry<String, JsonElement> entry: authentication.entrySet()) {
         existing.remove(entry.getKey());
         existing.addProperty(entry.getKey(), entry.getValue().getAsString());
       }
-      log.debug("Activation property (modified): {}", existing.toString());
+      LOG.debug("Activation property (modified): {}", existing.toString());
       return existing.toString();
     }
-    log.debug("Activation property (new): {}", authentication.toString());
+    LOG.debug("Activation property (new): {}", authentication.toString());
     return authentication.toString();
   }
 
@@ -499,12 +524,12 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
    * @return true if all conditions met for a full extract, otherwise false
    */
   private boolean checkFullExtractState(final State state, final Map<String, Long> previousHighWatermarks) {
-    if (MultistageProperties.EXTRACT_TABLE_TYPE_KEY.getValidNonblankWithDefault(state).toString()
+    if (EXTRACT_TABLE_TYPE.get(state).toString()
         .equalsIgnoreCase(KEY_WORD_SNAPSHOT_ONLY)) {
       return true;
     }
 
-    if (MultistageProperties.MSTAGE_ENABLE_DYNAMIC_FULL_LOAD.getValidNonblankWithDefault(state)) {
+    if (MSTAGE_ENABLE_DYNAMIC_FULL_LOAD.get(state)) {
       if (previousHighWatermarks.isEmpty()) {
         return true;
       }

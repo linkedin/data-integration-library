@@ -1,0 +1,1 @@
+basic|bearer|oauth|custom
