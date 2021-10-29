@@ -18,6 +18,9 @@
 
 `ms.source.files.pattern` specifies a pattern to filter files from S3 and SFTP sources.
 
+`ms.source.files.pattern` meant to provide advanced filtering
+that SFTP or S3 "list" command cannot do by using its own patterns.
+
 ### Statement of Direction
 
 Source file patterns will be moved to [ms.source.uri](ms.source.uri.md), 

@@ -12,6 +12,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.linkedin.cdi.connection.MultistageConnection;
+import com.linkedin.cdi.exception.RetriableAuthenticationException;
+import com.linkedin.cdi.keys.JobKeys;
+import com.linkedin.cdi.keys.JsonExtractorKeys;
+import com.linkedin.cdi.source.MultistageSource;
+import com.linkedin.cdi.util.JsonUtils;
+import com.linkedin.cdi.util.ParameterTypes;
+import com.linkedin.cdi.util.SchemaBuilder;
+import com.linkedin.cdi.util.WorkUnitStatus;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -21,18 +30,6 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.SourceState;
 import org.apache.gobblin.configuration.WorkUnitState;
-import com.linkedin.cdi.configuration.MultistageProperties;
-import com.linkedin.cdi.connection.MultistageConnection;
-import com.linkedin.cdi.exception.RetriableAuthenticationException;
-import com.linkedin.cdi.keys.JobKeys;
-import com.linkedin.cdi.keys.JsonExtractorKeys;
-import com.linkedin.cdi.source.HttpSource;
-import com.linkedin.cdi.source.MultistageSource;
-import com.linkedin.cdi.util.JsonUtils;
-import com.linkedin.cdi.util.ParameterTypes;
-import com.linkedin.cdi.util.SchemaBuilder;
-import com.linkedin.cdi.util.WorkUnitStatus;
-import org.apache.gobblin.runtime.JobState;
 import org.apache.gobblin.source.workunit.WorkUnit;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -43,7 +40,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static com.linkedin.cdi.configuration.MultistageProperties.*;
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static org.mockito.Mockito.*;
 
 
@@ -79,9 +76,9 @@ public class JsonExtractorTest {
     workUnitStatus = Mockito.mock(WorkUnitStatus.class);
     state = Mockito.mock(WorkUnitState.class);
     when(state.getProp(MSTAGE_ACTIVATION_PROPERTY.getConfig(), new JsonObject().toString())).thenReturn(ACTIVATION_PROP);
-    when(state.getPropAsLong(MSTAGE_WORKUNIT_STARTTIME_KEY.getConfig(), 0L)).thenReturn(WORKUNIT_STARTTIME_KEY);
+    when(state.getPropAsLong(MSTAGE_WORK_UNIT_SCHEDULING_STARTTIME.getConfig(), 0L)).thenReturn(WORKUNIT_STARTTIME_KEY);
     when(state.getWorkunit()).thenReturn(workUnit);
-    workUnit.setProp(MultistageProperties.DATASET_URN_KEY.getConfig(), DATA_SET_URN_KEY);
+    workUnit.setProp(DATASET_URN.getConfig(), DATA_SET_URN_KEY);
     when(source.getJobKeys()).thenReturn(jobKeys);
     when(jobKeys.getSourceParameters()).thenReturn(new JsonArray());
     when(jobKeys.getPaginationInitValues()).thenReturn(new HashMap<>());
@@ -120,7 +117,7 @@ public class JsonExtractorTest {
     when(jobKeys.getOutputSchema()).thenReturn(outputSchema);
     when(jsonExtractorKeys.getCurrentPageNumber()).thenReturn(Long.valueOf(0));
     when(jsonExtractorKeys.getSessionKeyValue()).thenReturn("session_key");
-    workUnit.setProp(MultistageProperties.DATASET_URN_KEY.getConfig(), "com.linkedin.xxxxx.UserGroups");
+    workUnit.setProp(DATASET_URN.getConfig(), "com.linkedin.xxxxx.UserGroups");
     Iterator jsonElementIterator = ImmutableList.of().iterator();
     when(jsonExtractorKeys.getJsonElementIterator()).thenReturn(jsonElementIterator);
     when(jsonExtractorKeys.getProcessedCount()).thenReturn(Long.valueOf(0));
@@ -225,36 +222,6 @@ public class JsonExtractorTest {
 
     jsonPath = "key.3";
     Assert.assertEquals(JsonUtils.get(row, jsonPath), JsonNull.INSTANCE);
-  }
-
-  /**
-   * Test Extractor shall stop the session when total count of records is met
-   */
-  @Test
-  void testStopConditionTotalCountMet() throws RetriableAuthenticationException {
-    InputStream inputStream = getClass().getResourceAsStream("/json/last-page-with-data.json");
-    WorkUnitStatus status = WorkUnitStatus.builder().buffer(inputStream).build();
-    status.setTotalCount(TOTAL_COUNT);
-
-    SourceState sourceState = mock(SourceState.class);
-    when(sourceState.getProp("ms.data.field", "")).thenReturn("items");
-    when(sourceState.getProp("ms.total.count.field", "")).thenReturn("totalResults");
-    when(sourceState.getProp("ms.pagination", "")).thenReturn("{\"fields\": [\"offset\", \"limit\"], \"initialvalues\": [0, 5000]}");
-    when(sourceState.getProp(MultistageProperties.MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
-    MultistageSource source = new HttpSource();
-    List<WorkUnit> wus = source.getWorkunits(sourceState);
-    WorkUnitState state = new WorkUnitState(wus.get(0), new JobState());
-
-    JsonExtractor extractor = new JsonExtractor(state, source.getJobKeys());
-    extractor.setConnection(multistageConnection);
-    extractor.getJsonExtractorKeys().setTotalCount(TOTAL_COUNT);
-
-    extractor.workUnitStatus = WorkUnitStatus.builder().build();
-    when(multistageConnection.executeFirst(extractor.workUnitStatus)).thenReturn(status);
-
-    Assert.assertFalse(extractor.processInputStream(TOTAL_COUNT));
-    // If total count not reached, should not fail
-    Assert.assertTrue(extractor.processInputStream(TOTAL_COUNT-1));
   }
 
   @Test

@@ -4,7 +4,6 @@
 
 package com.linkedin.cdi.connection;
 
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.factory.ConnectionClientFactory;
 import com.linkedin.cdi.factory.sftp.SftpClient;
@@ -22,6 +21,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 
 
 public class SftpConnection extends MultistageConnection {
@@ -52,19 +53,9 @@ public class SftpConnection extends MultistageConnection {
   }
 
   /**
-   This method is the main method to list files based on source base directory and source entity
-   ms.source.file.pattern
-   if Is not blank:
-   List the files and output as CSV
-   if is blank:
-   ms.extract.target.file.name?
-   if is blank:
-   List the files and output as CSV
-   if is not blank
-   if file size is 1
-   Dump the file
-   if files size is >1
-   Dump only the file which matches the pattern
+   * @param workUnitStatus prior work unit status
+   * @return new work unit status
+   * @throws RetriableAuthenticationException
    */
   @Override
   public WorkUnitStatus executeFirst(WorkUnitStatus workUnitStatus) throws RetriableAuthenticationException {
@@ -85,37 +76,30 @@ public class SftpConnection extends MultistageConnection {
     //get List of files matching the pattern
     List<String> files;
     try {
-       files = getFiles(finalPrefix);
+      files = getFiles(finalPrefix).stream()
+          .filter(objectKey -> objectKey.matches(sftpSourceKeys.getFilesPattern()))
+          .collect(Collectors.toList());
     } catch (Exception e) {
       LOG.error("Error reading file list", e);
       return null;
     }
 
-    boolean isFileWithPrefixExist = files.stream().anyMatch(file -> file.equals(finalPrefix));
     LOG.info("No Of Files to be processed matching the pattern: {}", files.size());
-    if (StringUtils.isNotBlank(sftpSourceKeys.getFilesPattern())) {
-      status.setBuffer(InputStreamUtils.convertListToInputStream(getFilteredFiles(files)));
+
+    if (StringUtils.isBlank(sftpSourceKeys.getTargetFilePattern())) {
+      status.setBuffer(InputStreamUtils.convertListToInputStream(files));
     } else {
-      if (StringUtils.isBlank(sftpSourceKeys.getTargetFilePattern())) {
-        status.setBuffer(InputStreamUtils.convertListToInputStream(files));
+      String fileToDownload = files.size() == 0 ? StringUtils.EMPTY : files.get(0);
+      if (StringUtils.isNotBlank(fileToDownload)) {
+        LOG.info("Downloading file: {}", fileToDownload);
+        try {
+          status.setBuffer(this.fsClient.getFileStream(fileToDownload));
+        } catch (Exception e) {
+          LOG.error("Error downloading file {}", fileToDownload, e);
+          return null;
+        }
       } else {
-        String fileToDownload = "";
-        if (files.size() == 1) {
-          fileToDownload = files.get(0);
-        } else if (isFileWithPrefixExist) {
-          fileToDownload = finalPrefix;
-        }
-        if (StringUtils.isNotBlank(fileToDownload)) {
-          LOG.info("Downloading file: {}", files.get(0));
-          try {
-            status.setBuffer(this.fsClient.getFileStream(fileToDownload));
-          } catch (Exception e) {
-            LOG.error("Error downloading file {}", fileToDownload, e);
-            return null;
-          }
-        } else {
-          LOG.warn("Invalid set of parameters. Please make sure to set source directory, entity and file pattern");
-        }
+        LOG.warn("Invalid set of parameters. Please make sure to set source directory, entity and file pattern");
       }
     }
     return status;
@@ -124,7 +108,7 @@ public class SftpConnection extends MultistageConnection {
   private SftpClient getFsClient() {
     if (this.fsClient == null) {
       try {
-        Class<?> factoryClass = Class.forName(MultistageProperties.MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(this.getState()));
+        Class<?> factoryClass = Class.forName(MSTAGE_CONNECTION_CLIENT_FACTORY.get(this.getState()));
         ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.getDeclaredConstructor().newInstance();
         this.fsClient = factory.getSftpChannelClient(this.getState());
       } catch (Exception e) {

@@ -30,6 +30,10 @@ DIL will implicitly generate a datetime watermark with a range from 2019-01-01 t
 
 There should be no more than 1 unit watermark.  
 
+This document focuses on the syntax of `ms.watermark` property. 
+To understand how watermark controls execution, please read: [key concept: watermark](../concepts/watermark.md).
+To understand how work unit works, please read: [key concept: work unit](../concepts/work-unit.md).
+
 ### More about Datetime Watermark
 
 A datetime watermark is a reference. It doesn't directly effect or control

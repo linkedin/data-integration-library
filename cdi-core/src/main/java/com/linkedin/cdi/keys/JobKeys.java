@@ -30,6 +30,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -50,37 +51,6 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
 public class JobKeys {
   private static final Logger LOG = LoggerFactory.getLogger(JobKeys.class);
   final static public Gson GSON = new Gson();
-  final static public List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      MultistageProperties.SOURCE_CLASS,
-      MultistageProperties.EXTRACTOR_CLASSES,
-      MultistageProperties.CONVERTER_CLASSES,
-      MultistageProperties.EXTRACT_IS_FULL,
-      MultistageProperties.EXTRACT_TABLE_TYPE_KEY,
-      MultistageProperties.STATE_STORE_ENABLED,
-      MultistageProperties.MSTAGE_ABSTINENT_PERIOD_DAYS,
-      MultistageProperties.MSTAGE_DERIVED_FIELDS,
-      MultistageProperties.MSTAGE_ENABLE_CLEANSING,
-      MultistageProperties.MSTAGE_ENABLE_DYNAMIC_FULL_LOAD,
-      MultistageProperties.MSTAGE_ENABLE_SCHEMA_BASED_FILTERING,
-      MultistageProperties.MSTAGE_ENCRYPTION_FIELDS,
-      MultistageProperties.MSTAGE_GRACE_PERIOD_DAYS,
-      MultistageProperties.MSTAGE_OUTPUT_SCHEMA,
-      MultistageProperties.MSTAGE_PAGINATION,
-      MultistageProperties.MSTAGE_PARAMETERS,
-      MultistageProperties.MSTAGE_RETENTION,
-      MultistageProperties.MSTAGE_SECONDARY_INPUT,
-      MultistageProperties.MSTAGE_SESSION_KEY_FIELD,
-      MultistageProperties.MSTAGE_SOURCE_DATA_CHARACTER_SET,
-      MultistageProperties.MSTAGE_SOURCE_SCHEMA_URN,
-      MultistageProperties.MSTAGE_SOURCE_URI,
-      MultistageProperties.MSTAGE_TOTAL_COUNT_FIELD,
-      MultistageProperties.MSTAGE_WAIT_TIMEOUT_SECONDS,
-      MultistageProperties.MSTAGE_WORK_UNIT_MIN_RECORDS,
-      MultistageProperties.MSTAGE_WORK_UNIT_MIN_UNITS,
-      MultistageProperties.MSTAGE_WORK_UNIT_PACING_SECONDS,
-      MultistageProperties.MSTAGE_WORK_UNIT_PARALLELISM_MAX,
-      MultistageProperties.MSTAGE_WORK_UNIT_PARTIAL_PARTITION,
-      MultistageProperties.MSTAGE_WATERMARK);
   final private static int RETRY_DELAY_IN_SEC_DEFAULT = 300;
   final private static int RETRY_COUNT_DEFAULT = 3;
   final private static String ITEMS_KEY = "items";
@@ -125,23 +95,23 @@ public class JobKeys {
   public void initialize(State state) {
     parsePaginationFields(state);
     parsePaginationInitialValues(state);
-    setSessionKeyField(MultistageProperties.MSTAGE_SESSION_KEY_FIELD.getValidNonblankWithDefault(state));
-    setTotalCountField(MultistageProperties.MSTAGE_TOTAL_COUNT_FIELD.getValidNonblankWithDefault(state));
-    setSourceParameters(MultistageProperties.MSTAGE_PARAMETERS.getValidNonblankWithDefault(state));
-    setSourceUri(MultistageProperties.MSTAGE_SOURCE_URI.getValidNonblankWithDefault(state));
+    setSessionKeyField(MSTAGE_SESSION_KEY_FIELD.get(state));
+    setTotalCountField(MSTAGE_TOTAL_COUNT_FIELD.get(state));
+    setSourceParameters(MSTAGE_PARAMETERS.get(state));
+    setSourceUri(MSTAGE_SOURCE_URI.get(state));
     setDefaultFieldTypes(parseDefaultFieldTypes(state));
     setDerivedFields(parseDerivedFields(state));
     setOutputSchema(parseOutputSchema(state));
-    setTargetSchema(MultistageProperties.MSTAGE_TARGET_SCHEMA.getValidNonblankWithDefault(state));
-    setEncryptionField(MultistageProperties.MSTAGE_ENCRYPTION_FIELDS.getValidNonblankWithDefault(state));
-    setDataField(MultistageProperties.MSTAGE_DATA_FIELD.getValidNonblankWithDefault(state));
-    setCallInterval(MultistageProperties.MSTAGE_CALL_INTERVAL.getProp(state));
-    setSessionTimeout(MultistageProperties.MSTAGE_WAIT_TIMEOUT_SECONDS.getMillis(state));
-    setMinWorkUnitRecords(MultistageProperties.MSTAGE_WORK_UNIT_MIN_RECORDS.getValidNonblankWithDefault(state));
-    setMinWorkUnits(MultistageProperties.MSTAGE_WORK_UNIT_MIN_UNITS.getValidNonblankWithDefault(state));
+    setTargetSchema(MSTAGE_TARGET_SCHEMA.get(state));
+    setEncryptionField(MSTAGE_ENCRYPTION_FIELDS.get(state));
+    setDataField(MSTAGE_DATA_FIELD.get(state));
+    setCallInterval(MSTAGE_CALL_INTERVAL_MILLIS.get(state));
+    setSessionTimeout(MSTAGE_WAIT_TIMEOUT_SECONDS.getMillis(state));
+    setMinWorkUnitRecords(MSTAGE_WORK_UNIT_MIN_RECORDS.get(state));
+    setMinWorkUnits(MSTAGE_WORK_UNIT_MIN_UNITS.get(state));
 
-    setEnableCleansing(MultistageProperties.MSTAGE_ENABLE_CLEANSING.getValidNonblankWithDefault(state));
-    JsonObject schemaCleansing = MultistageProperties.MSTAGE_SCHEMA_CLENSING.getValidNonblankWithDefault(state);
+    setEnableCleansing(MSTAGE_ENABLE_CLEANSING.get(state));
+    JsonObject schemaCleansing = MSTAGE_SCHEMA_CLEANSING.get(state);
     if (schemaCleansing.has("enabled")) {
       setEnableCleansing(Boolean.parseBoolean(schemaCleansing.get("enabled").getAsString()));
       if (enableCleansing && schemaCleansing.has("pattern")) {
@@ -155,20 +125,17 @@ public class JobKeys {
       }
     }
 
-    setIsPartialPartition(MultistageProperties.MSTAGE_WORK_UNIT_PARTIAL_PARTITION.getValidNonblankWithDefault(state));
+    setIsPartialPartition(MSTAGE_WORK_UNIT_PARTIAL_PARTITION.get(state));
     setWorkUnitPartitionType(parsePartitionType(state));
-    setWatermarkDefinition(MultistageProperties.MSTAGE_WATERMARK.getValidNonblankWithDefault(state));
-    Map<String, Long> retry = parseSecondaryInputRetry(
-        MultistageProperties.MSTAGE_SECONDARY_INPUT.getValidNonblankWithDefault(state));
+    setWatermarkDefinition(MSTAGE_WATERMARK.get(state));
+    Map<String, Long> retry = parseSecondaryInputRetry(MSTAGE_SECONDARY_INPUT.get(state));
     setRetryDelayInSec(retry.get(KEY_WORD_RETRY_DELAY_IN_SEC));
     setRetryCount(retry.get(KEY_WORD_RETRY_COUNT));
-    setSecondaryInputs(MultistageProperties.MSTAGE_SECONDARY_INPUT.getValidNonblankWithDefault(state));
+    setSecondaryInputs(MSTAGE_SECONDARY_INPUT.get(state));
     setIsSecondaryAuthenticationEnabled(checkSecondaryAuthenticationEnabled());
 
-    setSourceSchema(readSourceSchemaFromUrn(state,
-        MultistageProperties.MSTAGE_SOURCE_SCHEMA_URN.getValidNonblankWithDefault(state)));
-    setTargetSchema(readTargetSchemaFromUrn(state,
-        MultistageProperties.MSTAGE_TARGET_SCHEMA_URN.getValidNonblankWithDefault(state)));
+    setSourceSchema(readSourceSchemaFromUrn(state, MSTAGE_SOURCE_SCHEMA_URN.get(state)));
+    setTargetSchema(readTargetSchemaFromUrn(state, MSTAGE_TARGET_SCHEMA_URN.get(state)));
 
     // closing out schema reader if it was created because of reading
     // output schema or target schema.
@@ -248,6 +215,30 @@ public class JobKeys {
    * @return true if validation was successful, otherwise false
    */
   public boolean validate(State state) {
+
+    // Validate all job parameters
+    boolean allValid = true;
+    for (MultistageProperties<?> p: allProperties) {
+      if (!p.isBlank(state) && !p.isValid(state))  {
+        LOG.error(p.errorMessage(state));
+        allValid = false;
+      }
+    }
+
+    for (String deprecatedKey: deprecatedProperties.keySet()) {
+      if (state.contains(deprecatedKey) &&
+          StringUtils.isNotBlank(state.getProp(deprecatedKey, StringUtils.EMPTY)))  {
+        LOG.error(String.format(EXCEPTION_DEPRECATED_CONFIGURATION, deprecatedKey,
+            deprecatedProperties.get(deprecatedKey).getConfig(),
+            deprecatedProperties.get(deprecatedKey).getDocUrl()));
+        allValid = false;
+      }
+    }
+
+    if(!allValid) {
+      return false;
+    }
+
     /**
      * If pagination is enabled,  we need one of following ways to stop pagination
      *  1. through a total count field, i.e. ms.total.count.field = data.
@@ -276,7 +267,7 @@ public class JobKeys {
      * It is OK if output schema is intentionally left blank.
      */
     if (!hasOutputSchema()) {
-      if (!state.getProp(MultistageProperties.MSTAGE_OUTPUT_SCHEMA.getConfig(), StringUtils.EMPTY).isEmpty()) {
+      if (!state.getProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), StringUtils.EMPTY).isEmpty()) {
         LOG.error("Output schema is specified but it is an invalid or empty JsonArray");
         return false;
       }
@@ -286,7 +277,7 @@ public class JobKeys {
      * Check if partitioning property is correct
      */
     if (getWorkUnitPartitionType() == null) {
-      String partTypeString = state.getProp(MultistageProperties.MSTAGE_WORK_UNIT_PARTITION.getConfig());
+      String partTypeString = state.getProp(MSTAGE_WORK_UNIT_PARTITION.getConfig());
       if (!StringUtils.isBlank(partTypeString)) {
         LOG.error("ms.work.unit.partition has a unaccepted value: {}", partTypeString);
         return false;
@@ -330,8 +321,8 @@ public class JobKeys {
   }
 
   public void logUsage(State state) {
-    for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
+    for (MultistageProperties<?> p: allProperties) {
+      LOG.info(p.info(state));
     }
   }
 
@@ -341,8 +332,8 @@ public class JobKeys {
         ParameterTypes.PAGESIZE,
         ParameterTypes.PAGENO
     );
-    if (MultistageProperties.MSTAGE_PAGINATION.validateNonblank(state)) {
-      JsonObject p = MultistageProperties.MSTAGE_PAGINATION.getProp(state);
+    if (MSTAGE_PAGINATION.isValidNonblank(state)) {
+      JsonObject p = MSTAGE_PAGINATION.get(state);
       if (p.has("fields")) {
         JsonArray fields = p.get("fields").getAsJsonArray();
         for (int i = 0; i < fields.size(); i++) {
@@ -360,8 +351,8 @@ public class JobKeys {
         ParameterTypes.PAGESIZE,
         ParameterTypes.PAGENO
     );
-    if (MultistageProperties.MSTAGE_PAGINATION.validateNonblank(state)) {
-      JsonObject p = MultistageProperties.MSTAGE_PAGINATION.getProp(state);
+    if (MSTAGE_PAGINATION.isValidNonblank(state)) {
+      JsonObject p = MSTAGE_PAGINATION.get(state);
       if (p.has("initialvalues")) {
         JsonArray values = p.get("initialvalues").getAsJsonArray();
         for (int i = 0; i < values.size(); i++) {
@@ -380,8 +371,8 @@ public class JobKeys {
    * @return A map of fields and their default types
    */
   private Map<String, String> parseDefaultFieldTypes(State state) {
-    if (MultistageProperties.MSTAGE_DATA_DEFAULT_TYPE.validateNonblank(state)) {
-      return GSON.fromJson(MultistageProperties.MSTAGE_DATA_DEFAULT_TYPE.getProp(state).toString(),
+    if (MSTAGE_DATA_DEFAULT_TYPE.isValidNonblank(state)) {
+      return GSON.fromJson(MSTAGE_DATA_DEFAULT_TYPE.get(state).toString(),
           new TypeToken<HashMap<String, String>>() {
           }.getType());
     }
@@ -403,12 +394,12 @@ public class JobKeys {
    */
   @VisibleForTesting
   Map<String, Map<String, String>> parseDerivedFields(State state) {
-    if (!MultistageProperties.MSTAGE_DERIVED_FIELDS.validateNonblank(state)) {
+    if (!MSTAGE_DERIVED_FIELDS.isValidNonblank(state)) {
       return new HashMap<>();
     }
 
     Map<String, Map<String, String>> derivedFields = new HashMap<>();
-    JsonArray jsonArray = MultistageProperties.MSTAGE_DERIVED_FIELDS.getProp(state);
+    JsonArray jsonArray = MSTAGE_DERIVED_FIELDS.get(state);
     for (JsonElement field: jsonArray) {
 
       // change the formula part, which is JsonObject, into map
@@ -428,7 +419,7 @@ public class JobKeys {
    * @return the output schema
    */
   public JsonArray parseOutputSchema(State state) {
-    return JsonUtils.deepCopy(MultistageProperties.MSTAGE_OUTPUT_SCHEMA.getValidNonblankWithDefault(state)).getAsJsonArray();
+    return JsonUtils.deepCopy(MSTAGE_OUTPUT_SCHEMA.get(state)).getAsJsonArray();
   }
 
 
@@ -439,7 +430,7 @@ public class JobKeys {
    */
   WorkUnitPartitionTypes parsePartitionType(State state) {
     WorkUnitPartitionTypes partitionType = WorkUnitPartitionTypes.fromString(
-        MultistageProperties.MSTAGE_WORK_UNIT_PARTITION.getValidNonblankWithDefault(state));
+        MSTAGE_WORK_UNIT_PARTITION.get(state));
 
     if (partitionType != WorkUnitPartitionTypes.COMPOSITE) {
       return partitionType;
@@ -449,7 +440,7 @@ public class JobKeys {
     WorkUnitPartitionTypes.COMPOSITE.resetSubRange();
     try {
       JsonObject jsonObject = GSON.fromJson(
-          MultistageProperties.MSTAGE_WORK_UNIT_PARTITION.getValidNonblankWithDefault(state).toString(),
+          MSTAGE_WORK_UNIT_PARTITION.get(state).toString(),
           JsonObject.class);
 
       for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
@@ -466,7 +457,7 @@ public class JobKeys {
       }
     } catch (Exception e) {
       LOG.error("Error parsing composite partition string: "
-              + MultistageProperties.MSTAGE_WORK_UNIT_PARTITION.getValidNonblankWithDefault(state).toString()
+              + MSTAGE_WORK_UNIT_PARTITION.get(state).toString()
               + "\n partitions may not be generated properly.",
           e);
     }
@@ -552,7 +543,7 @@ public class JobKeys {
       // Schema Reader could be plugged in before the initialization on JobKeys
       if (schemaReader == null) {
         Class<?> factoryClass = Class.forName(
-            MultistageProperties.MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
+            MSTAGE_CONNECTION_CLIENT_FACTORY.get(state));
         ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.newInstance();
         schemaReader = factory.getSchemaReader(state);
       }

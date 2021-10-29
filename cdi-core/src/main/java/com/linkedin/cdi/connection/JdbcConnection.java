@@ -6,7 +6,6 @@ package com.linkedin.cdi.connection;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.factory.ConnectionClientFactory;
 import com.linkedin.cdi.keys.ExtractorKeys;
@@ -31,6 +30,8 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 
 
 /**
@@ -112,13 +113,13 @@ public class JdbcConnection extends MultistageConnection {
    */
   private synchronized Connection getJdbcConnection(State state) {
     try {
-      Class<?> factoryClass = Class.forName(MultistageProperties.MSTAGE_CONNECTION_CLIENT_FACTORY.getValidNonblankWithDefault(state));
+      Class<?> factoryClass = Class.forName(MSTAGE_CONNECTION_CLIENT_FACTORY.get(state));
       ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.newInstance();
 
       return factory.getJdbcConnection(
           jdbcSourceKeys.getSourceUri(),
-          MultistageProperties.SOURCE_CONN_USERNAME.getValidNonblankWithDefault(state),
-          MultistageProperties.SOURCE_CONN_PASSWORD.getValidNonblankWithDefault(state),
+          SOURCE_CONN_USERNAME.get(state),
+          SOURCE_CONN_PASSWORD.get(state),
           state);
     } catch (Exception e) {
       LOG.error("Error creating Jdbc connection: {}", e.getMessage());
@@ -169,12 +170,10 @@ public class JdbcConnection extends MultistageConnection {
 
     if (stmt.execute(query)) {
       ResultSet resultSet = stmt.getResultSet();
-      if (MultistageProperties.MSTAGE_EXTRACTOR_CLASS.getValidNonblankWithDefault(getState()).toString()
-          .matches(".*JsonExtractor.*")) {
+      if (MSTAGE_EXTRACTOR_CLASS.get(getState()).matches(".*JsonExtractor.*")) {
         wuStatus.setBuffer(new ByteArrayInputStream(toJson(resultSet,
             resultSet.getMetaData()).toString().getBytes(StandardCharsets.UTF_8)));
-      } else if (MultistageProperties.MSTAGE_EXTRACTOR_CLASS.getValidNonblankWithDefault(getState()).toString()
-          .matches(".*CsvExtractor.*")) {
+      } else if (MSTAGE_EXTRACTOR_CLASS.get(getState()).matches(".*CsvExtractor.*")) {
         wuStatus.setBuffer(new ByteArrayInputStream(toCsv(resultSet,
             resultSet.getMetaData()).getBytes(StandardCharsets.UTF_8)));
       } else {
@@ -230,7 +229,7 @@ public class JdbcConnection extends MultistageConnection {
       for (int i = 0; i < resultSetMetadata.getColumnCount(); i++) {
         builder.append(StringEscapeUtils.escapeCsv(JdbcUtils.parseColumnAsString(resultSet, resultSetMetadata, i + 1)));
         if (i < resultSetMetadata.getColumnCount() - 1) {
-          builder.append(jdbcSourceKeys.getSeparator());
+          builder.append(MSTAGE_CSV.getFieldSeparator(getState()));
         } else {
           builder.append(System.lineSeparator());
         }

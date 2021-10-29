@@ -8,6 +8,8 @@
 
 **Default value**: 500
 
+**Minimum value**: 1
+
 **Related**:
 
 - [job property: ms.target.schema](ms.target.schema.md)

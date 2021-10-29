@@ -48,64 +48,47 @@ allowed by the QPS to avoid QPS violations cross threads.
 ms.connection.client.factory allows vendors specify customized connections with proxy or enhanced security.
 The default factory is com.linkedin.cdi.DefaultConnectionClientFactory. 
 
-## ms.converter.csv.max.failures
+## [ms.csv](ms.csv.md)
 
-This is for future CSV converter.
+[ms.csv](ms.csv.md) defines CSV extraction and conversion parameters. 
+It can have the following parameters:
 
-## ms.converter.keep.null.strings
-
-This is for future CSV converter.
-
-## [ms.csv.column.header](ms.csv.column.header.md)
-
-ms.csv.column.header specifies whether the CSV data contains a header row.
-
-## [ms.csv.column.header.index](ms.csv.column.header.index.md)
-
-ms.csv.column.header.index specifies the 0-based row index of the header columns if they are available.
-
-## [ms.csv.column.projection](ms.csv.column.projection.md)
-
-`ms.csv.column.projection` defines how CSV columns should be arranged and filtered after parse,
-before being sent to converter and writer to persist.
+- **linesToSkip**, specifies how many lines of data to skip in the CSV payload.
+The linesToSkip need to be more than the columnHeaderIndex. 
+For example, if columnHeaderIndex = 0, the number of lines to skip need to be at least 1. 
+When the linesToSkip is not set explicitly, and the columnHeaderIndex is set, linesToSkip = columnHeaderIndex + 1.
+When neither linesToSkip and columnHeaderIndex are set, linesToSkip = 0.  
+If more lines need to be skipped after the header, then set this parameter explicitly.
+- **columnHeaderIndex**, specifies the 0-based row index of the header columns if they are available.
+CSV files may have 1 or more descriptive lines before the actual data. These descriptive lines, 
+including the column header line, should be skipped. 
+Note the column header line can be in any place of the skipped lines. 
+- **escapeCharacter**, specifies how characters can be escaped. Default is "u005C" (backslash \). 
+This can be specified as a variation of unicode without a backslash (\) before 'u'.
+For example: \ can be specified as "u005c".
+- **quoteCharacter**, specifies how source data are enclosed by columns. Default is double-quote (").
+This can be specified as a variation of unicode without a backslash (\) before 'u'.
+For example: | can be specified as "u007C".
+- **fieldSeparator**, specifies the field delimiter in the source csv data. The default is comma.
+This can be specified as a variation of unicode without a backslash (\) before 'u'.
+For example: tab (\t) can be specified as "u0009".
+- **recordSeparator**, also called line separator, specifies the line or record
+delimiter. The default is system line separator. 
+This can be specified as a variation of unicode without a backslash (\) before 'u'.
+- **columnProjection**, defines how CSV columns should be arranged and filtered after parse,
+before being sent to converter and writer to persist. 
 This feature is primarily used to extract selected columns from csv source without a header.
-
 Column projection definition is a comma-separated string, where each value is either an 
 integer or a range, with each number representing the 0 based index of the field.
-
 Column projection definition is inclusive, i.e., only the selected fields are included
 in the final dataset, if a column projection is defined.  
-
-## [ms.csv.default.field.type](ms.csv.default.field.type.md)
-
-ms.csv.default.field.type specifies a default type to supersede field type inference.
-
+For example, to include the 0th, 2nd, 3rd, and 4th column from a source that has 6 columns, 
+set the value to: `"columnProjection": "0,2-4"`
+- **defaultFieldType**, specifies a default type to supersede field type inference.
 By default, CsvExtractor tries to infer the true type of fields when inferring schema
 However, in some cases, the inference is not accurate, and users may prefer to keep all fields as strings.
-In this case `ms.csv.default.field.type = string`
-
-## [ms.csv.escape.character](ms.csv.escape.character.md)
-
-ms.csv.escape.character specifies how characters can be escaped.
-Default is "u005C" (backslash '\'). 
-see [CsvExtractor](https://github.com/linkedin/data-integration-library/blob/master/docs/components/CsvExtractor.md)
-
-## [ms.csv.quote.character](ms.csv.quote.character.md)
-
-ms.csv.quote.character specifies how source data are enclosed by columns.
-Default is double-quote. 
-see [CsvExtractor](https://github.com/linkedin/data-integration-library/blob/master/docs/components/CsvExtractor.md)
-
-## [ms.csv.separator](ms.csv.separator.md)
-
-`ms.csv.separator` specifies the delimiter in the source csv file. 
-Default is comma. 
-see [CsvExtractor](https://github.com/linkedin/data-integration-library/blob/master/docs/components/CsvExtractor.md)
-
-## [ms.csv.skip.lines](ms.csv.skip.lines.md)
-
-`ms.csv.skip.lines` is a CsvExtractor property, it specifies how many 
-lines of data to skip in the CSV payload. see [CsvExtractor](https://github.com/linkedin/data-integration-library/blob/master/docs/components/CsvExtractor.md)
+In this case `"defaultFieldType": "string"`. 
+Supported types: string | int | long | double | boolean | float.
 
 ## [ms.data.default.type](ms.data.default.type.md)
 
@@ -201,6 +184,23 @@ very common if the ingestion source is a data warehouse.
 and it adds extra buffer to cutoff timestamp during the
 incremental load so that more data can be included. 
 
+## [ms.http.conn.max](ms.http.conn.max.md)
+
+`ms.http.conn.max` defines maximum number of connections to keep
+in a connection pool. It limits the total connections to an HTTP
+server. The default value is 50.
+
+## [ms.http.conn.per.route.max](ms.http.conn.per.route.max.md)
+
+`ms.http.conn.per.route.max` defines maximum number of connections to keep
+in a connection pool. It limits the total connections to a particular
+path, or endpoint, on the HTTP server. The default value is 20.
+
+## [ms.http.conn.ttl.seconds](ms.http.conn.ttl.seconds.md)
+
+`ms.http.conn.ttl.seconds` defines maximum idle time allowed when there
+is no activity on an HTTP connection. When there is no activity after
+TTL passed, the connection is disconnected. The default is 10 seconds. 
 
 ## [ms.http.request.headers](ms.http.request.headers.md)
 
@@ -314,6 +314,10 @@ a session in backend by a status field, a session cursor, or through
 `ms.session.key.field` specifies the key field in response in order to retrieve the 
 status for session control and the condition for termination.
 
+## [ms.sftp.conn.timeout.millis](ms.sftp.conn.timeout.millis.md)
+
+`ms.sftp.conn.timeout.millis` defines maximum allowed inactive time. The default is 60 seconds.
+
 ## [ms.source.data.character.set](ms.source.data.character.set.md)
 
 `ms.source.data.character.set` specifies a character set to parse JSON or CSV payload. 
@@ -337,9 +341,14 @@ store. `ms.target.schema.urn` address the option that defines source schema in m
 
 ## [ms.source.uri](ms.source.uri.md)
 
-`ms.source.uri` defines the integration point, which is called data source for data ingestion or target for data egression. 
+[`ms.source.uri`](ms.source.uri.md) 
+defines the integration point, which is called data source for data ingestion or target for data egression. 
 It follows the [URI format](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier). 
 The only exception is that authority is not supported, because all authority cannot be fit in the URI.
+
+## [ms.ssl](ms.ssl.md)
+
+[`ms.ssl`](ms.ssl.md) defines SSL parameters. 
 
 ## [ms.target.schema](ms.target.schema.md)
 

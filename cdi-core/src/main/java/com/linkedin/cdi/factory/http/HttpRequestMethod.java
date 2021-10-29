@@ -2,10 +2,12 @@
 // Licensed under the BSD-2 Clause license.
 // See LICENSE in the project root for license information.
 
-package com.linkedin.cdi.util;
+package com.linkedin.cdi.factory.http;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.util.JsonUtils;
+import com.linkedin.cdi.util.VariableUtils;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -226,7 +228,9 @@ public enum HttpRequestMethod {
     try {
       URIBuilder builder = new URIBuilder(new URI(uri));
       for (Map.Entry<String, JsonElement> entry : parameters.entrySet()) {
-        builder.addParameter(entry.getKey(), entry.getValue().getAsString());
+        if (!entry.getKey().matches("tmp.*")) {
+          builder.addParameter(entry.getKey(), entry.getValue().getAsString());
+        }
       }
       return builder.build().toString();
     } catch (Exception e) {

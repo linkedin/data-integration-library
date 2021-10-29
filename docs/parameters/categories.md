@@ -26,6 +26,8 @@ The following are related to connections:
 - [ms.connection.client.factory](ms.connection.client.factory.md)
 - [ms.source.uri](ms.source.uri.md)
 - [ms.source.s3.parameters](ms.source.s3.parameters.md)
+- [ms.sftp.conn.timeout.millis](ms.sftp.conn.timeout.millis.md)
+- [ms.ssl](ms.ssl.md)
 - source.conn.username
 - source.conn.password
 
@@ -53,18 +55,9 @@ The following are related to conversion (converters):
 - [ms.target.schema](ms.target.schema.md)
 - [ms.target.schema.urn](ms.target.schema.urn.md)
 - [ms.validation.attributes](ms.validation.attributes.md)
-- ms.converter.csv.max.failures
-- ms.converter.keep.null.strings
 
-# CSV Extractor Properties
-- [ms.csv.column.header](ms.csv.column.header.md)
-- [ms.csv.column.header.index](ms.csv.column.header.index.md)
-- [ms.csv.column.projection](ms.csv.column.projection.md)
-- [ms.csv.default.field.type](ms.csv.default.field.type.md)
-- [ms.csv.escape.character](ms.csv.escape.character.md)
-- [ms.csv.quote.character](ms.csv.quote.character.md)
-- [ms.csv.separator](ms.csv.separator.md)
-- [ms.csv.skip.lines](ms.csv.skip.lines.md)
+# Extractor Properties
+- [ms.csv](ms.csv.md)
 
 # Execution Properties
 - [ms.enable.dynamic.full.load](ms.enable.dynamic.full.load.md)
@@ -78,6 +71,9 @@ The following are related to HTTP sources:
 - [ms.http.request.method](ms.http.request.method.md)
 - [ms.http.response.type](ms.http.response.type.md)
 - [ms.http.statuses](ms.http.statuses.md)
+- [ms.http.conn.max](ms.http.conn.max.md)
+- [ms.http.conn.per.route.max](ms.http.conn.per.route.max.md)
+- [ms.http.conn.ttl.seconds](ms.http.conn.ttl.seconds.md)
 
 # Pagination Properties 
 - [ms.call.interval.millis](ms.call.interval.millis.md)

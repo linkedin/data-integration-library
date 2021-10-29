@@ -4,21 +4,19 @@
 
 package com.linkedin.cdi.keys;
 
-import com.google.common.collect.Lists;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.gobblin.configuration.State;
 import org.apache.gobblin.source.workunit.WorkUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 
 
 /**
@@ -28,21 +26,9 @@ import org.slf4j.LoggerFactory;
  */
 public class CsvExtractorKeys extends ExtractorKeys {
   private static final Logger LOG = LoggerFactory.getLogger(CsvExtractorKeys.class);
-  final private static List<MultistageProperties> ESSENTIAL_PARAMETERS = Lists.newArrayList(
-      MultistageProperties.MSTAGE_CSV_COLUMN_HEADER,
-      MultistageProperties.MSTAGE_CSV_SEPARATOR,
-      MultistageProperties.MSTAGE_CSV_SKIP_LINES,
-      MultistageProperties.MSTAGE_CSV_QUOTE_CHARACTER,
-      MultistageProperties.MSTAGE_CSV_ESCAPE_CHARACTER);
-
   private Iterator<String[]> csvIterator = null;
   private long currentPageNumber = 0;
   private Boolean columnHeader = false;
-  private int columnHeaderIndex = 0;
-  private int rowsToSkip = 0;
-  private String separator = MultistageProperties.MSTAGE_CSV_SEPARATOR.getDefaultValue();
-  private String quoteCharacter = MultistageProperties.MSTAGE_CSV_QUOTE_CHARACTER.getDefaultValue();
-  private String escapeCharacter = MultistageProperties.MSTAGE_CSV_ESCAPE_CHARACTER.getDefaultValue();
   // column name --> index mapping created based on the output or inferred schema
   private Map<String, Integer> columnToIndexMap = new HashMap<>();
   // A queue that stores sample rows read in during schema inference
@@ -61,17 +47,8 @@ public class CsvExtractorKeys extends ExtractorKeys {
   public void logDebugAll(WorkUnit workUnit) {
     super.logDebugAll(workUnit);
     LOG.debug("These are values of CsvExtractor regarding to Work Unit: {}",
-        workUnit == null ? "testing" : workUnit.getProp(MultistageProperties.DATASET_URN_KEY.toString()));
+        workUnit == null ? "testing" : workUnit.getProp(DATASET_URN.toString()));
     LOG.debug("Is column header present: {}", columnHeader);
-    LOG.debug("Total rows to skip: {}", rowsToSkip);
-  }
-
-  @Override
-  public void logUsage(State state) {
-    super.logUsage(state);
-    for (MultistageProperties p: ESSENTIAL_PARAMETERS) {
-      LOG.info("Property {} ({}) has value {} ", p.toString(), p.getClassName(), p.getValidNonblankWithDefault(state));
-    }
   }
 
   public Iterator<String[]> getCsvIterator() {
@@ -96,46 +73,6 @@ public class CsvExtractorKeys extends ExtractorKeys {
 
   public void setColumnHeader(Boolean columnHeader) {
     this.columnHeader = columnHeader;
-  }
-
-  public int getColumnHeaderIndex() {
-    return columnHeaderIndex;
-  }
-
-  public void setColumnHeaderIndex(int columnHeaderIndex) {
-    this.columnHeaderIndex = columnHeaderIndex;
-  }
-
-  public int getRowsToSkip() {
-    return rowsToSkip;
-  }
-
-  public void setRowsToSkip(int rowsToSkip) {
-    this.rowsToSkip = rowsToSkip;
-  }
-
-  public String getSeparator() {
-    return separator;
-  }
-
-  public void setSeparator(String separator) {
-    this.separator = separator;
-  }
-
-  public String getQuoteCharacter() {
-    return quoteCharacter;
-  }
-
-  public void setQuoteCharacter(String quoteCharacter) {
-    this.quoteCharacter = quoteCharacter;
-  }
-
-  public String getEscapeCharacter() {
-    return escapeCharacter;
-  }
-
-  public void setEscapeCharacter(String escapeCharacter) {
-    this.escapeCharacter = escapeCharacter;
   }
 
   public Map<String, Integer> getColumnToIndexMap() {

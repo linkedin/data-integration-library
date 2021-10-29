@@ -23,6 +23,11 @@ These fields can be of JsonPrimitive type (string/int/boolean/etc.) or
 JsonObject type (with nested structure). For the later, the field 
 name can be Json Path.
 
+Fields to be encrypted cannot have null values, and the data type of 
+the fields cannot be nullable (need to have isNullable: false). When
+[ms.output.schema](ms.output.schema.md) is defined, this will be
+checked against the definition in it. 
+
 ### Example
 
 `ms.encryption.fields=["access_token", "client_secret", "refresh_token"]`
