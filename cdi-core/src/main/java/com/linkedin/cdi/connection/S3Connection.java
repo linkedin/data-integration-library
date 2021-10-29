@@ -111,6 +111,7 @@ public class S3Connection extends MultistageConnection {
   public boolean closeAll(String message) {
     if (s3Client != null) {
       s3Client.close();
+      s3Client = null;
     }
     return true;
   }
