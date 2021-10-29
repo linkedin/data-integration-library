@@ -10,7 +10,6 @@ import com.linkedin.cdi.factory.sftp.SftpClient;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.keys.SftpKeys;
-import com.linkedin.cdi.util.InputStreamUtils;
 import com.linkedin.cdi.util.WorkUnitStatus;
 import java.io.File;
 import java.net.URI;
@@ -38,11 +37,6 @@ public class SftpConnection extends MultistageConnection {
   }
 
   @Override
-  public WorkUnitStatus execute(WorkUnitStatus status) {
-    return null;
-  }
-
-  @Override
   public boolean closeAll(String message) {
     if (this.fsClient != null) {
       LOG.info("Shutting down FileSystem connection");
@@ -52,14 +46,8 @@ public class SftpConnection extends MultistageConnection {
     return true;
   }
 
-  /**
-   * @param workUnitStatus prior work unit status
-   * @return new work unit status
-   * @throws RetriableAuthenticationException
-   */
   @Override
-  public WorkUnitStatus executeFirst(WorkUnitStatus workUnitStatus) throws RetriableAuthenticationException {
-    WorkUnitStatus status = super.executeFirst(workUnitStatus);
+  public WorkUnitStatus execute(WorkUnitStatus status) {
     String path = getPath();
     String finalPrefix = getWorkUnitSpecificString(path, getExtractorKeys().getDynamicParameters());
     LOG.info("File path found is: " + finalPrefix);
@@ -87,7 +75,7 @@ public class SftpConnection extends MultistageConnection {
     LOG.info("No Of Files to be processed matching the pattern: {}", files.size());
 
     if (StringUtils.isBlank(sftpSourceKeys.getTargetFilePattern())) {
-      status.setBuffer(InputStreamUtils.convertListToInputStream(files));
+      status.setBuffer(wrap(files));
     } else {
       String fileToDownload = files.size() == 0 ? StringUtils.EMPTY : files.get(0);
       if (StringUtils.isNotBlank(fileToDownload)) {
@@ -103,6 +91,28 @@ public class SftpConnection extends MultistageConnection {
       }
     }
     return status;
+  }
+
+  /**
+   * @param workUnitStatus prior work unit status
+   * @return new work unit status
+   * @throws RetriableAuthenticationException
+   */
+  @Override
+  public WorkUnitStatus executeFirst(WorkUnitStatus workUnitStatus) throws RetriableAuthenticationException {
+    WorkUnitStatus status = super.executeFirst(workUnitStatus);
+    return this.execute(status);
+  }
+
+  /**
+   * @param workUnitStatus prior work unit status
+   * @return new work unit status
+   * @throws RetriableAuthenticationException
+   */
+  @Override
+  public WorkUnitStatus executeNext(WorkUnitStatus workUnitStatus) throws RetriableAuthenticationException {
+    WorkUnitStatus status = super.executeNext(workUnitStatus);
+    return this.execute(status);
   }
 
   private SftpClient getFsClient() {
