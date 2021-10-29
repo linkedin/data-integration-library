@@ -419,9 +419,13 @@ public class JsonExtractorTest {
   public void testRetrieveSessionKeyValue() throws Exception {
     JsonObject sessionKeyField = gson.fromJson("{\"name\": \"hasMore\", \"condition\": {\"regexp\": \"false|False\"}}", JsonObject.class);
     when(jobKeys.getSessionKeyField()).thenReturn(sessionKeyField);
-    JsonElement input = gson.fromJson("[{\"name\": \"hasMore\"}]", JsonArray.class);
+    JsonElement input = gson.fromJson("[{\"notMore\": \"dummy\"}]", JsonArray.class);
     Assert.assertEquals(
-        Whitebox.invokeMethod(jsonExtractor, "retrieveSessionKeyValue", input), StringUtils.EMPTY);
+        Whitebox.invokeMethod(jsonExtractor, "retrieveSessionKeyValue", input), JsonNull.INSTANCE.toString());
+
+    input = gson.fromJson("[{\"hasMore\": \"dummy\"}]", JsonArray.class);
+    Assert.assertEquals(
+        Whitebox.invokeMethod(jsonExtractor, "retrieveSessionKeyValue", input), "dummy");
 
     input = gson.fromJson("{\"notMore\": \"someValue\"}", JsonObject.class);
     Assert.assertEquals(

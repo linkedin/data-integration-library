@@ -6,13 +6,21 @@ package com.linkedin.cdi.connection;
 
 import com.google.gson.JsonObject;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
+import com.linkedin.cdi.extractor.CsvExtractor;
+import com.linkedin.cdi.extractor.JsonExtractor;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
+import com.linkedin.cdi.util.InputStreamUtils;
 import com.linkedin.cdi.util.VariableUtils;
 import com.linkedin.cdi.util.WorkUnitStatus;
+import java.io.InputStream;
+import java.util.List;
 import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
+import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
 /**
@@ -133,5 +141,24 @@ public class MultistageConnection implements Connection {
     }
     LOG.info("Final work unit specific string: {}", finalString);
     return finalString;
+  }
+
+  /**
+   * Wraps a list of entries into an InputStream
+   *
+   * The InputStream will be plain text if CsvExtractor is used, and
+   * it will be a Json structure if JsonExtractor is used.
+   *
+   * @param entries list of files or keys
+   * @return the wrapped InputStream
+   */
+  protected InputStream wrap(List<String> entries) {
+    if (MSTAGE_EXTRACTOR_CLASS.get(getState()).equals(CsvExtractor.class.getName())) {
+      return InputStreamUtils.convertListToInputStream(entries);
+    } else if (MSTAGE_EXTRACTOR_CLASS.get(getState()).equals(JsonExtractor.class.getName())) {
+      return InputStreamUtils.convertListToInputStream(KEY_WORD_VALUES, entries);
+    } else {
+      return null;
+    }
   }
 }

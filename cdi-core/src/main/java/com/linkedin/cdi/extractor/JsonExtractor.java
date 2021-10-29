@@ -5,7 +5,9 @@
 package com.linkedin.cdi.extractor;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -31,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
@@ -405,7 +408,27 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
    * @return the session key if the property is available
    */
   private String retrieveSessionKeyValue(JsonElement input) {
-    if (jobKeys.getSessionKeyField().entrySet().size() == 0 || !input.isJsonObject()) {
+    if (jobKeys.getSessionKeyField().entrySet().size() == 0) {
+      return StringUtils.EMPTY;
+    }
+
+    if (input.isJsonArray()) {
+      String fld = jobKeys.getSessionKeyField().get("name").getAsString();
+      List<String> valueList = Lists.newArrayList();
+      for (JsonElement v: input.getAsJsonArray()) {
+        if (v.isJsonObject()) {
+          JsonElement fldValue = JsonUtils.get(v.getAsJsonObject(), fld);
+          if (fldValue.isJsonPrimitive()) {
+            valueList.add(fldValue.getAsString());
+          } else {
+            valueList.add(fldValue.toString());
+          }
+        }
+      }
+      return Joiner.on("|").join(valueList);
+    }
+
+    if (!input.isJsonObject()) {
       return StringUtils.EMPTY;
     }
 

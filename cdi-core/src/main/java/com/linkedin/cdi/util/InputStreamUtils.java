@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.util;
 
+import com.google.gson.JsonArray;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 
 public interface InputStreamUtils {
@@ -22,6 +24,23 @@ public interface InputStreamUtils {
   static InputStream convertListToInputStream(List<String> stringList) {
     return CollectionUtils.isEmpty(stringList) ? null
         : new ByteArrayInputStream(String.join("\n", stringList).getBytes(StandardCharsets.UTF_8));
+  }
+
+  /**
+   * Convert a list of strings with a name to an InputStream of JsonArray
+   * @param name the Json field name
+   * @param stringList a list of strings
+   * @return an InputStream made of the named list
+   */
+  static InputStream convertListToInputStream(String name, List<String> stringList) {
+    if (CollectionUtils.isEmpty(stringList) || StringUtils.isBlank(name)) {
+      return null;
+    }
+    JsonArray output = new JsonArray();
+    for (String value: stringList) {
+      output.add(JsonUtils.createAndAddProperty(name, value));
+    }
+    return new ByteArrayInputStream(output.toString().getBytes(StandardCharsets.UTF_8));
   }
 
   /**

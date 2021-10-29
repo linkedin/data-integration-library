@@ -11,7 +11,6 @@ import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.keys.S3Keys;
 import com.linkedin.cdi.util.EncryptionUtils;
-import com.linkedin.cdi.util.InputStreamUtils;
 import com.linkedin.cdi.util.WorkUnitStatus;
 import java.net.URI;
 import java.time.Duration;
@@ -69,22 +68,6 @@ public class S3Connection extends MultistageConnection {
 
   @Override
   public WorkUnitStatus execute(WorkUnitStatus status) {
-    return null;
-  }
-
-  @Override
-  public boolean closeAll(String message) {
-    return true;
-  }
-
-  /**
-   * @param workUnitStatus prior work unit status
-   * @return new work unit status
-   * @throws RetriableAuthenticationException
-   */
-  @Override
-  public WorkUnitStatus executeFirst(WorkUnitStatus workUnitStatus) throws RetriableAuthenticationException {
-    WorkUnitStatus status = super.executeFirst(workUnitStatus);
     s3Client = getS3HttpClient(getState());
 
     String finalPrefix = getWorkUnitSpecificString(s3SourceV2Keys.getPrefix(), getExtractorKeys().getDynamicParameters());
@@ -97,7 +80,7 @@ public class S3Connection extends MultistageConnection {
       LOG.debug("Number of files identified: {}", files.size());
 
       if (StringUtils.isBlank(s3SourceV2Keys.getTargetFilePattern())) {
-        status.setBuffer(InputStreamUtils.convertListToInputStream(files));
+        status.setBuffer(wrap(files));
       } else {
         // Multiple files are returned, then only process the exact match
         String fileToDownload = files.size() == 0
@@ -122,6 +105,33 @@ public class S3Connection extends MultistageConnection {
       return null;
     }
     return status;
+  }
+
+  @Override
+  public boolean closeAll(String message) {
+    return true;
+  }
+
+  /**
+   * @param workUnitStatus prior work unit status
+   * @return new work unit status
+   * @throws RetriableAuthenticationException
+   */
+  @Override
+  public WorkUnitStatus executeFirst(WorkUnitStatus workUnitStatus) throws RetriableAuthenticationException {
+    WorkUnitStatus status = super.executeFirst(workUnitStatus);
+    return this.execute(status);
+  }
+
+  /**
+   * @param workUnitStatus prior work unit status
+   * @return new work unit status
+   * @throws RetriableAuthenticationException
+   */
+  @Override
+  public WorkUnitStatus executeNext(WorkUnitStatus workUnitStatus) throws RetriableAuthenticationException {
+    WorkUnitStatus status = super.executeNext(workUnitStatus);
+    return this.execute(status);
   }
 
   /**
