@@ -79,7 +79,9 @@ public class AvroExtractorTest {
     httpSource = mock(HttpSource.class);
     realHttpSource = new HttpSource();
 
-    List<WorkUnit> wus = new MultistageSource().getWorkunits(new SourceState());
+    SourceState tmpState = new SourceState();
+    tmpState.setProp("extract.table.name", "xxx");
+    List<WorkUnit> wus = new MultistageSource().getWorkunits(tmpState);
     workUnit = wus.get(0);
     workUnit.setProp(DATASET_URN.getConfig(), DATA_SET_URN_KEY);
 
@@ -136,6 +138,9 @@ public class AvroExtractorTest {
     WorkUnitStatus status = WorkUnitStatus.builder().buffer(inputStream).build();
 
     when(sourceState.getProp("ms.output.schema", "" )).thenReturn("");
+    when(sourceState.contains("extract.table.name")).thenReturn(true);
+    when(sourceState.getProp("extract.table.name")).thenReturn("xxx");
+    when(sourceState.getProp("extract.table.name", "")).thenReturn("xxx");
 
     // replace mocked keys with default keys
     realHttpSource.getWorkunits(sourceState);
@@ -356,6 +361,9 @@ public class AvroExtractorTest {
     WorkUnitStatus status = WorkUnitStatus.builder().buffer(inputStream).build();
 
     when(sourceState.getProp("ms.output.schema", "" )).thenReturn("");
+    when(sourceState.contains("extract.table.name")).thenReturn(true);
+    when(sourceState.getProp("extract.table.name")).thenReturn("xxx");
+    when(sourceState.getProp("extract.table.name", "")).thenReturn("xxx");
 
     // replace mocked keys with default keys
     realHttpSource.getWorkunits(sourceState);
@@ -417,6 +425,9 @@ public class AvroExtractorTest {
     WorkUnitStatus status = WorkUnitStatus.builder().buffer(inputStream).build();
 
     when(sourceState.getProp("ms.output.schema", "" )).thenReturn("");
+    when(sourceState.contains("extract.table.name")).thenReturn(true);
+    when(sourceState.getProp("extract.table.name")).thenReturn("xxx");
+    when(sourceState.getProp("extract.table.name", "")).thenReturn("xxx");
 
     // replace mocked keys with default keys
     realHttpSource.getWorkunits(sourceState);
@@ -498,6 +509,9 @@ public class AvroExtractorTest {
     WorkUnitStatus status = WorkUnitStatus.builder().buffer(inputStream).build();
 
     when(sourceState.getProp("ms.output.schema", "" )).thenReturn("");
+    when(sourceState.contains("extract.table.name")).thenReturn(true);
+    when(sourceState.getProp("extract.table.name")).thenReturn("xxx");
+    when(sourceState.getProp("extract.table.name", "")).thenReturn("xxx");
 
     // replace mocked keys with default keys
     realHttpSource.getWorkunits(sourceState);

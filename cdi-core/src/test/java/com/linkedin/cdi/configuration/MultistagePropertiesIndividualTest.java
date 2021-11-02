@@ -20,6 +20,10 @@ public class MultistagePropertiesIndividualTest {
   @Test
   public void testAllKeys() {
     SourceState state = new SourceState();
+    Assert.assertFalse(new JobKeys().validate(state));
+
+    // required parameters
+    state.setProp("extract.table.name", "xxx");
     Assert.assertTrue(new JobKeys().validate(state));
 
     state.setProp("ms.csv.column.header", "xxx");

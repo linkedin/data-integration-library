@@ -37,6 +37,7 @@ public class HdfsReadConnectionTest extends PowerMockTestCase {
     SourceState sourceState = new SourceState();
     sourceState.setProp("ms.extractor.class", "com.linkedin.cdi.extractor.CsvExtractor");
     sourceState.setProp("ms.source.uri", "/data/test?RE=.*");
+    sourceState.setProp("extract.table.name", "xxx");
     WorkUnitState state = new WorkUnitState(hdfsSource.getWorkunits(sourceState).get(0), new State());
 
     state.setProp("ms.extractor.class", "com.linkedin.cdi.extractor.CsvExtractor");
@@ -71,6 +72,7 @@ public class HdfsReadConnectionTest extends PowerMockTestCase {
 
     HdfsSource hdfsSource = new HdfsSource();
     SourceState sourceState = new SourceState();
+    sourceState.setProp("extract.table.name", "xxx");
     sourceState.setProp("ms.extractor.class", "com.linkedin.cdi.extractor.CsvExtractor");
     sourceState.setProp("ms.source.uri", "/jobs/exttest/data/external/snapshots/test");
     WorkUnitState state = new WorkUnitState(hdfsSource.getWorkunits(sourceState).get(0), new State());

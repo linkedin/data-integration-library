@@ -22,12 +22,15 @@ import static com.linkedin.cdi.configuration.PropertyCollection.*;
 public class S3ReadConnectionTest {
   @Test
   public void testGetS3HttpClient() {
-    List<WorkUnit> wus = new MultistageSource().getWorkunits(new SourceState());
+    SourceState sourceState = new SourceState();
+    sourceState.setProp("extract.table.name", "xxx");
+    List<WorkUnit> wus = new MultistageSource().getWorkunits(sourceState);
     WorkUnitState wuState = new WorkUnitState(wus.get(0), new JobState());
     wuState.setProp(MSTAGE_CONNECTION_CLIENT_FACTORY.getConfig(), "com.linkedin.cdi.factory.DefaultConnectionClientFactory");
 
     S3SourceV2 source = new S3SourceV2();
-    SourceState sourceState = new SourceState();
+    sourceState = new SourceState();
+    sourceState.setProp("extract.table.name", "xxx");
     sourceState.setProp(MSTAGE_SOURCE_URI.getConfig(), "https://nonexist.s3.amazonaws.com/data");
     source.getWorkunits(sourceState);
 

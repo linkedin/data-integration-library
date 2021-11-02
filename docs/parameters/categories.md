@@ -127,3 +127,10 @@ The following are related to watermarks and work units:
 - [ms.work.unit.partial.partition](ms.work.unit.partial.partition.md)
 - [ms.work.unit.partition](ms.work.unit.partition.md)
 
+# Gobblin Properties
+
+The following properties are inherited from Gobblin and enhanced with explicitly validation rules.
+
+- [extract.table.name](extract.table.name.md)
+- [source.class](source.class.md)
+- [converter.class](converter.class.md)

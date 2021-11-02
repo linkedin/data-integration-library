@@ -461,5 +461,12 @@ a work unit. Partitioning, therefore, allows parallel processing.
 The following are Gobblin core properties that are essential to job configuration. This is only a short list,
 for a complete list of Gobblin core properties, please refer to Gobblin documentation.
 
-# [source.class](source.class.md)
-# [converter.class](converter.class.md)
+## [extract.table.name](extract.table.name.md)
+
+`extract.table.name` specifies the target table name, not the source table name. This
+is a required parameter if the extractor is anything other than the FileDumpExtractor.
+Writers and some converters don't work without it.
+
+
+## [source.class](source.class.md)
+## [converter.class](converter.class.md)

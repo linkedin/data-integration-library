@@ -70,7 +70,9 @@ public class JsonExtractorTest {
     source = Mockito.mock(MultistageSource.class);
     jobKeys = Mockito.mock(JobKeys.class);
 
-    List<WorkUnit> wus = new MultistageSource().getWorkunits(new SourceState());
+    SourceState sourceState = new SourceState();
+    sourceState.setProp("extract.table.name", "xxx");
+    List<WorkUnit> wus = new MultistageSource().getWorkunits(sourceState);
     workUnit = wus.get(0);
 
     workUnitStatus = Mockito.mock(WorkUnitStatus.class);

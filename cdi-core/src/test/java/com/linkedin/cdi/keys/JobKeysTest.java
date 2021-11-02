@@ -108,6 +108,7 @@ public class JobKeysTest extends PowerMockTestCase {
   public void testValidation() {
     // test pagination parameter validation
     SourceState state = new SourceState();
+    state.setProp("extract.table.name", "xxx");
     Map<ParameterTypes, Long> paginationInitValues = new HashMap<>();
     paginationInitValues.put(ParameterTypes.PAGESTART, 0L);
     paginationInitValues.put(ParameterTypes.PAGESIZE, 100L);

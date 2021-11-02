@@ -113,14 +113,10 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
     sourceState = state;
     initialize(state);
 
-    jobKeys.logUsage(state);
     if (!jobKeys.validate(state)) {
-      LOG.error("Some parameters are invalid, job will do nothing until they are fixed.");
-      if (MSTAGE_WORK_UNIT_MIN_UNITS.get(state) > 0) {
-        throw new RuntimeException(String.format(EXCEPTION_WORK_UNIT_MINIMUM, MSTAGE_WORK_UNIT_MIN_UNITS.get(state), 0));
-      }
-      return new ArrayList<>();
+      throw new RuntimeException("Some parameters are invalid, job will do nothing until they are fixed.");
     }
+    jobKeys.logUsage(state);
 
     // Parse watermark settings if defined
     List<WatermarkDefinition> definedWatermarks = Lists.newArrayList();

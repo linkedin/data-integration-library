@@ -13,6 +13,7 @@ import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.util.EndecoUtils;
 import com.linkedin.cdi.util.WatermarkDefinition;
 import com.linkedin.cdi.util.WorkUnitPartitionTypes;
+import com.mchange.util.AssertException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,6 +60,7 @@ public class MultistageSourceTest {
   @Test
   public void testWorkUnitPartitionDef(){
     SourceState state = new SourceState();
+    state.setProp("extract.table.name", "xxx");
     state.setProp("ms.work.unit.partition", "daily");
     state.setProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "");
 
@@ -72,6 +74,7 @@ public class MultistageSourceTest {
   @Test
   public void testWorkUnitPacingDef(){
     SourceState state = new SourceState();
+    state.setProp("extract.table.name", "xxx");
     state.setProp("ms.work.unit.pacing.seconds", "10");
     MultistageSource source = new MultistageSource();
     source.getWorkunits(state);
@@ -81,6 +84,7 @@ public class MultistageSourceTest {
   @Test
   public void testWorkUnitPacingConversion(){
     SourceState state = new SourceState();
+    state.setProp("extract.table.name", "xxx");
     state.setProp("ms.work.unit.pacing.seconds", "10");
     MultistageSource source = new MultistageSource();
     source.getWorkunits(state);
@@ -161,6 +165,7 @@ public class MultistageSourceTest {
   @Test
   public void testDerivedFields() {
     SourceState sourceState = new SourceState();
+    sourceState.setProp("extract.table.name","xxx");
     sourceState.setProp("ms.derived.fields", "[{\"name\": \"activityDate\", \"formula\": {\"type\": \"epoc\", \"source\": \"fromDateTime\", \"format\": \"yyyy-MM-dd'T'HH:mm:ss'Z'\"}}]");
     MultistageSource source = new MultistageSource();
     source.getWorkunits(sourceState);
@@ -170,32 +175,23 @@ public class MultistageSourceTest {
   @Test
   public void testOutputSchema(){
     SourceState state = new SourceState();
+    state.setProp("extract.table.name", "xxx");
     state.setProp("ms.output.schema", "");
     MultistageSource source = new MultistageSource();
     source.getWorkunits(state);
     Assert.assertEquals(0, source.getJobKeys().getOutputSchema().size());
-
-    // wrong format should be ignored
-    state.setProp("ms.output.schema", "{\"name\": \"responseTime\"}");
-    source.getWorkunits(state);
-    Assert.assertEquals(0, source.getJobKeys().getOutputSchema().size());
-
-    // wrong format should be ignored
-    state.setProp("ms.output.schema", "[{\"name\": \"responseTime\"}]");
-    source.getWorkunits(state);
-    Assert.assertEquals(1, source.getJobKeys().getOutputSchema().size());
-    Assert.assertEquals(1, source.getJobKeys().getOutputSchema().size());
   }
 
   @Test
   public void testSourceParameters(){
-    SourceState sourceState = mock(SourceState.class);
-    when(sourceState.getProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "")).thenReturn("");
+    SourceState sourceState = new SourceState();
+    sourceState.setProp("extract.table.name", "xxx");
+    sourceState.setProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "");
     MultistageSource source = new MultistageSource();
     source.getWorkunits(sourceState);
     Assert.assertNotNull(source.getJobKeys().getSourceParameters());
 
-    when(sourceState.getProp("ms.parameters", new JsonArray().toString())).thenReturn("[{\"name\":\"cursor\",\"type\":\"session\"}]");
+    sourceState.setProp("ms.parameters", "[{\"name\":\"cursor\",\"type\":\"session\"}]");
     source.getWorkunits(sourceState);
     Assert.assertNotNull(source.getJobKeys().getSourceParameters());
   }
