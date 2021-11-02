@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.extractor.FileDumpExtractor;
 import com.linkedin.cdi.util.SchemaUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -286,7 +287,20 @@ public interface PropertyCollection {
   // add a default value of FALSE to Gobblin configuration extract.is.full
   BooleanProperties EXTRACT_IS_FULL = new BooleanProperties("extract.is.full", Boolean.FALSE);
   StringProperties EXTRACT_NAMESPACE = new StringProperties("extract.namespace");
-  StringProperties EXTRACT_TABLE_NAME = new StringProperties("extract.table.name");
+
+  // make extract.table.name required unless it is a file dump extractor
+  StringProperties EXTRACT_TABLE_NAME = new StringProperties("extract.table.name") {
+    @Override
+    public boolean isValid(State state) {
+      if (isBlank(state)) {
+        if (!MSTAGE_EXTRACTOR_CLASS.get(state).equals(FileDumpExtractor.class.getName())) {
+          return false;
+        }
+      }
+      return super.isValid(state);
+    }
+  };
+
   StringProperties EXTRACT_TABLE_TYPE = new StringProperties("extract.table.type", "SNAPSHOT_ONLY") {
     @Override
     protected String getValidNonblankWithDefault(State state) {

@@ -219,7 +219,7 @@ public class JobKeys {
     // Validate all job parameters
     boolean allValid = true;
     for (MultistageProperties<?> p: allProperties) {
-      if (!p.isBlank(state) && !p.isValid(state))  {
+      if (!p.isValid(state))  {
         LOG.error(p.errorMessage(state));
         allValid = false;
       }

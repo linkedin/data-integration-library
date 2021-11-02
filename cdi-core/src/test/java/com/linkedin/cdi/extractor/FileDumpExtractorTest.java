@@ -43,10 +43,11 @@ public class FileDumpExtractorTest {
     WorkUnitStatus status = WorkUnitStatus.builder().buffer(inputStream).build();
 
     SourceState sourceState = new SourceState();
+    sourceState.setProp("extract.table.name", "xxx");
     HttpSource source = new HttpSource();
     source.getWorkunits(sourceState);
 
-    List<WorkUnit> wus = source.getWorkunits(new SourceState());
+    List<WorkUnit> wus = source.getWorkunits(sourceState);
     WorkUnitState state = new WorkUnitState(wus.get(0), new JobState());
     state.setProp("fs.uri", "file://localhost/");
     state.setProp("state.store.fs.uri", "file://localhost");

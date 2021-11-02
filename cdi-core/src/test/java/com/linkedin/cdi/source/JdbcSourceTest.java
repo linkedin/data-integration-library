@@ -14,6 +14,7 @@ public class JdbcSourceTest {
   public void testInitialize() {
     JdbcSource jdbcSource = new JdbcSource();
     SourceState state = new SourceState();
+    state.setProp("extract.table.name", "xxx");
     Assert.assertNotNull(jdbcSource.getWorkunits(state));
   }
 }

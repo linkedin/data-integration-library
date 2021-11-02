@@ -16,6 +16,7 @@ public class HdfsSourceTest {
   public void testInitialize() {
     HdfsSource hdfsSource = new HdfsSource();
     SourceState state = new SourceState();
+    state.setProp("extract.table.name", "xxx");
     Assert.assertTrue(hdfsSource.getWorkunits(state).size() > 0);
   }
 
@@ -23,6 +24,7 @@ public class HdfsSourceTest {
   public void testGetExtractor() {
     HdfsSource hdfsSource = new HdfsSource();
     SourceState sourceState = new SourceState();
+    sourceState.setProp("extract.table.name", "xxx");
     WorkUnitState state = new WorkUnitState(hdfsSource.getWorkunits(sourceState).get(0), new State());
     state.setProp("ms.extractor.class", "com.linkedin.cdi.extractor.CsvExtractor");
     hdfsSource.getExtractor(state);
