@@ -112,4 +112,24 @@ public interface DateTimeUtils {
     }
     return DATE_FORMATTER.withZone(timeZone).parseDateTime(dtString.substring(0, 10));
   }
+
+  /**
+   * Check if the date time string is in one of the expected formats
+   *
+   * @param dtString the date time value string
+   * @return true if the date time string is recognizable
+   */
+  static boolean check(String dtString) {
+    for (String format : FORMATS.keySet()) {
+      if (dtString.matches(format)) {
+        return true;
+      }
+    }
+    for (String format : FORMATS_WITH_ZONE.keySet()) {
+      if (dtString.matches(format)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

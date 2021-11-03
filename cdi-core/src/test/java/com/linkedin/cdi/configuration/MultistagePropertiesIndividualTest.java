@@ -223,6 +223,23 @@ public class MultistagePropertiesIndividualTest {
     Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
     Assert.assertEquals(MSTAGE_WATERMARK.getRanges(state).getLeft(), "2021-08-21");
     Assert.assertEquals(MSTAGE_WATERMARK.getUnits(state), Lists.newArrayList("null,0,1,2,3,4,5,6,7,8,9".split(",")));
+
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"2020-01-01\", \"to\": \"2020-01-31\"}}]");
+    Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
+
+    state.setProp("ms.watermark", "[{\"name\":\"system\",\"type\":\"datetime\",\"range\":{\"from\":\"2021-01-01\",\"to\":\"P0D\"}}]");
+    Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
+
+    state.setProp("ms.watermark", "[{\"name\": \"table\", \"type\": \"unit\", \"units\": \"ac_audit_log,ac_tables,accounts\"}]");
+    Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
+
+    // P0D0H0M - minute offset not supported yet
+    state.setProp("ms.watermark", "[{\"name\":\"system\",\"type\":\"datetime\",\"range\":{\"from\":\"2021-01-01\",\"to\":\"P0D0H0M\"}}]");
+    Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+
+    // YYYYMMDD format is not supported for now
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"20091201\", \"to\": \"-\"}}]");
+    Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
   }
 
   @Test

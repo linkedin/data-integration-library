@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.util.DateTimeUtils;
 import com.linkedin.cdi.util.JsonUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,9 +71,18 @@ public class WatermarkProperties extends JsonArrayProperties {
           }
 
           String from = range.get(KEY_WORD_FROM).getAsString();
-          // TODO validate from
+          if (!from.equals("-")
+              && !from.matches("P\\d+D(T\\d+H){0,1}")
+              && !DateTimeUtils.check(from)) {
+            return false;
+          }
+
           String to = range.get(KEY_WORD_TO).getAsString();
-          // TODO validate to
+          if (!to.equals("-")
+              && !to.matches("P\\d+D(T\\d+H){0,1}")
+              && !DateTimeUtils.check(to)) {
+            return false;
+          }
         }
 
         // a unit watermark must have a "units" element, and the element
