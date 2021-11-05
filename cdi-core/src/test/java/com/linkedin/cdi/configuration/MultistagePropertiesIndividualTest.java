@@ -51,6 +51,10 @@ public class MultistagePropertiesIndividualTest {
 
     state.setProp("ms.authentication", "{\"method\": \"bearer\", \"encryption\": \"base64\", \"header\": \"Authorization\"}");
     Assert.assertTrue(MSTAGE_AUTHENTICATION.isValid(state));
+
+    // SAML 2.0 is not supported yet
+    state.setProp("ms.authentication", "{\"method\": \"saml\", \"encryption\": \"base64\", \"header\": \"Authorization\"}");
+    Assert.assertFalse(MSTAGE_AUTHENTICATION.isValid(state));
   }
 
   @Test

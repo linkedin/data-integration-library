@@ -41,11 +41,24 @@ public interface PropertyCollection {
 
   JsonObjectProperties MSTAGE_ACTIVATION_PROPERTY = new JsonObjectProperties("ms.activation.property");
   JsonObjectProperties MSTAGE_AUTHENTICATION = new JsonObjectProperties("ms.authentication") {
+    final List<String> methods = Lists.newArrayList("basic", "bearer", "oauth", "custom");
     @Override
     public boolean isValid(State state) {
       if (super.isValid(state) && !super.isBlank(state)) {
+        // avoid using the get() method of JsonObjectProperties as that will recursively call isValid()
         JsonObject auth = GSON.fromJson(state.getProp(getConfig()), JsonObject.class);
-        return auth.entrySet().size() > 0 && auth.has("method") && auth.has("encryption");
+        if(!auth.has(KEY_WORD_METHOD) || !auth.has(KEY_WORD_ENCRYPTION)) {
+          return false;
+        }
+
+        if (!auth.get(KEY_WORD_METHOD).isJsonPrimitive() || !auth.get(KEY_WORD_ENCRYPTION).isJsonPrimitive()) {
+          return false;
+        }
+
+        String method = auth.get(KEY_WORD_METHOD).getAsString().toLowerCase();
+        if (methods.stream().noneMatch(x -> x.equals(method))) {
+          return false;
+        }
       }
       return super.isValid(state);
     }

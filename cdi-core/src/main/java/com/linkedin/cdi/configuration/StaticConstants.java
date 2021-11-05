@@ -19,6 +19,7 @@ public interface StaticConstants {
   String KEY_WORD_DATA_IS_NULLABLE = "isNullable";
   String KEY_WORD_DATA_TYPE = "dataType";
   String KEY_WORD_DATA_TYPE_TYPE = "dataType.type";
+  String KEY_WORD_ENCRYPTION = "encryption";
   String KEY_WORD_EOF = "EOF";
   String KEY_WORD_EPOC = "epoc";
   String KEY_WORD_FIELDS = "fields";
@@ -31,6 +32,7 @@ public interface StaticConstants {
   String KEY_WORD_MAP = "map";
   String KEY_WORD_NAME = "name";
   String KEY_WORD_HTTP_NOTOK = "notok";
+  String KEY_WORD_METHOD = "method";
   String KEY_WORD_NULL = "null";
   String KEY_WORD_NULLABLE = "nullable";
   String KEY_WORD_NUMBER = "number";
