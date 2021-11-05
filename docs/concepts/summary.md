@@ -36,6 +36,14 @@ the data is fetched through a series of pages.
 
 ## [Session Control](session-control.md)
 
+Session control is the mechanism to maintain state over a stateless connection. For example, Http connections
+are stateless. So data ingestion from API often relies on session control. Session control in DIL has broad
+usage. Typical scenarios of using session control are:
+
+- [Asynchronous ingestion](../patterns/asynchronous-ingestion-pattern.md)
+- [Pagination](../concepts/pagination.md)
+- [Two-step file download ](../how-to/status-check-job.md)
+
 ## [Single Flow](single-flow.md)
 
 ## [Variable](variables.md)
