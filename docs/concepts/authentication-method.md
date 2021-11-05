@@ -1,5 +1,9 @@
 # Authentication Methods
 
+Each system might require credentials be supplied in different ways. The authentication
+methods are very system dependent. DIL generalizes the authentication mechanism so that
+many authentication schemes can be configured in similar way.
+
 ## Credentials
 
 DIL supports multiple authentication methods that uses the following credentials.  
