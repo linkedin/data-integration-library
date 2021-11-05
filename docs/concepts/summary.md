@@ -2,6 +2,10 @@
 
 ## [Authentication Methods](authentication-method.md)
 
+Each system might require credentials be supplied in different ways. The authentication
+methods are very system dependent. DIL generalizes the authentication mechanism so that
+many authentication schemes can be configured in similar way. 
+
 ## [Encryption Method](encryption-method.md)
 
 ## [ISO Duration](iso-date-interval.md)
@@ -31,6 +35,14 @@ the data is fetched through a series of pages.
 ## [Secret Encryption](secret-encryption.md)
 
 ## [Session Control](session-control.md)
+
+Session control is the mechanism to maintain state over a stateless connection. For example, Http connections
+are stateless. So data ingestion from API often relies on session control. Session control in DIL has broad
+usage. Typical scenarios of using session control are:
+
+- [Asynchronous ingestion](../patterns/asynchronous-ingestion-pattern.md)
+- [Pagination](../concepts/pagination.md)
+- [Two-step file download ](../how-to/status-check-job.md)
 
 ## [Single Flow](single-flow.md)
 
