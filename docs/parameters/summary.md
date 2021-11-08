@@ -467,6 +467,10 @@ for a complete list of Gobblin core properties, please refer to Gobblin document
 is a required parameter if the extractor is anything other than the FileDumpExtractor.
 Writers and some converters don't work without it.
 
+## [job.commmit.policy](job.commit.policy.md)
+
+`job.commit.policy` specifies how to job state will be committed when some of its tasks failed. Valid values are
+"full", and "successful".
 
 ## [source.class](source.class.md)
 ## [converter.class](converter.class.md)
