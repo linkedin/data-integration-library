@@ -441,6 +441,7 @@ public interface PropertyCollection {
   );
   Map<String, MultistageProperties<?>> deprecatedProperties =
       new ImmutableMap.Builder<String, MultistageProperties<?>>()
+          .put("dataset.name", EXTRACT_TABLE_NAME)
           .put("ms.csv.column.header", MSTAGE_CSV)
           .put("ms.csv.column.header.index", MSTAGE_CSV)
           .put("ms.csv.column.projection", MSTAGE_CSV)
