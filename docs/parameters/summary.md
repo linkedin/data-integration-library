@@ -461,6 +461,21 @@ a work unit. Partitioning, therefore, allows parallel processing.
 The following are Gobblin core properties that are essential to job configuration. This is only a short list,
 for a complete list of Gobblin core properties, please refer to Gobblin documentation.
 
+## [converter.avro.date.format](converter.avro.date.format.md)
+
+`converter.avro.date.format` indicates how date values are formatted in the user data. This property
+is used by the JSON to AVRO converter in converting fields of type "date".
+
+## [converter.avro.time.format](converter.avro.time.format.md)
+
+`converter.avro.time.format` indicates how time values are formatted in the user data. This property
+is used by the JSON to AVRO converter in converting fields of type "time".
+
+## [converter.avro.timestamp.format](converter.avro.timestamp.format.md)
+
+`converter.avro.timestamp.format` indicates how timestamp values are formatted in the user data. This property
+is used by the JSON to AVRO converter in converting fields of type "timestamp".
+
 ## [extract.table.name](extract.table.name.md)
 
 `extract.table.name` specifies the target table name, not the source table name. This
@@ -469,8 +484,8 @@ Writers and some converters don't work without it.
 
 ## [job.commmit.policy](job.commit.policy.md)
 
-`job.commit.policy` specifies how to job state will be committed when some of its tasks failed. Valid values are
-"full", and "successful".
+`job.commit.policy` specifies how the job state will be committed when some of its tasks failed. Valid values are
+"full" or "successful".
 
 ## [source.class](source.class.md)
 ## [converter.class](converter.class.md)
