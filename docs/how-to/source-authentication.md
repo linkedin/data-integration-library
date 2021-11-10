@@ -105,7 +105,8 @@ jobs can use the token in subsequent jobs. See [authentication job](authenticati
 
 The following is a typical OAuth2.0 authentication flow configuration:
 
-- the authentication job retrieves an authentication from the source, this job doesn't actually extract data. 
-- one or more subsequent jobs use the token based authentication method leveraging the token from the first job through secondary input 
+- the authentication job retrieves an authentication token from the source, this job doesn't actually extract data. 
+- one or more subsequent jobs use the [token based authentication](../concepts/authentication-method.md) 
+  method leveraging the token from the first job through secondary input 
 
 [Back to Summary](summary.md#config-source-and-authentication)
