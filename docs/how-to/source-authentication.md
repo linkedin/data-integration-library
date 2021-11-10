@@ -100,4 +100,7 @@ variables will be replaced with actual values, hence source URI can get differen
 After the basic source properties are set, it's time to config authentication. 
 For that, please follow [Authentication Methods](../concepts/authentication-method.md) for authentication configuration details.
 
+Many data providers use OAuth2.0, which require an authentication job to retrieve a token before the data extraction 
+jobs can use the token in subsequent jobs. See [authentication job](authentication-job.md).
+
 [Back to Summary](summary.md#config-source-and-authentication)
