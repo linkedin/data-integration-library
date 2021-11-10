@@ -103,4 +103,9 @@ For that, please follow [Authentication Methods](../concepts/authentication-meth
 Many data providers use OAuth2.0, which require an authentication job to retrieve a token before the data extraction 
 jobs can use the token in subsequent jobs. See [authentication job](authentication-job.md).
 
+The following is a typical OAuth2.0 authentication flow configuration:
+
+- the authentication job retrieves an authentication from the source, this job doesn't actually extract data. 
+- one or more subsequent jobs use the token based authentication method leveraging the token from the first job through secondary input 
+
 [Back to Summary](summary.md#config-source-and-authentication)
