@@ -34,23 +34,23 @@ For HTTP connections, `ms.source.uri` accepts a domain or host name, optional pa
 parameters. All of them can be dynamic, i.e., they can contain DIL variables enclosed with double brackets `{{` and `}}`.
 
 For basic authentication, use the following:
-    - `source.conn.username`
-    - `source.conn.password`
-    - `ms.authentication`
+- `source.conn.username`
+- `source.conn.password`
+- `ms.authentication`
 
 For token based authentication:
-    - `ms.authentication`
+- `ms.authentication`
 
 **Note**: Basic authentication can also be configured as token authentication by concatenating username and password, separated
 by a column.
 
 For OAuth2.0 authentication:
-    - `ms.authentication`
-    - `ms.secondary.input`
+- `ms.authentication`
+- `ms.secondary.input`
 
 For form based authentication:
-    - `ms.parameters`
-    - `ms.http.request.headers={"Content-Type": "application/x-www-form-urlencoded"}`
+- `ms.parameters`
+- `ms.http.request.headers={"Content-Type": "application/x-www-form-urlencoded"}`
 
 ### S3 Syntax
 
