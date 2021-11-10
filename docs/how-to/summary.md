@@ -5,12 +5,22 @@ The source URI can contain variables. Using variables makes it dynamic. For exam
 entities from the same API endpoint, the entity ID be represented with a variable so that we just need one job configuration,
 not many repeating job configurations.
 
+# [Config an Authentication Job](authentication-job.md)
+
+The purpose of the authentication job is to retrieve an authentication token from the third party system, so that
+subsequent data extraction jobs can use the token to authenticate with the third party system. An authentication job is
+needed mostly in cases where credentials or tokens have to be refreshed in each flow execution, such as in
+the case of OAuth2.0 authentication.
+
 # [Config a Status Checking Job](status-check-job.md)
 
-A [status checking job](../concepts/job-type.md#status-checking-job) ensures the data is
-ready for consumption on the third party system.
+A status checking job ensures the data is ready for consumption on the third party system.
+A status checking job tries to read a small piece of information from the third party system, and it then 
+verifies per the given criteria for success or failure. This can be used in asynchronous data ingestion and file downloads.
 
-# [Config a Authentication Job](authentication-job.md)
+In the asynchronous ingestion scenario, this job will keep checking status with the third party system
+every once a while (e.g., every 15 minutes) until the status turns to ready or timeout. In the file 
+downloading scenario, the status checking job can keep checking the availability of source data until they are
+present or timeout.
 
-An authentication job is needed mostly in cases where credentials or tokens have to
-be refreshed in each flow execution, such as in the case of OAuth2.0 authentication.
+
