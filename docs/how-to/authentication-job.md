@@ -28,8 +28,9 @@ Specify the HTTP request properties:
 - Specify the 3rd party system to connect to, including the endpoint serving the authentication tokens. This is done
   through `ms.source.uri`. For example: `ms.source.uri=https://oauth2.googleapis.com/token`.
 - `ms.http.request.method` should be `POST` in most cases as we are "creating" a new token, but it depends on the 3rd party system.
-- Authentication jobs mostly use form based authentication, where clients supply access credentials through a form, See [form based authentication](source-authentication.md).
-  Form based authentication use `ms.parameters` to supply form entries, such as client ids and secrets, etc. 
+- Authentication jobs mostly use form based authentication, where clients supply access credentials through a form,
+  Form based authentication use `ms.parameters` to supply form entries, such as client ids and secrets, etc.
+  See [form based authentication](source-authentication.md#http-syntax).
 - The content type is normally "x-www-form-urlencoded"; therefore, normally it requires `ms.http.request.headers={"Content-Type": "application/x-www-form-urlencoded"}`. 
 
 Specify the data processing properties:
