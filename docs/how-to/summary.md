@@ -12,6 +12,14 @@ subsequent data extraction jobs can use the token to authenticate with the third
 needed mostly in cases where credentials or tokens have to be refreshed in each flow execution, such as in
 the case of OAuth2.0 authentication.
 
+# [Config Data Processing](data-processing.md)
+
+For data ingestion, data processing includes decrypting, uncompressing, and parsing extracted or downloaded data. The parsing
+step also includes retrieving metadata in order to decide the next action for pagination and session control.
+
+For data egression, data processing includes reading and formatting payload, and structure the egress plan through proper
+pagination.
+
 # [Config a Status Checking Job](status-check-job.md)
 
 A status checking job ensures the data is ready for consumption on the third party system.
