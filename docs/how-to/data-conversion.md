@@ -53,6 +53,10 @@ Each converter can have its own set of properties.
 - [ms.normalizer.batch.size](../parameters/ms.normalizer.batch.size.md), optional
 - [ms.data.explicit.eof](../parameters/ms.data.explicit.eof.md), required to be true 
 
+### Data Validation Properties
+
+- [ms.validation.attributes](../parameters/ms.validation.attributes.md)
+
 ## Config Dataset and Schema Tagging
 
 The tagging converters tag attributes to the ingested dataset, at the dataset level or field level.

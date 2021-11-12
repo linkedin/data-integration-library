@@ -44,4 +44,28 @@ To parse the incoming data, the job might need specify one or more of the follow
 - [ms.pagination](../parameters/ms.pagination.md) if the pagination information like page start, page size, and page number etc are available, for example, `ms.pagination={"fields": ["offset", "limit"], "initialvalues": [0, 25000]}`
 - [ms.output.schema](../parameters/ms.output.schema.md) if the data format cannot be reliably inferred from the actual data, for example, `ms.output.schema=[{"columnName":"s3key","isNullable":"true","dataType":{"type":"string"}}]`
 
+## Schema Cleansing
+
+Incoming data may have schema names that are not supported in downstream processing, including converters or writers. Invalid
+characters and white spaces can be replaced with more acceptable characters, such as "_" (underscore). 
+
+For nested data, such as JSON, schema cleansing will go into nested schema and cleanse up to the lowest level. 
+
+Schema cleansing is configured through:
+
+- [ms.schema.cleansing](../parameters/ms.schema.cleansing.md)
+
+## Column Projection
+
+Column projection allows:
+
+- Filter out some unwanted fields
+- Reorder output fields
+
+For JSON data, [ms.output.schema](../parameters/ms.output.schema.md) includes fields to be output, and any fields not
+in output schema will be excluded if [ms.enable.schema.based.filtering](../parameters/ms.enable.schema.based.filtering.md) is true, which
+is the default value. 
+
+For CSV data [ms.csv](../parameters/ms.csv.md) can specify what and how columns should be output. 
+
 [Back to Summary](summary.md#config-data-processing)
