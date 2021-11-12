@@ -137,4 +137,4 @@ The following properties are inherited from Gobblin and enhanced with explicitly
 - [extract.table.name](extract.table.name.md)
 - [job.commit.policy](job.commit.policy.md)  
 - [source.class](source.class.md)
-- [converter.class](converter.class.md)
+- [converter.class](converter.classes.md)
