@@ -65,7 +65,7 @@ Currently, the following properties are for dataset tagging:
 - **extract.primary.key.fields**, one or more fields that can be used as the logical primary key of the dataset. A primary
   key field can be a nested field. 
 - **extract.delta.fields**, one of more fields that can be used as the delta key of the newly extracted records so that they
-  can be merged with previously extracted record properly. Delta fields need to be of TIMESTAMP or LONG type. When it is LONG type
+  can be merged with previously extracted records properly. Delta fields need to be of TIMESTAMP or LONG type. When it is LONG type
   the data need to be EPOCH values. 
 
 ## Config Field Encryption
