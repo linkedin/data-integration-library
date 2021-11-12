@@ -22,6 +22,11 @@ pagination.
 
 # [Config Data Transformation](data-conversion.md)
 
+Data conversion for ingestion includes the following two types:
+- To create derived fields
+- Data format conversion
+- Dataset and schema tagging
+- Encrypting sensitive information
 
 # [Config a Status Checking Job](status-check-job.md)
 

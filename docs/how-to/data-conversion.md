@@ -1,7 +1,7 @@
 # Config Data Transformation
 
 Data conversion for ingestion includes the following two types:
-- Derived Fields
+- To create derived fields
 - Data format conversion
 - Dataset and schema tagging
 - Encrypting sensitive information
@@ -20,9 +20,9 @@ Derived fields are configured through [ms.derived.fields](../parameters/ms.deriv
 
 Data format conversion includes:
 
-- converting CSV data to JSON
-- converting JSON data to Avro
-- converting rows into batches of rows
+- Converting CSV data to JSON
+- Converting JSON data to Avro
+- Converting rows into batches of rows
 
 Data format conversion are handled by converters, the configuration is [converter.classes](../parameters/converter.classes.md).
 
