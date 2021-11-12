@@ -20,6 +20,9 @@ step also includes retrieving metadata in order to decide the next action for pa
 For data egression, data processing includes reading and formatting payload, and structure the egress plan through proper
 pagination.
 
+# [Config Data Transformation](data-conversion.md)
+
+
 # [Config a Status Checking Job](status-check-job.md)
 
 A status checking job ensures the data is ready for consumption on the third party system.

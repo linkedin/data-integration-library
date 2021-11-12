@@ -112,7 +112,7 @@ The following is a typical OAuth2.0 authentication flow configuration:
 ## Config Source and Authentication for Egress
 
 In egression, data is sent out, and a response is returned. The configuration of egression job is
-the same as an ingestion job as if it is ingesting the response the target system; therefore,
+the same as an ingestion job as if it is ingesting the response from the target system; therefore,
 above configuration steps apply to both ingestion and egression. Putting it in simple way:  
 
 **egression = ingestion of the response**
