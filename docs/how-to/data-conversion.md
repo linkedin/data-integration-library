@@ -27,8 +27,16 @@ Data format conversion includes:
 Data format conversion are handled by converters, the configuration is [converter.classes](../parameters/converter.classes.md).
 
 Converters are optional, and there could be multiple converters, i.e, the number of converters can be 0 or more.
+Typical converters are:
+- org.apache.gobblin.converter.avro.JsonIntermediateToAvroConverter
+- org.apache.gobblin.converter.csv.CsvToJsonConverterV2
+- com.linkedin.cdi.converter.JsonNormalizerConverter
+- com.linkedin.cdi.converter.AvroNormalizerConverter  
+- org.apache.gobblin.converter.LumosAttributesConverter
+- com.linkedin.cdi.converter.InFlowValidationConverter
+- org.apache.gobblin.converter.IdentityConverter
 
-Each converter can have its own set of properties. 
+Each converter can have its own set of properties.
 
 ### CSV to JSON Converter Properties
 
@@ -47,6 +55,19 @@ Each converter can have its own set of properties.
 
 ## Config Dataset and Schema Tagging
 
+The tagging converters tag attributes to the ingested dataset, at the dataset level or field level.
+
+Currently, the following properties are for dataset tagging:
+- **extract.primary.key.fields**, one or more fields that can be used as the logical primary key of the dataset. A primary
+  key field can be a nested field. 
+- **extract.delta.fields**, one of more fields that can be used as the delta key of the newly extracted records so that they
+  can be merged with previously extracted record properly. Delta fields need to be of TIMESTAMP or LONG type. When it is LONG type
+  the data need to be EPOCH values. 
+
 ## Config Field Encryption
+
+Fields that have to stored with encryption for security can be configured through [ms.encryption.fields](../parameters/ms.encryption.fields.md). 
+
+Those fields will be encrypted using Gobblin encryption codec. 
 
 [Back to Summary](summary.md#config-data-transformation)
