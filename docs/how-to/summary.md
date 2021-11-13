@@ -28,6 +28,11 @@ Data conversion for ingestion includes the following two types:
 - Dataset and schema tagging
 - Encrypting sensitive information
 
+# [Config Data Persistence](data-persistence.md)
+
+Data persistence includes writer and publisher configuration. Writer writes data into a working directory, and publisher
+pushes data to the final storage, such as a data lake.
+
 # [Config a Status Checking Job](status-check-job.md)
 
 A status checking job ensures the data is ready for consumption on the third party system.
