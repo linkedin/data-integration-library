@@ -43,6 +43,8 @@ To parse the incoming data, the job might need specify one or more of the follow
 - [ms.session.key.field](../parameters/ms.session.key.field.md) if the session key is available under the specific field, for example, `ms.session.key.field="name": "records.cursor"}`
 - [ms.pagination](../parameters/ms.pagination.md) if the pagination information like page start, page size, and page number etc are available, for example, `ms.pagination={"fields": ["offset", "limit"], "initialvalues": [0, 25000]}`
 - [ms.output.schema](../parameters/ms.output.schema.md) if the data format cannot be reliably inferred from the actual data, for example, `ms.output.schema=[{"columnName":"s3key","isNullable":"true","dataType":{"type":"string"}}]`
+- [ms.http.response.type](../parameters/ms.http.response.type.md) if the response from the source system has content-type other than what the extractor is expecting. The
+  default expected content-type of `JsonExtractor` is application/json, and the default expected content-type of `CsvExtractor` is application/csv. 
 
 ## Schema Cleansing
 
