@@ -157,15 +157,14 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
           jobKeys.getMinWorkUnits()));
     }
 
-    if (authentications != null && authentications.size() == 1) {
-      for (WorkUnit wu : wuList) {
+    for (WorkUnit wu : wuList) {
+      if (authentications != null && authentications.size() == 1) {
         wu.setProp(MSTAGE_ACTIVATION_PROPERTY.toString(),
             getUpdatedWorkUnitActivation(wu, authentications.get(0).getAsJsonObject()));
-
+      }
         // unlike activation secondary inputs, payloads will be processed in each work unit
         // and payloads will not be loaded until the Connection executes the command
         wu.setProp(MSTAGE_PAYLOAD_PROPERTY.toString(), payloads);
-      }
     }
     return wuList;
   }
