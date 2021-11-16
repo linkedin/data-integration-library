@@ -5,13 +5,6 @@ The source URI can contain variables. Using variables makes it dynamic. For exam
 entities from the same API endpoint, the entity ID be represented with a variable so that we just need one job configuration,
 not many repeating job configurations.
 
-# [Config an Authentication Job](authentication-job.md)
-
-The purpose of the authentication job is to retrieve an authentication token from the third party system, so that
-subsequent data extraction jobs can use the token to authenticate with the third party system. An authentication job is
-needed mostly in cases where credentials or tokens have to be refreshed in each flow execution, such as in
-the case of OAuth2.0 authentication.
-
 # [Config Data Processing](data-processing.md)
 
 For data ingestion, data processing includes decrypting, uncompressing, and parsing extracted or downloaded data. The parsing
@@ -32,6 +25,13 @@ Data conversion for ingestion includes the following two types:
 
 Data persistence includes writer and publisher configuration. Writer writes data into a working directory, and publisher
 pushes data to the final storage, such as a data lake.
+
+# [Config an Authentication Job](authentication-job.md)
+
+The purpose of the authentication job is to retrieve an authentication token from the third party system, so that
+subsequent data extraction jobs can use the token to authenticate with the third party system. An authentication job is
+needed mostly in cases where credentials or tokens have to be refreshed in each flow execution, such as in
+the case of OAuth2.0 authentication.
 
 # [Config a Status Checking Job](status-check-job.md)
 
