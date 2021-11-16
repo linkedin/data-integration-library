@@ -17,6 +17,8 @@ have this job property will have no harm.
 
 ## Factories
 
+These factory properties are replaced by [ms.connection.client.factory](ms.connection.client.factory.md)
+
 - ms.http.client.factory
 - ms.source.schema.reader.factory
 - ms.target.schema.reader.factory
@@ -36,8 +38,5 @@ The following properties are replaced by [ms.csv](ms.csv.md)
 - `ms.converter.keep.null.strings`
 - `csv.max.failures`
 
-## Other Decprecations
+## Other Deprecations
 - `dataset.name` replaced by [extract.table.name](extract.table.name.md)
-
-Above factories are replaced by [ms.connection.client.factory](ms.connection.client.factory.md)
-
