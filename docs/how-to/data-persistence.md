@@ -7,9 +7,11 @@ To persist data into a HDFS folder in AVRO format, the job need the following op
 
 - `writer.builder.class=gobblin.writer.AvroDataWriterBuilder`, optional writer class, default is Avro data writer
 - `writer.file.path.type=namespace_table`, optionally change how the sub-folders should be structured, default
+- `data.publisher.replace.final.dir`, optionally truncate the directory if it is a staging area for onetime use in each execution
   
 and the following standard configurations:
 
+- `data.publisher.final.dir=/path`
 - `writer.destination.type=HDFS`
 - `writer.fs.uri=hdfs://host:port`
 - `writer.dir.permissions=750`
