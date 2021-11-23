@@ -75,7 +75,6 @@ public class JobKeys {
   private long retryDelayInSec;
   private long retryCount;
   private Boolean isPartialPartition;
-  private JsonArray secondaryInputs = new JsonArray();
   private WorkUnitPartitionTypes workUnitPartitionType;
   private Boolean isSecondaryAuthenticationEnabled = false;
   private String sourceUri = StringUtils.EMPTY;
@@ -125,7 +124,6 @@ public class JobKeys {
     Map<String, Long> retry = MSTAGE_SECONDARY_INPUT.getAuthenticationRetry(state);
     setRetryDelayInSec(retry.get(KEY_WORD_RETRY_DELAY_IN_SEC));
     setRetryCount(retry.get(KEY_WORD_RETRY_COUNT));
-    setSecondaryInputs(MSTAGE_SECONDARY_INPUT.get(state));
     setIsSecondaryAuthenticationEnabled(MSTAGE_SECONDARY_INPUT.isAuthenticationEnabled(state));
 
     setSourceSchema(readSourceSchemaFromUrn(state, MSTAGE_SOURCE_SCHEMA_URN.get(state)));
@@ -674,14 +672,6 @@ public class JobKeys {
 
   public void setIsPartialPartition(Boolean partialPartition) {
     isPartialPartition = partialPartition;
-  }
-
-  public JsonArray getSecondaryInputs() {
-    return secondaryInputs;
-  }
-
-  public void setSecondaryInputs(JsonArray secondaryInputs) {
-    this.secondaryInputs = secondaryInputs;
   }
 
   public WorkUnitPartitionTypes getWorkUnitPartitionType() {
