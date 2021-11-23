@@ -15,7 +15,6 @@ import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.factory.ConnectionClientFactory;
 import com.linkedin.cdi.factory.reader.SchemaReader;
 import com.linkedin.cdi.util.DateTimeUtils;
-import com.linkedin.cdi.util.HdfsReader;
 import com.linkedin.cdi.util.JsonUtils;
 import com.linkedin.cdi.util.ParameterTypes;
 import com.linkedin.cdi.util.WorkUnitPartitionTypes;
@@ -23,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
 import org.joda.time.DateTime;
@@ -458,27 +456,6 @@ public class JobKeys {
           e);
     }
     return partitionType;
-  }
-
-  public Map<String, JsonArray> readSecondaryInputs(State state, final long retries) throws InterruptedException {
-    LOG.info("Trying to read secondary input with retry = {}", retries);
-    Map<String, JsonArray> secondaryInputs = readContext(state);
-
-    // Check if authentication is ready, and if not, whether retry is required
-    JsonArray authentications = secondaryInputs.get(KEY_WORD_AUTHENTICATION);
-    if ((authentications == null || authentications.size() == 0) && this.getIsSecondaryAuthenticationEnabled()
-        && retries > 0) {
-      LOG.info("Authentication tokens are expected from secondary input, but not ready");
-      LOG.info("Will wait for {} seconds and then retry reading the secondary input", this.getRetryDelayInSec());
-      TimeUnit.SECONDS.sleep(this.getRetryDelayInSec());
-      return readSecondaryInputs(state, retries - 1);
-    }
-    LOG.info("Successfully read secondary input, no more retry");
-    return secondaryInputs;
-  }
-
-  private Map<String, JsonArray> readContext(State state) {
-    return new HdfsReader(state, this.getSecondaryInputs()).readAll();
   }
 
   /**
