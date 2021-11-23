@@ -54,6 +54,19 @@ public class SecondaryInputProperties extends JsonArrayProperties {
   }
 
   /**
+   * reads the authentication content
+   *
+   * @param state the state object
+   * @return  the secondary input entries
+   */
+  public Map<String, JsonArray> readAuthenticationToken(State state) {
+    Map<String, JsonArray> secondaryInputs = new HashMap<>();
+    JsonArray categoryData = secondaryInputs.computeIfAbsent(KEY_WORD_AUTHENTICATION, x -> new JsonArray());
+    categoryData.addAll(new HdfsReader(state).readSecondary(getAuthenticationDefinition(state).getAsJsonObject()));
+    return secondaryInputs;
+  }
+
+  /**
    * Read authentication and activation secondary input records and payload definitions (not records)
    *
    * @return a set of JsonArrays of data read from locations specified in SECONDARY_INPUT
@@ -88,7 +101,7 @@ public class SecondaryInputProperties extends JsonArrayProperties {
    * @return true if secondary input contains an authentication definition
    */
   public boolean isAuthenticationEnabled(State state) {
-    return getAuthenticationSI(state).entrySet().size() > 0;
+    return getAuthenticationDefinition(state).entrySet().size() > 0;
   }
 
   /**
@@ -96,12 +109,12 @@ public class SecondaryInputProperties extends JsonArrayProperties {
    * @param state state object
    * @return the authentication secondary input
    */
-  private JsonObject getAuthenticationSI(State state) {
-    for (JsonElement si : get(state)) {
-      if (si.isJsonObject() && si.getAsJsonObject().has(KEY_WORD_CATEGORY)) {
-        String category = si.getAsJsonObject().get(KEY_WORD_CATEGORY).getAsString();
+  private JsonObject getAuthenticationDefinition(State state) {
+    for (JsonElement entry : get(state)) {
+      if (entry.isJsonObject() && entry.getAsJsonObject().has(KEY_WORD_CATEGORY)) {
+        String category = entry.getAsJsonObject().get(KEY_WORD_CATEGORY).getAsString();
         if (category.equalsIgnoreCase(KEY_WORD_AUTHENTICATION)) {
-          return si.getAsJsonObject();
+          return entry.getAsJsonObject();
         }
       }
     }
@@ -125,8 +138,8 @@ public class SecondaryInputProperties extends JsonArrayProperties {
     long retryCount = RETRY_COUNT_DEFAULT;
     Map<String, Long> retry = new HashMap<>();
 
-    if (JsonUtils.get(KEY_WORD_RETRY, getAuthenticationSI(state)) != JsonNull.INSTANCE) {
-      JsonObject retryFields = getAuthenticationSI(state).get(KEY_WORD_RETRY).getAsJsonObject();
+    if (JsonUtils.get(KEY_WORD_RETRY, getAuthenticationDefinition(state)) != JsonNull.INSTANCE) {
+      JsonObject retryFields = getAuthenticationDefinition(state).get(KEY_WORD_RETRY).getAsJsonObject();
       retryDelay = retryFields.has(KEY_WORD_RETRY_DELAY_IN_SEC)
           ? retryFields.get(KEY_WORD_RETRY_DELAY_IN_SEC).getAsLong() : retryDelay;
       retryCount = retryFields.has(KEY_WORD_RETRY_COUNT)
