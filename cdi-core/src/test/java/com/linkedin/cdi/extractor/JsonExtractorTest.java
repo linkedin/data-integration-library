@@ -82,7 +82,6 @@ public class JsonExtractorTest {
     when(state.getWorkunit()).thenReturn(workUnit);
     workUnit.setProp(DATASET_URN.getConfig(), DATA_SET_URN_KEY);
     when(source.getJobKeys()).thenReturn(jobKeys);
-    when(jobKeys.getSourceParameters()).thenReturn(new JsonArray());
     when(jobKeys.getPaginationInitValues()).thenReturn(new HashMap<>());
     when(jobKeys.getSchemaCleansingPattern()).thenReturn("(\\s|\\$|@)");
     when(jobKeys.getSchemaCleansingReplacement()).thenReturn("_");

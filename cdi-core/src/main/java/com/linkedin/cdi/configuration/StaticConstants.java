@@ -81,6 +81,8 @@ public interface StaticConstants {
   String EXCEPTION_INCORRECT_CONFIGURATION = "Property %s has incorrect configuration: %s, see: %s";
   String EXCEPTION_DEPRECATED_CONFIGURATION = "Property %s has been deprecated, and the replacement is: %s, see: %s";
 
+  String ERROR_READING_SECONDARY_INPUT =  "Error reading %s secondary input for work unit %s";
+
   String MSG_ROWS_PROCESSED = "Processed %s records, work unit: %s";
   String MSG_WORK_UNIT_ALWAYS = "There should be a work unit.";
   String MSG_LOW_WATER_MARK_ALWAYS = "There should be a low watermark.";

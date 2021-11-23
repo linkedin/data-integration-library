@@ -369,7 +369,6 @@ public class AvroExtractorTest {
     realHttpSource.getWorkunits(sourceState);
     avroExtractor.jobKeys = jobKeys;
     avroExtractor.setAvroExtractorKeys(new AvroExtractorKeys());
-    when(jobKeys.getSourceParameters()).thenReturn(realHttpSource.getJobKeys().getSourceParameters());
     when(jobKeys.getDataField()).thenReturn("results");
     when(multistageConnection.executeFirst(avroExtractor.workUnitStatus)).thenReturn(status);
 
@@ -433,7 +432,6 @@ public class AvroExtractorTest {
     realHttpSource.getWorkunits(sourceState);
     avroExtractor.jobKeys = jobKeys;
     avroExtractor.setAvroExtractorKeys(new AvroExtractorKeys());
-    when(jobKeys.getSourceParameters()).thenReturn(realHttpSource.getJobKeys().getSourceParameters());
     when(jobKeys.getDataField()).thenReturn("results");
     when(multistageConnection.executeFirst(avroExtractor.workUnitStatus)).thenReturn(status);
 
@@ -517,7 +515,6 @@ public class AvroExtractorTest {
     realHttpSource.getWorkunits(sourceState);
     avroExtractor.jobKeys = jobKeys;
     avroExtractor.setAvroExtractorKeys(new AvroExtractorKeys());
-    when(jobKeys.getSourceParameters()).thenReturn(realHttpSource.getJobKeys().getSourceParameters());
     when(jobKeys.getDataField()).thenReturn("results.0.wrapper.field1");
     when(multistageConnection.executeFirst(avroExtractor.workUnitStatus)).thenReturn(status);
 

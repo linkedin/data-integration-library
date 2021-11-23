@@ -63,7 +63,6 @@ public class JobKeys {
 
   private JsonObject sessionKeyField = new JsonObject();
   private String totalCountField = StringUtils.EMPTY;
-  private JsonArray sourceParameters = new JsonArray();
   private Map<ParameterTypes, String> paginationFields = new HashMap<>();
   private Map<ParameterTypes, Long> paginationInitValues = new HashMap<>();
   private long sessionTimeout;
@@ -90,7 +89,6 @@ public class JobKeys {
     parsePaginationInitialValues(state);
     setSessionKeyField(MSTAGE_SESSION_KEY_FIELD.get(state));
     setTotalCountField(MSTAGE_TOTAL_COUNT_FIELD.get(state));
-    setSourceParameters(MSTAGE_PARAMETERS.get(state));
     setSourceUri(MSTAGE_SOURCE_URI.get(state));
     setDefaultFieldTypes(parseDefaultFieldTypes(state));
     setDerivedFields(parseDerivedFields(state));
@@ -576,14 +574,6 @@ public class JobKeys {
 
   public void setTotalCountField(String totalCountField) {
     this.totalCountField = totalCountField;
-  }
-
-  public JsonArray getSourceParameters() {
-    return sourceParameters;
-  }
-
-  public void setSourceParameters(JsonArray sourceParameters) {
-    this.sourceParameters = sourceParameters;
   }
 
   public Map<ParameterTypes, String> getPaginationFields() {

@@ -1,9 +1,15 @@
 # Work Unit
 
-"Time" watermarks can generate partitions, and "unit" watermarks have units. 
+A time partition and an activation unit make a work unit. DIL
+maintains execution states, including watermarks, for each work unit.
 
-Time watermark and unit watermark together creates work units, and DIL 
-maintains execution state including watermarks for each work unit. 
+A "time" watermark can generate partitions. Time partitions are defined by 
+[ms.watermark](../parameters/ms.watermark.md) and
+[ms.work.unit.partition](../parameters/ms.work.unit.partition.md).
+
+Activation units can have 2 sources: 
+- units of a unit watermark defined in [ms.watermark](../parameters/ms.watermark.md)
+- activation entries of a secondary input from [ms.secondary.input](../parameters/ms.secondary.input.md)
 
 Partitions and Units make a matrix. Assuming we have m periods and n units, 
 the matrix will be n x m. **Each combination of partitions and units makes 

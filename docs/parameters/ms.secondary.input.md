@@ -70,18 +70,26 @@ work units, i.e, all work units get the same authentication credentials/tokens.
 
 ### Payload Secondary Input
 
-`payload` secondary inputs are used to specify raw payload locations.
+`payload` secondary inputs are used to specify raw payload locations. 
+Payloads are read and passed to connections without processing. The connection will decide what to do about it. 
 
-Payloads are simply passed to connections without processing. The connection will decide 
-what to do about it. 
-For example, HTTP connection will read the records from the payload, and attach 1
-row to 1 HTTP request. If there are multiple rows, HTTP connection will page (see [pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md))
+For example, HTTP connection will attach 1 row to 1 HTTP request. If there are multiple rows, HTTP connection will page (see [pagination](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/pagination.md))
 through them. Therefore, each row of the payload is processed by 1 HTTP request. 
 
 `payload` secondary input is typically used in the egression flows. If there are many
-rows to send out, they can be "batched" so that the payload file has fewer number of
-records. 
- 
+rows to send out, they can be "batched" so that the payload file has fewer number of records. 
+
+The `path` of payload can have dynamic variables that came from either `ms.watermark`, `ms.parameters`, or activation type secondary
+input from `ms.secondary.input` itself. For example, the following configuration used the variable "customId" that
+is defined in `ms.watermark`. In execution, there will be 3 work units generated, each processing the payload under "/data/customer1",
+"/data/customer2", and "/data/customer3". 
+
+- `ms.secondary.input=[{"path": "/data/{{customerId}}", "fields": ["dummy"], "category": "payload"}]`
+- `ms.watermark=[{"name":"customerId","type":"unit","units":"customer1, customer2, customer3"}]`
+
+The variable can only be a job-level variables or a work-unit-level static variable.
+The variable cannot be a work-unit-level dynamic variables, like a pagination variable or a session variable.
+
 ### Examples
 
 In the following, we have a file with a list of ids and their statuses. We
