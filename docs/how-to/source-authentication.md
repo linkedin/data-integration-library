@@ -109,4 +109,17 @@ The following is a typical OAuth2.0 authentication flow configuration:
 - one or more subsequent jobs use the [token based authentication](../concepts/authentication-method.md#bearer-token-credentials) 
   method leveraging the token from the first job through secondary input 
 
+## Config Source and Authentication for Egress
+
+In egression, data is sent out, and a response is returned. The configuration of egression job is
+the same as an ingestion job as if it is ingesting the response from the target system; therefore,
+above configuration steps apply to both ingestion and egression. Putting it in simple way:  
+
+**egression = ingestion of the response**
+
+### Extra Egress Configurations
+
+In egression, the payload that will be sent out is supplied through [ms.secondary.input](../parameters/ms.secondary.input.md). 
+The secondary input type of "payload" indicating that the path contains files to be sent out. 
+
 [Back to Summary](summary.md#config-source-and-authentication)

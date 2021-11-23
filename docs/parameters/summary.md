@@ -488,4 +488,4 @@ Writers and some converters don't work without it.
 "full" or "successful".
 
 ## [source.class](source.class.md)
-## [converter.class](converter.class.md)
+## [converter.class](converter.classes.md)
