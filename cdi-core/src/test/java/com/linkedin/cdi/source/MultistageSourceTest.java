@@ -13,7 +13,6 @@ import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.util.EndecoUtils;
 import com.linkedin.cdi.util.WatermarkDefinition;
 import com.linkedin.cdi.util.WorkUnitPartitionTypes;
-import com.mchange.util.AssertException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -223,25 +222,6 @@ public class MultistageSourceTest {
     state.setProp("ms.pagination", "{}");
     MultistageSource source = new MultistageSource();
     Assert.assertEquals(source.getWorkunits(state).size(), 3);
-  }
-
-  @Test
-  public void testIsSecondaryAuthenticationEnabledWithInvalidSecondaryInput() {
-    JobKeys jobKeys = Mockito.mock(JobKeys.class);
-    source.jobKeys = jobKeys;
-    JsonArray secondaryInput = gson.fromJson("[\"test_field\"]", JsonArray.class);
-    when(jobKeys.getSecondaryInputs()).thenReturn(secondaryInput);
-    Assert.assertFalse(source.jobKeys.getIsSecondaryAuthenticationEnabled());
-  }
-
-  @Test
-  public void testReadSecondaryAuthentication() throws InterruptedException {
-    JsonArray secondaryInput = gson.fromJson("[{\"fields\": [\"access_token\"], \"category\": \"authentication\"}]", JsonArray.class);
-    JobKeys jobKeys = Mockito.mock(JobKeys.class);
-    State state = Mockito.mock(State.class);
-    when(jobKeys.getSecondaryInputs()).thenReturn(secondaryInput);
-    source.jobKeys = jobKeys;
-    Assert.assertEquals(source.readSecondaryAuthentication(state, 1L).toString(), "{}");
   }
 
   @Test

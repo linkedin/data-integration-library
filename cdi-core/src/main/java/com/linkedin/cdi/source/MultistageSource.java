@@ -14,7 +14,6 @@ import com.google.gson.JsonObject;
 import com.linkedin.cdi.extractor.MultistageExtractor;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.util.EndecoUtils;
-import com.linkedin.cdi.util.HdfsReader;
 import com.linkedin.cdi.util.WatermarkDefinition;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -23,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -127,7 +125,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
           jobKeys.getWorkUnitPartitionType()));
     }
 
-    Map<String, JsonArray> secondaryInputs = readSecondaryInputs(sourceState, jobKeys.getRetryCount());
+    Map<String, JsonArray> secondaryInputs = MSTAGE_SECONDARY_INPUT.readAllContext(sourceState);
     JsonArray authentications = secondaryInputs.get(KEY_WORD_AUTHENTICATION);
     JsonArray activations = secondaryInputs.computeIfAbsent(KEY_WORD_ACTIVATION, x -> new JsonArray());
     JsonArray payloads = secondaryInputs.computeIfAbsent(KEY_WORD_PAYLOAD, x -> new JsonArray());
@@ -167,32 +165,6 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
         wu.setProp(MSTAGE_PAYLOAD_PROPERTY.toString(), payloads);
     }
     return wuList;
-  }
-
-  /**
-   * reads the multistage source to get the secondary input categories - authentication and activation
-   * In case the token is missing, it will retry accessing the tokens as per the retry parameters
-   * ("delayInSec", "retryCount")
-   */
-  private Map<String, JsonArray> readSecondaryInputs(State state, final long retries) {
-    LOG.info("Trying to read secondary input with retry = {}", retries);
-    Map<String, JsonArray> secondaryInputs = readContext(state);
-
-    // Check if authentication is ready, and if not, whether retry is required
-    JsonArray authentications = secondaryInputs.get(KEY_WORD_AUTHENTICATION);
-    if ((authentications == null || authentications.size() == 0)
-        && jobKeys.getIsSecondaryAuthenticationEnabled() && retries > 0) {
-      LOG.info("Authentication tokens are expected from secondary input, but not ready");
-      LOG.info("Will wait for {} seconds and then retry reading the secondary input", jobKeys.getRetryDelayInSec());
-      try {
-        TimeUnit.SECONDS.sleep(jobKeys.getRetryDelayInSec());
-      } catch (Exception e) {
-        throw new RuntimeException("Sleep() interrupted", e);
-      }
-      return readSecondaryInputs(state, retries - 1);
-    }
-    LOG.info("Successfully read secondary input, no more retry");
-    return secondaryInputs;
   }
 
   /**
@@ -394,44 +366,6 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
   }
 
   /**
-   * Read preceding job output, and return as a JsonArray.
-   *
-   * The location of preceding job output and fields of selection are
-   * configured in parameter multistagesource.secondary.input, which should
-   * have a path element and fields element. The path element shall contain
-   * a list of input paths, and the fields element contains columns to be
-   * returned.
-   *
-   * Assume this cannot be a Json primitive, and return null if so.
-   *
-   * @return a set of JsonArrays of data read from locations specified in SECONDARY_INPUT
-   *         property organized by category, in a Map<String, JsonArray> structure
-   */
-  private Map<String, JsonArray> readContext(State state) {
-    Map<String, JsonArray> secondaryInputs = new HashMap<>();
-    for (JsonElement entry: jobKeys.getSecondaryInputs()) {
-      if (!entry.getAsJsonObject().has(KEY_WORD_PATH)) {
-        continue;
-      }
-
-      String category = entry.getAsJsonObject().has(KEY_WORD_CATEGORY)
-          ? entry.getAsJsonObject().get(KEY_WORD_CATEGORY).getAsString()
-          : KEY_WORD_ACTIVATION;
-
-      JsonArray categoryData = secondaryInputs.computeIfAbsent(category, x -> new JsonArray());
-      if (category.equalsIgnoreCase(KEY_WORD_ACTIVATION) || category.equalsIgnoreCase(KEY_WORD_AUTHENTICATION)) {
-        categoryData.addAll(new HdfsReader(state).readSecondary(entry.getAsJsonObject()));
-      }
-
-      if (entry.getAsJsonObject().has(KEY_WORD_PATH) && category.equalsIgnoreCase(KEY_WORD_PAYLOAD)) {
-        categoryData.add(entry);
-      }
-
-    }
-    return secondaryInputs;
-  }
-
-  /**
    * Get all previous highest high watermarks, by dataset URN. If a dataset URN
    * had multiple work units, the highest high watermark is retrieved for that
    * dataset URN.
@@ -476,18 +410,12 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
 
   /**
    * retrieve the authentication data from secondary input
-   * TODO there is a slight inefficiency here
-   * @param retries number of retries remaining
+   * TODO this is not being used in handling HTTP 403 error
    * @return the authentication JsonObject
    */
-  protected JsonObject readSecondaryAuthentication(State state, final long retries) throws InterruptedException {
-    Map<String, JsonArray> secondaryInputs = readSecondaryInputs(state, retries);
-    if (secondaryInputs.containsKey(KEY_WORD_ACTIVATION)
-        && secondaryInputs.get(KEY_WORD_AUTHENTICATION).isJsonArray()
-        && secondaryInputs.get(KEY_WORD_AUTHENTICATION).getAsJsonArray().size() > 0) {
-      return secondaryInputs.get(KEY_WORD_AUTHENTICATION).get(0).getAsJsonObject();
-    }
-    return new JsonObject();
+  protected JsonObject readSecondaryAuthentication(State state) throws InterruptedException {
+    Map<String, JsonArray> secondaryInputs = MSTAGE_SECONDARY_INPUT.readAuthenticationToken(state);
+    return secondaryInputs.get(KEY_WORD_AUTHENTICATION).get(0).getAsJsonObject();
   }
 
   /**
