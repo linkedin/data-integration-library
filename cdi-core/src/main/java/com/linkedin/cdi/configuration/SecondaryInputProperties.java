@@ -41,6 +41,13 @@ public class SecondaryInputProperties extends JsonArrayProperties {
       JsonArray value = GSON.fromJson(state.getProp(getConfig()), JsonArray.class);
 
       // check categories, make sure they are spelled properly
+      for (JsonElement entry : value) {
+        if (!entry.isJsonObject() || !entry.getAsJsonObject().has(KEY_WORD_PATH)) {
+          return false;
+        }
+      }
+
+      // check categories, make sure they are spelled properly
       for (JsonElement si : value) {
         if (JsonUtils.get(KEY_WORD_CATEGORY, si.getAsJsonObject()) != JsonNull.INSTANCE) {
           String category = JsonUtils.get(KEY_WORD_CATEGORY, si.getAsJsonObject()).getAsString();
