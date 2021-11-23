@@ -62,8 +62,12 @@ To contribute, please use submit Pull Request (PR) for committers to merge.
             - `git push origin +master`
             - check your fork should be in sync with the main repository
 
-# Detailed Documents
+# User Guides
 
-- [Job Properties](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
-- [Job Properties by Category](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md)
-- [Deprecated Job Properties](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/deprecated.md)
+- [1. Job Properties](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
+- [2. Job Properties by Category](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md)
+- [3. Deprecated Job Properties](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/deprecated.md)
+- [4. Flow Design Patterns](docs/patterns/summary.md)
+- [5. How-tos](docs/how-to/summary.md)
+- [6. Key Concepts](docs/concepts/summary.md)
+- [7. Sample Flow Configurations](docs/sample-configs/summary.md)

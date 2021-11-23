@@ -222,7 +222,7 @@ public interface PropertyCollection {
   IntegerProperties MSTAGE_S3_LIST_MAX_KEYS = new IntegerProperties("ms.s3.list.max.keys", 1000, Integer.MAX_VALUE, 1);
 
   JsonObjectProperties MSTAGE_SCHEMA_CLEANSING = new JsonObjectProperties("ms.schema.cleansing");
-  JsonArrayProperties MSTAGE_SECONDARY_INPUT = new JsonArrayProperties("ms.secondary.input");
+  SecondaryInputProperties MSTAGE_SECONDARY_INPUT = new SecondaryInputProperties("ms.secondary.input");
   JsonObjectProperties MSTAGE_SESSION_KEY_FIELD = new JsonObjectProperties("ms.session.key.field");
 
   // default: 60 seconds, minimum: 0, maximum: -
@@ -292,6 +292,9 @@ public interface PropertyCollection {
   BooleanProperties MSTAGE_WORK_UNIT_PARTIAL_PARTITION =
       new BooleanProperties("ms.work.unit.partial.partition", Boolean.TRUE);
   StringProperties MSTAGE_WORK_UNIT_PARTITION = new StringProperties("ms.work.unit.partition", "none");
+  StringProperties CONVERTER_AVRO_DATE_FORMAT = new StringProperties("converter.avro.date.format");
+  StringProperties CONVERTER_AVRO_TIME_FORMAT = new StringProperties("converter.avro.time.format");
+  StringProperties CONVERTER_AVRO_TIMESTAMP_FORMAT = new StringProperties("converter.avro.timestamp.format");
   StringProperties CONVERTER_CLASSES = new StringProperties("converter.classes");
   StringProperties DATA_PUBLISHER_FINAL_DIR = new StringProperties("data.publisher.final.dir");
   StringProperties DATASET_URN = new StringProperties("dataset.urn");
@@ -321,6 +324,7 @@ public interface PropertyCollection {
     }
   };
 
+  StringProperties JOB_COMMIT_POLICY = new StringProperties("job.commit.policy");
   StringProperties JOB_DIR = new StringProperties("job.dir");
   StringProperties JOB_NAME = new StringProperties("job.name");
   StringProperties SOURCE_CLASS = new StringProperties("source.class");
@@ -405,6 +409,9 @@ public interface PropertyCollection {
       MSTAGE_WORK_UNIT_PARALLELISM_MAX,
       MSTAGE_WORK_UNIT_PARTIAL_PARTITION,
       MSTAGE_WORK_UNIT_PARTITION,
+      CONVERTER_AVRO_DATE_FORMAT,
+      CONVERTER_AVRO_TIME_FORMAT,
+      CONVERTER_AVRO_TIMESTAMP_FORMAT,
       CONVERTER_CLASSES,
       DATA_PUBLISHER_FINAL_DIR,
       DATASET_URN,
@@ -414,6 +421,7 @@ public interface PropertyCollection {
       EXTRACT_NAMESPACE,
       EXTRACT_TABLE_NAME,
       EXTRACT_TABLE_TYPE,
+      JOB_COMMIT_POLICY,
       JOB_DIR,
       JOB_NAME,
       SOURCE_CLASS,
@@ -433,6 +441,7 @@ public interface PropertyCollection {
   );
   Map<String, MultistageProperties<?>> deprecatedProperties =
       new ImmutableMap.Builder<String, MultistageProperties<?>>()
+          .put("dataset.name", EXTRACT_TABLE_NAME)
           .put("ms.csv.column.header", MSTAGE_CSV)
           .put("ms.csv.column.header.index", MSTAGE_CSV)
           .put("ms.csv.column.projection", MSTAGE_CSV)

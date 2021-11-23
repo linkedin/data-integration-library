@@ -15,7 +15,6 @@ import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.factory.ConnectionClientFactory;
 import com.linkedin.cdi.factory.reader.SchemaReader;
 import com.linkedin.cdi.util.DateTimeUtils;
-import com.linkedin.cdi.util.HdfsReader;
 import com.linkedin.cdi.util.JsonUtils;
 import com.linkedin.cdi.util.ParameterTypes;
 import com.linkedin.cdi.util.WorkUnitPartitionTypes;
@@ -23,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
 import org.joda.time.DateTime;
@@ -51,10 +49,6 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
 public class JobKeys {
   private static final Logger LOG = LoggerFactory.getLogger(JobKeys.class);
   final static public Gson GSON = new Gson();
-  final private static int RETRY_DELAY_IN_SEC_DEFAULT = 300;
-  final private static int RETRY_COUNT_DEFAULT = 3;
-  final private static String ITEMS_KEY = "items";
-
   private Map<String, Map<String, String>> derivedFields = new HashMap<>();
   private Map<String, String> defaultFieldTypes = new HashMap<>();
 
@@ -81,7 +75,6 @@ public class JobKeys {
   private long retryDelayInSec;
   private long retryCount;
   private Boolean isPartialPartition;
-  private JsonArray secondaryInputs = new JsonArray();
   private WorkUnitPartitionTypes workUnitPartitionType;
   private Boolean isSecondaryAuthenticationEnabled = false;
   private String sourceUri = StringUtils.EMPTY;
@@ -128,11 +121,10 @@ public class JobKeys {
     setIsPartialPartition(MSTAGE_WORK_UNIT_PARTIAL_PARTITION.get(state));
     setWorkUnitPartitionType(parsePartitionType(state));
     setWatermarkDefinition(MSTAGE_WATERMARK.get(state));
-    Map<String, Long> retry = parseSecondaryInputRetry(MSTAGE_SECONDARY_INPUT.get(state));
+    Map<String, Long> retry = MSTAGE_SECONDARY_INPUT.getAuthenticationRetry(state);
     setRetryDelayInSec(retry.get(KEY_WORD_RETRY_DELAY_IN_SEC));
     setRetryCount(retry.get(KEY_WORD_RETRY_COUNT));
-    setSecondaryInputs(MSTAGE_SECONDARY_INPUT.get(state));
-    setIsSecondaryAuthenticationEnabled(checkSecondaryAuthenticationEnabled());
+    setIsSecondaryAuthenticationEnabled(MSTAGE_SECONDARY_INPUT.isAuthenticationEnabled(state));
 
     setSourceSchema(readSourceSchemaFromUrn(state, MSTAGE_SOURCE_SCHEMA_URN.get(state)));
     setTargetSchema(readTargetSchemaFromUrn(state, MSTAGE_TARGET_SCHEMA_URN.get(state)));
@@ -465,73 +457,6 @@ public class JobKeys {
   }
 
   /**
-   *  This method populates the retry parameters (delayInSec, retryCount) via the secondary input.
-   *   These values are used to retry connection whenever the "authentication" type category is defined and the token hasn't
-   *   been populated yet. If un-defined, they will retain the default values as specified by RETRY_DEFAULT_DELAY and
-   *   RETRY_DEFAULT_COUNT.
-   *
-   *   For e.g.
-   *   ms.secondary.input : "[{"path": "/util/avro_retry", "fields": ["uuid"],
-   *   "category": "authentication", "retry": {"delayInSec" : "1", "retryCount" : "2"}}]"
-   * @param jsonArray the raw secondary input
-   * @return the retry delay and count in a map structure
-   */
-  private Map<String, Long> parseSecondaryInputRetry(JsonArray jsonArray) {
-    long retryDelay = RETRY_DELAY_IN_SEC_DEFAULT;
-    long retryCount = RETRY_COUNT_DEFAULT;
-    Map<String, Long> retry = new HashMap<>();
-    for (JsonElement field: jsonArray) {
-      JsonObject retryFields = (JsonObject) field.getAsJsonObject().get(KEY_WORD_RETRY);
-      if (retryFields != null && !retryFields.isJsonNull()) {
-        retryDelay = retryFields.has(KEY_WORD_RETRY_DELAY_IN_SEC)
-            ? retryFields.get(KEY_WORD_RETRY_DELAY_IN_SEC).getAsLong() : retryDelay;
-        retryCount = retryFields.has(KEY_WORD_RETRY_COUNT)
-            ? retryFields.get(KEY_WORD_RETRY_COUNT).getAsLong() : retryCount;
-      }
-    }
-    retry.put(KEY_WORD_RETRY_DELAY_IN_SEC, retryDelay);
-    retry.put(KEY_WORD_RETRY_COUNT, retryCount);
-    return retry;
-  }
-
-  /**
-   * Check if authentication is configured in secondary input
-   * @return true if secondary input contains an authentication definition
-   */
-  protected boolean checkSecondaryAuthenticationEnabled() {
-    for (JsonElement entry: getSecondaryInputs()) {
-      if (entry.isJsonObject()
-          && entry.getAsJsonObject().has(KEY_WORD_CATEGORY)
-          && entry.getAsJsonObject().get(KEY_WORD_CATEGORY).getAsString()
-          .equalsIgnoreCase(KEY_WORD_AUTHENTICATION)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public Map<String, JsonArray> readSecondaryInputs(State state, final long retries) throws InterruptedException {
-    LOG.info("Trying to read secondary input with retry = {}", retries);
-    Map<String, JsonArray> secondaryInputs = readContext(state);
-
-    // Check if authentication is ready, and if not, whether retry is required
-    JsonArray authentications = secondaryInputs.get(KEY_WORD_AUTHENTICATION);
-    if ((authentications == null || authentications.size() == 0) && this.getIsSecondaryAuthenticationEnabled()
-        && retries > 0) {
-      LOG.info("Authentication tokens are expected from secondary input, but not ready");
-      LOG.info("Will wait for {} seconds and then retry reading the secondary input", this.getRetryDelayInSec());
-      TimeUnit.SECONDS.sleep(this.getRetryDelayInSec());
-      return readSecondaryInputs(state, retries - 1);
-    }
-    LOG.info("Successfully read secondary input, no more retry");
-    return secondaryInputs;
-  }
-
-  private Map<String, JsonArray> readContext(State state) {
-    return new HdfsReader(state, this.getSecondaryInputs()).readAll();
-  }
-
-  /**
    * Call the reader factory and read schema of the URN
    * @param urn the dataset URN
    * @param state gobblin configuration
@@ -747,14 +672,6 @@ public class JobKeys {
 
   public void setIsPartialPartition(Boolean partialPartition) {
     isPartialPartition = partialPartition;
-  }
-
-  public JsonArray getSecondaryInputs() {
-    return secondaryInputs;
-  }
-
-  public void setSecondaryInputs(JsonArray secondaryInputs) {
-    this.secondaryInputs = secondaryInputs;
   }
 
   public WorkUnitPartitionTypes getWorkUnitPartitionType() {

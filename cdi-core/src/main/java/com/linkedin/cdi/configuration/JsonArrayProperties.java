@@ -5,6 +5,9 @@
 package com.linkedin.cdi.configuration;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.linkedin.cdi.util.VariableUtils;
+import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
@@ -109,5 +112,23 @@ public class JsonArrayProperties extends MultistageProperties<JsonArray> {
       return GSON.fromJson(state.getProp(getConfig()), JsonArray.class);
     }
     return getDefaultValue();
+  }
+
+  /**
+   * Retrieves property value from state object if valid and not blank, then apply dynamic variables,
+   * otherwise, return default value of the property type
+   *
+   * @param state state
+   * @param parameters dynamic parameters
+   * @return JsonArray of the property with variables substituted
+   */
+  public JsonArray get(State state, JsonObject parameters) {
+    String propertyValue = get(state).toString();
+    try {
+      propertyValue = VariableUtils.replaceWithTracking(propertyValue, parameters, false).getKey();
+    } catch (IOException e) {
+      LOG.error("Invalid parameter: " + parameters);
+    }
+    return GSON.fromJson(propertyValue, JsonArray.class);
   }
 }

@@ -36,8 +36,6 @@ public class WatermarkProperties extends JsonArrayProperties {
   public boolean isValid(State state) {
     final List<String> types = Lists.newArrayList("unit", "datetime");
     if (super.isValid(state) && !isBlank(state)) {
-      // Derived fields should meet general JsonArray configuration requirements
-      // and contain only JsonObject items that each has a "name" element and a "formula" element
       JsonArray value = GSON.fromJson(state.getProp(getConfig()), JsonArray.class);
       if (value.size() == 0) {
         return false;

@@ -131,6 +131,10 @@ The following are related to watermarks and work units:
 
 The following properties are inherited from Gobblin and enhanced with explicitly validation rules.
 
+- [converter.avro.date.format](converter.avro.date.format.md)
+- [converter.avro.time.format](converter.avro.time.format.md)
+- [converter.avro.timestamp.format](converter.avro.timestamp.format.md)
 - [extract.table.name](extract.table.name.md)
+- [job.commit.policy](job.commit.policy.md)  
 - [source.class](source.class.md)
-- [converter.class](converter.class.md)
+- [converter.class](converter.classes.md)
