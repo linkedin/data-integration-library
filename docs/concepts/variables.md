@@ -76,6 +76,38 @@ but allow multiple fields. That means it can generate multiple variables,
 with each variable having only 1 value. 
 `authentication` variable will be shared across all work units. 
 
+## Scope of Variables
+
+Variables defined using above methods can be classified into 3 categories:
+1. Job level variables
+2. Work-unit level static variables
+3. Work-unit level dynamic variables
+
+### Job-level Variables
+
+Job-level variables are static; they have the same value across all work units. Variables defined through the following 
+methods are job-level: 
+
+- Variables defined in `ms.parameters` that don't use any work-unit level variables
+- The range of time watermark defined in [ms.watermark](../parameters/ms.watermark.md)
+- Secondary input variables from Authentication category
+- Pagination initial values
+
+### Work-unit-level Static Variables
+
+Work-unit level variables can be static or dynamic. The static work unit variables include the following:
+- Variables defined in `ms.parameters` that contain reference to work-unit level static variables
+- Variables from unit watermark that is defined in [ms.watermark](../parameters/ms.watermark.md)
+- Variables from partitioned time watermark that is defined in `ms.watermark` and [ms.work.unit.partition](../parameters/ms.work.unit.partition.md)
+- Secondary input variables from Activation category 
+
+### Work-unit-level Dynamic Variables
+
+Work-unit level variables can be static or dynamic. The dynamic work unit variables include the following:
+- Variables defined in `ms.parameters` that contain reference to work-unit level dynamic variables
+- Session variables
+- Pagination current values
+
 ## Parameters
 
 Parameters are used to execute requests (Http request, JDBC request, and Sftp request, etc). 

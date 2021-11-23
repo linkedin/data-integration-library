@@ -32,6 +32,9 @@ the data is fetched through a series of pages.
 
 ## [Secondary Input](secondary-input.md)
 
+Secondary inputs provides additional directives to job execution, in addition to
+the primary inputs of job execution, which is its metadata, i.e, job configurations.
+
 ## [Secret Encryption](secret-encryption.md)
 
 ## [Session Control](session-control.md)
