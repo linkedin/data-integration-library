@@ -14,7 +14,6 @@ import com.google.gson.JsonObject;
 import com.linkedin.cdi.extractor.MultistageExtractor;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.util.EndecoUtils;
-import com.linkedin.cdi.util.HdfsReader;
 import com.linkedin.cdi.util.WatermarkDefinition;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -177,7 +176,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
    */
   private Map<String, JsonArray> readSecondaryInputs(State state, final long retries) {
     LOG.info("Trying to read secondary input with retry = {}", retries);
-    Map<String, JsonArray> secondaryInputs = readContext(state);
+    Map<String, JsonArray> secondaryInputs = MSTAGE_SECONDARY_INPUT.readAllContext(state);
 
     // Check if authentication is ready, and if not, whether retry is required
     JsonArray authentications = secondaryInputs.get(KEY_WORD_AUTHENTICATION);
@@ -392,44 +391,6 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
       LOG.warn("Too many partitions, created {}, only processing the last {}", partitions.size(), MAX_DATETIME_PARTITION);
     }
     return partitions;
-  }
-
-  /**
-   * Read preceding job output, and return as a JsonArray.
-   *
-   * The location of preceding job output and fields of selection are
-   * configured in parameter multistagesource.secondary.input, which should
-   * have a path element and fields element. The path element shall contain
-   * a list of input paths, and the fields element contains columns to be
-   * returned.
-   *
-   * Assume this cannot be a Json primitive, and return null if so.
-   *
-   * @return a set of JsonArrays of data read from locations specified in SECONDARY_INPUT
-   *         property organized by category, in a Map<String, JsonArray> structure
-   */
-  private Map<String, JsonArray> readContext(State state) {
-    Map<String, JsonArray> secondaryInputs = new HashMap<>();
-    for (JsonElement entry: jobKeys.getSecondaryInputs()) {
-      if (!entry.getAsJsonObject().has(KEY_WORD_PATH)) {
-        continue;
-      }
-
-      String category = entry.getAsJsonObject().has(KEY_WORD_CATEGORY)
-          ? entry.getAsJsonObject().get(KEY_WORD_CATEGORY).getAsString()
-          : KEY_WORD_ACTIVATION;
-
-      JsonArray categoryData = secondaryInputs.computeIfAbsent(category, x -> new JsonArray());
-      if (category.equalsIgnoreCase(KEY_WORD_ACTIVATION) || category.equalsIgnoreCase(KEY_WORD_AUTHENTICATION)) {
-        categoryData.addAll(new HdfsReader(state).readSecondary(entry.getAsJsonObject()));
-      }
-
-      if (entry.getAsJsonObject().has(KEY_WORD_PATH) && category.equalsIgnoreCase(KEY_WORD_PAYLOAD)) {
-        categoryData.add(entry);
-      }
-
-    }
-    return secondaryInputs;
   }
 
   /**

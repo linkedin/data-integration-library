@@ -4,9 +4,13 @@
 
 package com.linkedin.cdi.configuration;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
+import com.linkedin.cdi.util.HdfsReader;
 import com.linkedin.cdi.util.JsonUtils;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,5 +45,35 @@ public class SecondaryInputProperties extends JsonArrayProperties {
       }
     }
     return false;
+  }
+
+  /**
+   * Read authentication and activation secondary input records and payload definitions (not records)
+   *
+   * @return a set of JsonArrays of data read from locations specified in SECONDARY_INPUT
+   *         property organized by category, in a Map<String, JsonArray> structure
+   */
+  public Map<String, JsonArray> readAllContext(State state) {
+    Map<String, JsonArray> secondaryInputs = new HashMap<>();
+    for (JsonElement entry: get(state)) {
+      if (!entry.getAsJsonObject().has(KEY_WORD_PATH)) {
+        continue;
+      }
+
+      String category = entry.getAsJsonObject().has(KEY_WORD_CATEGORY)
+          ? entry.getAsJsonObject().get(KEY_WORD_CATEGORY).getAsString()
+          : KEY_WORD_ACTIVATION;
+
+      JsonArray categoryData = secondaryInputs.computeIfAbsent(category, x -> new JsonArray());
+      if (category.equalsIgnoreCase(KEY_WORD_ACTIVATION) || category.equalsIgnoreCase(KEY_WORD_AUTHENTICATION)) {
+        categoryData.addAll(new HdfsReader(state).readSecondary(entry.getAsJsonObject()));
+      }
+
+      if (entry.getAsJsonObject().has(KEY_WORD_PATH) && category.equalsIgnoreCase(KEY_WORD_PAYLOAD)) {
+        categoryData.add(entry);
+      }
+
+    }
+    return secondaryInputs;
   }
 }
