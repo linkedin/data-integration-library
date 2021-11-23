@@ -155,22 +155,6 @@ public class JobKeysTest extends PowerMockTestCase {
   }
 
   @Test
-  public void testParseSecondaryInputRetry() throws Exception {
-    JobKeys jobkeys = new JobKeys();
-    JsonArray input = gson.fromJson("[{\"retry\": {\"threadpool\": 5}}]", JsonArray.class);
-    Method method = JobKeys.class.getDeclaredMethod("parseSecondaryInputRetry", JsonArray.class);
-    method.setAccessible(true);
-    Map<String, Long> actual = (Map) method.invoke(jobkeys, input);
-    Assert.assertEquals((long) actual.get("delayInSec"), 300L);
-    Assert.assertEquals((long) actual.get("retryCount"), 3);
-
-    input = gson.fromJson("[{\"retry\": {\"delayInSec\": 500,\"retryCount\": 5}}]", JsonArray.class);
-    actual = (Map) method.invoke(jobkeys, input);
-    Assert.assertEquals((long) actual.get("delayInSec"), 500L);
-    Assert.assertEquals((long) actual.get("retryCount"), 5);
-  }
-
-  @Test
   public void testGetPaginationInitialValues() throws Exception {
     JobKeys jobkeys = new JobKeys();
     Method method = JobKeys.class.getDeclaredMethod("parsePaginationInitialValues", State.class);

@@ -8,6 +8,8 @@ import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.linkedin.cdi.keys.JobKeys;
+import java.lang.reflect.Method;
+import java.util.Map;
 import org.apache.gobblin.configuration.SourceState;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -262,4 +264,12 @@ public class MultistagePropertiesIndividualTest {
     Assert.assertFalse(MSTAGE_WORK_UNIT_PARALLELISM_MAX.isValid(state));
   }
 
+  @Test
+  public void testSecondaryInput() throws Exception {
+    SourceState state = new SourceState();
+    Assert.assertTrue(MSTAGE_SECONDARY_INPUT.isValid(state));
+    state.setProp("ms.secondary.input", "[{\"path\": \"dummy\", \"fields\": [\"access_token\"], \"category\": \"authentication\",\"retry\": {\"threadpool\": 5}}]");
+    Assert.assertEquals((long) MSTAGE_SECONDARY_INPUT.getAuthenticationRetry(state).get("delayInSec"), 300L);
+    Assert.assertEquals((long) MSTAGE_SECONDARY_INPUT.getAuthenticationRetry(state).get("retryCount"), 3);
+  }
 }

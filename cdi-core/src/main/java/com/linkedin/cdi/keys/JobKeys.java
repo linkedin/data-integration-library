@@ -128,7 +128,7 @@ public class JobKeys {
     setIsPartialPartition(MSTAGE_WORK_UNIT_PARTIAL_PARTITION.get(state));
     setWorkUnitPartitionType(parsePartitionType(state));
     setWatermarkDefinition(MSTAGE_WATERMARK.get(state));
-    Map<String, Long> retry = parseSecondaryInputRetry(MSTAGE_SECONDARY_INPUT.get(state));
+    Map<String, Long> retry = MSTAGE_SECONDARY_INPUT.getAuthenticationRetry(state);
     setRetryDelayInSec(retry.get(KEY_WORD_RETRY_DELAY_IN_SEC));
     setRetryCount(retry.get(KEY_WORD_RETRY_COUNT));
     setSecondaryInputs(MSTAGE_SECONDARY_INPUT.get(state));
@@ -462,36 +462,6 @@ public class JobKeys {
           e);
     }
     return partitionType;
-  }
-
-  /**
-   *  This method populates the retry parameters (delayInSec, retryCount) via the secondary input.
-   *   These values are used to retry connection whenever the "authentication" type category is defined and the token hasn't
-   *   been populated yet. If un-defined, they will retain the default values as specified by RETRY_DEFAULT_DELAY and
-   *   RETRY_DEFAULT_COUNT.
-   *
-   *   For e.g.
-   *   ms.secondary.input : "[{"path": "/util/avro_retry", "fields": ["uuid"],
-   *   "category": "authentication", "retry": {"delayInSec" : "1", "retryCount" : "2"}}]"
-   * @param jsonArray the raw secondary input
-   * @return the retry delay and count in a map structure
-   */
-  private Map<String, Long> parseSecondaryInputRetry(JsonArray jsonArray) {
-    long retryDelay = RETRY_DELAY_IN_SEC_DEFAULT;
-    long retryCount = RETRY_COUNT_DEFAULT;
-    Map<String, Long> retry = new HashMap<>();
-    for (JsonElement field: jsonArray) {
-      JsonObject retryFields = (JsonObject) field.getAsJsonObject().get(KEY_WORD_RETRY);
-      if (retryFields != null && !retryFields.isJsonNull()) {
-        retryDelay = retryFields.has(KEY_WORD_RETRY_DELAY_IN_SEC)
-            ? retryFields.get(KEY_WORD_RETRY_DELAY_IN_SEC).getAsLong() : retryDelay;
-        retryCount = retryFields.has(KEY_WORD_RETRY_COUNT)
-            ? retryFields.get(KEY_WORD_RETRY_COUNT).getAsLong() : retryCount;
-      }
-    }
-    retry.put(KEY_WORD_RETRY_DELAY_IN_SEC, retryDelay);
-    retry.put(KEY_WORD_RETRY_COUNT, retryCount);
-    return retry;
   }
 
   /**
