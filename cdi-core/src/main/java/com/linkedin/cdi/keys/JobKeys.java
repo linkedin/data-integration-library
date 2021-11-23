@@ -51,10 +51,6 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
 public class JobKeys {
   private static final Logger LOG = LoggerFactory.getLogger(JobKeys.class);
   final static public Gson GSON = new Gson();
-  final private static int RETRY_DELAY_IN_SEC_DEFAULT = 300;
-  final private static int RETRY_COUNT_DEFAULT = 3;
-  final private static String ITEMS_KEY = "items";
-
   private Map<String, Map<String, String>> derivedFields = new HashMap<>();
   private Map<String, String> defaultFieldTypes = new HashMap<>();
 
@@ -132,7 +128,7 @@ public class JobKeys {
     setRetryDelayInSec(retry.get(KEY_WORD_RETRY_DELAY_IN_SEC));
     setRetryCount(retry.get(KEY_WORD_RETRY_COUNT));
     setSecondaryInputs(MSTAGE_SECONDARY_INPUT.get(state));
-    setIsSecondaryAuthenticationEnabled(checkSecondaryAuthenticationEnabled());
+    setIsSecondaryAuthenticationEnabled(MSTAGE_SECONDARY_INPUT.isAuthenticationEnabled(state));
 
     setSourceSchema(readSourceSchemaFromUrn(state, MSTAGE_SOURCE_SCHEMA_URN.get(state)));
     setTargetSchema(readTargetSchemaFromUrn(state, MSTAGE_TARGET_SCHEMA_URN.get(state)));
@@ -462,22 +458,6 @@ public class JobKeys {
           e);
     }
     return partitionType;
-  }
-
-  /**
-   * Check if authentication is configured in secondary input
-   * @return true if secondary input contains an authentication definition
-   */
-  protected boolean checkSecondaryAuthenticationEnabled() {
-    for (JsonElement entry: getSecondaryInputs()) {
-      if (entry.isJsonObject()
-          && entry.getAsJsonObject().has(KEY_WORD_CATEGORY)
-          && entry.getAsJsonObject().get(KEY_WORD_CATEGORY).getAsString()
-          .equalsIgnoreCase(KEY_WORD_AUTHENTICATION)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   public Map<String, JsonArray> readSecondaryInputs(State state, final long retries) throws InterruptedException {
