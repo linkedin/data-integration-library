@@ -4,48 +4,30 @@
 
 package com.linkedin.cdi.extractor;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.linkedin.cdi.configuration.MultistageProperties;
 import com.linkedin.cdi.connection.MultistageConnection;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.keys.JsonExtractorKeys;
-import com.linkedin.cdi.source.HttpSource;
 import com.linkedin.cdi.source.MultistageSource;
-import com.linkedin.cdi.util.JsonUtils;
-import com.linkedin.cdi.util.ParameterTypes;
-import com.linkedin.cdi.util.SchemaBuilder;
 import com.linkedin.cdi.util.WorkUnitStatus;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.SourceState;
 import org.apache.gobblin.configuration.WorkUnitState;
-import org.apache.gobblin.runtime.JobState;
 import org.apache.gobblin.source.workunit.WorkUnit;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
-import org.powermock.reflect.Whitebox;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import static com.linkedin.cdi.configuration.PropertyCollection.*;
 
-import static com.linkedin.cdi.configuration.MultistageProperties.*;
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static org.mockito.Mockito.*;
 
 
@@ -87,7 +69,6 @@ public class TextExtractorTest {
     when(state.getWorkunit()).thenReturn(workUnit);
     workUnit.setProp(DATASET_URN.getConfig(), DATA_SET_URN_KEY);
     when(source.getJobKeys()).thenReturn(jobKeys);
-    when(jobKeys.getSourceParameters()).thenReturn(new JsonArray());
     when(jobKeys.getPaginationInitValues()).thenReturn(new HashMap<>());
     when(jobKeys.getSchemaCleansingPattern()).thenReturn("(\\s|\\$|@)");
     when(jobKeys.getSchemaCleansingReplacement()).thenReturn("_");

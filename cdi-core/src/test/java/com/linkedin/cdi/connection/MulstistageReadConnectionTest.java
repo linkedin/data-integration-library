@@ -42,7 +42,6 @@ public class MulstistageReadConnectionTest extends PowerMockTestCase {
     JobKeys jobKeys = Mockito.mock(JobKeys.class);
     when(jobKeys.getCallInterval()).thenReturn(1L);
     conn.setJobKeys(jobKeys);
-    when(jobKeys.getSourceParameters()).thenReturn(new JsonArray());
     when(jobKeys.getCallInterval()).thenThrow(Mockito.mock(IllegalArgumentException.class));
     conn.executeNext(workUnitStatus);
     Assert.assertEquals(conn.executeNext(workUnitStatus), workUnitStatus);

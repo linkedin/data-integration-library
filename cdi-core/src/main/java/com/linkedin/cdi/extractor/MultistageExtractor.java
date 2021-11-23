@@ -131,14 +131,6 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
     this.eof = eof;
   }
 
-  public Iterator<JsonElement> getPayloadIterator() {
-    return payloadIterator;
-  }
-
-  public void setPayloadIterator(Iterator<JsonElement> payloadIterator) {
-    this.payloadIterator = payloadIterator;
-  }
-
   public ExtractorKeys getExtractorKeys() {
     return extractorKeys;
   }
@@ -183,8 +175,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
     extractorKeys.setExplictEof(MSTAGE_DATA_EXPLICIT_EOF.get(state));
     extractorKeys.setSignature(DATASET_URN.get(state));
     extractorKeys.setPreprocessors(getPreprocessors(state));
-    extractorKeys.setPayloads(getPayloads(state));
-    payloadIterator = extractorKeys.getPayloads().iterator();
+    readPayloads(state);
     extractorKeys.logDebugAll(state.getWorkunit());
   }
 
@@ -795,12 +786,15 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
    */
   protected JsonObject getInitialWorkUnitParameters() {
     JsonObject definedParameters =
-        JsonParameter.getParametersAsJson(jobKeys.getSourceParameters().toString(), getInitialWorkUnitVariableValues(),
+        JsonParameter.getParametersAsJson(MSTAGE_PARAMETERS.get(this.state).toString(), getInitialWorkUnitVariableValues(),
             this.state);
     JsonObject initialParameters = replaceVariablesInParameters(appendActivationParameter(definedParameters));
-    if (this.payloadIterator.hasNext()) {
+
+    // payload Iterator might not have been initialized yet
+    if (payloadIterator != null && payloadIterator.hasNext()) {
       initialParameters.add("payload", payloadIterator.next());
     }
+
     return initialParameters;
   }
 
@@ -869,10 +863,11 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   }
 
   protected JsonObject getCurrentWorkUnitParameters() {
-    JsonObject definedParameters = JsonParameter.getParametersAsJson(jobKeys.getSourceParameters().toString(),
+    JsonObject definedParameters = JsonParameter.getParametersAsJson(MSTAGE_PARAMETERS.get(state).toString(),
         getUpdatedWorkUnitVariableValues(getInitialWorkUnitVariableValues()), state);
     JsonObject currentParameters = replaceVariablesInParameters(appendActivationParameter(definedParameters));
-    if (this.payloadIterator.hasNext()) {
+
+    if (payloadIterator != null && payloadIterator.hasNext()) {
       currentParameters.add("payload", payloadIterator.next());
     }
     return currentParameters;
@@ -941,15 +936,21 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
    * override this to process payload differently.
    *
    * @param state WorkUnitState
-   * @return the payload records
    */
-  protected JsonArray getPayloads(State state) {
-    JsonArray payloads = MSTAGE_PAYLOAD_PROPERTY.get(state);
+  protected void readPayloads(State state) {
+    JsonArray payloads = MSTAGE_PAYLOAD_PROPERTY.get(state, getInitialWorkUnitParameters());
     JsonArray records = new JsonArray();
     for (JsonElement entry : payloads) {
-      records.addAll(new HdfsReader(state).readSecondary(entry.getAsJsonObject()));
+      try {
+        records.addAll(new HdfsReader(state).readSecondary(entry.getAsJsonObject()));
+        extractorKeys.setPayloads(records);
+        payloadIterator = records.iterator();
+      } catch (Exception e) {
+        // in exception, put payload definition as payload, keep iterator as null
+        LOG.error(String.format(ERROR_READING_SECONDARY_INPUT, KEY_WORD_PAYLOAD, DATASET_URN.get(state)));
+        extractorKeys.setPayloads(payloads);
+      }
     }
-    return records;
   }
 
   /**

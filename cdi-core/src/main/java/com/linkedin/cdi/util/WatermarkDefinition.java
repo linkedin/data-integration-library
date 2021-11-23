@@ -164,7 +164,7 @@ public class WatermarkDefinition {
       List<String> units = Lists.newArrayList(commaSeparatedUnits.split(StringUtils.COMMA_STR));
       for (String unit: units) {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty(name, unit);
+        jsonObject.addProperty(name, unit.trim());
         unitArray.add(jsonObject);
       }
       this.setUnits(unitArray.toString());

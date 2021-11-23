@@ -188,11 +188,8 @@ public class MultistageSourceTest {
     sourceState.setProp(MSTAGE_OUTPUT_SCHEMA.getConfig(), "");
     MultistageSource source = new MultistageSource();
     source.getWorkunits(sourceState);
-    Assert.assertNotNull(source.getJobKeys().getSourceParameters());
-
     sourceState.setProp("ms.parameters", "[{\"name\":\"cursor\",\"type\":\"session\"}]");
     source.getWorkunits(sourceState);
-    Assert.assertNotNull(source.getJobKeys().getSourceParameters());
   }
 
   @Test

@@ -11,6 +11,7 @@ import com.google.gson.JsonObject;
 import com.linkedin.cdi.util.DateTimeUtils;
 import com.linkedin.cdi.util.JsonUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -139,7 +140,9 @@ public class WatermarkProperties extends JsonArrayProperties {
       }
       return unitList;
     } else if (units.isJsonPrimitive()) {
-      return Lists.newArrayList(units.getAsString().split(KEY_WORD_COMMA));
+      List<String> unitList = Lists.newArrayList();
+      Arrays.stream(units.getAsString().split(KEY_WORD_COMMA)).forEach(x -> unitList.add(x.trim()));
+      return unitList;
     }
     return null;
   }
