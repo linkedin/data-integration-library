@@ -8,8 +8,6 @@ import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.linkedin.cdi.keys.JobKeys;
-import java.lang.reflect.Method;
-import java.util.Map;
 import org.apache.gobblin.configuration.SourceState;
 import org.testng.Assert;
 import org.testng.annotations.Test;
