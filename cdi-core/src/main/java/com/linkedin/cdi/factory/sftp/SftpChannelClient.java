@@ -5,6 +5,7 @@
 package com.linkedin.cdi.factory.sftp;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -35,18 +36,11 @@ public class SftpChannelClient implements SftpClient {
   protected State state;
   protected Session session = null;
   protected JSch jsch = new JSch();
-//  protected SSLContext sslContext = null;
 
   public SftpChannelClient(State state) {
     this.state = state;
     initializeConnection(state);
   }
-//
-//  public SftpChannelClient(State state, SSLContext sslContext) {
-//    this(state);
-//    this.sslContext = sslContext;
-//    initializeConnection(state);
-//  }
 
   protected void initializeConnection(State state) {
     JSch.setLogger(new SftpFsHelper.JSchLogger());
@@ -95,7 +89,8 @@ public class SftpChannelClient implements SftpClient {
   @Override
   public void close() {
     if (this.session != null) {
-      this.session.disconnect();
+      session.disconnect();
+      session = null;
     }
   }
 
@@ -132,6 +127,35 @@ public class SftpChannelClient implements SftpClient {
     } catch (SftpException e) {
       throw new RuntimeException("Cannot execute ls command on sftp connection", e);
     }
+  }
+
+  /**
+   * Execute an FTP ls command with retries
+   * @param path the target path to list content
+   * @param  retries the number of times to try the ls command, must be > 0
+   * @return the list of files and directories
+   */
+  @Override
+  public List<String> ls(String path, final int retries) {
+    List<String> results = Lists.newArrayList();
+    for (int tries = retries; tries > 0; tries --) {
+      try {
+        results = ls(path);
+      } catch (RuntimeException e1) {
+        if (tries == 1) {
+          throw new RuntimeException(e1);
+        }
+
+        // reset the session and retry
+        try {
+          close();
+          initializeConnection(state);
+        } catch (Exception e2) {
+          throw new RuntimeException(e2);
+        }
+      }
+    }
+    return results;
   }
 
   /**
