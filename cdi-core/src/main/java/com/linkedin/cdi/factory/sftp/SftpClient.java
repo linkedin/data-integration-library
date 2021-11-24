@@ -39,6 +39,14 @@ public interface SftpClient {
   List<String> ls(String path);
 
   /**
+   * Execute an FTP ls command with retries
+   * @param path path on target host to be listed
+   * @return the list of files and directories
+   */
+  List<String> ls(String path, final int retries);
+
+
+  /**
    * Get file modification time
    * @param path file path on target to be checked
    * @return the modification time in long format

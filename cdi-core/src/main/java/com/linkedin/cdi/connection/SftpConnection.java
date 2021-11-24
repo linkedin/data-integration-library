@@ -141,7 +141,7 @@ public class SftpConnection extends MultistageConnection {
     List<String> files = new ArrayList<>();
     LOG.info("Files to be processed from input " + filesPattern);
     try {
-      files = fsClient.ls(filesPattern);
+      files = fsClient.ls(filesPattern, 2);
       int i = 0;
       for (String file : files) {
         URI uri = new URI(file);
@@ -154,7 +154,8 @@ public class SftpConnection extends MultistageConnection {
         i++;
       }
     } catch (Exception e) {
-      LOG.error("Unable to list files " + e.getMessage());
+      LOG.error("Unable to list files after 2 tries. {}", e.getMessage());
+      throw new RuntimeException(e);
     }
     return files;
   }
