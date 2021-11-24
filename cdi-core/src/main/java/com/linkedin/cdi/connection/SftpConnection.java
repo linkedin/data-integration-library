@@ -138,10 +138,9 @@ public class SftpConnection extends MultistageConnection {
    * @return list of content
    */
   private List<String> getFiles(String filesPattern) {
-    List<String> files = new ArrayList<>();
     LOG.info("Files to be processed from input " + filesPattern);
     try {
-      files = fsClient.ls(filesPattern);
+      List<String> files = fsClient.ls(filesPattern, 2);
       int i = 0;
       for (String file : files) {
         URI uri = new URI(file);
@@ -153,10 +152,11 @@ public class SftpConnection extends MultistageConnection {
         files.set(i, filepath);
         i++;
       }
+      return files;
     } catch (Exception e) {
-      LOG.error("Unable to list files " + e.getMessage());
+      LOG.error("Unable to list files after 2 tries. {}", e.getMessage());
+      throw new RuntimeException(e);
     }
-    return files;
   }
   private String getPath() {
     return sftpSourceKeys.getFilesPath();
