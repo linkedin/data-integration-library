@@ -6,7 +6,14 @@ Each system might require credentials be supplied in different ways. The authent
 methods are very system dependent. DIL generalizes the authentication mechanism so that
 many authentication schemes can be configured in similar way. 
 
-## [Encryption Method](encryption-method.md)
+## [Encryption Methods](encryption-method.md)
+
+There are several types of encryption, and each can engage different methods. Encryption can be used in the following scenarios:
+
+1. Encrypt credentials, like usernames, passwords, keys, or refresh tokens, in configurations
+2. Encrypt confidential data, like access tokens, in data files
+3. Encrypt credentials that are to be sent over network for authentication
+4. Encrypt data files that are to be sent out to cloud storage
 
 ## [ISO Duration](iso-date-interval.md)
 
