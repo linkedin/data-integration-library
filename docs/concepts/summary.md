@@ -10,6 +10,8 @@ many authentication schemes can be configured in similar way.
 
 ## [ISO Duration](iso-date-interval.md)
 
+ISO Duration is a form to specify time intervals in very compact format. The standard is available [Here: ISO 8601 duration format](https://en.wikipedia.org/wiki/ISO_8601#Durations)
+
 ## [Job Pattern](job-type.md)
 
 There are several logical types of Azkaban jobs in 

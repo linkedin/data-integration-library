@@ -87,7 +87,7 @@ is defined in `ms.watermark`. In execution, there will be 3 work units generated
 - `ms.secondary.input=[{"path": "/data/{{customerId}}", "fields": ["dummy"], "category": "payload"}]`
 - `ms.watermark=[{"name":"customerId","type":"unit","units":"customer1, customer2, customer3"}]`
 
-The variable can only be a [job-level variables](../concepts/concepts/variables.md#job-level-variables) or a 
+The variable can only be a [job-level variables](../concepts/variables.md#job-level-variables) or a 
 [work-unit-level static variable](../concepts/variables.md#work-unit-level-static-variables).
 The variable cannot be a [work-unit-level dynamic variables](../concepts/variables.md#work-unit-level-dynamic-variables), like a pagination variable or a session variable.
 
