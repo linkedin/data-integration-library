@@ -39,7 +39,7 @@ public class MultistagePropertiesClassTest {
     Assert.assertEquals(MSTAGE_DERIVED_FIELDS.get(state), new JsonArray());
 
     state.setProp("ms.derived.fields", "[{\"name\": \"dummy\", \"formula\": \"dummy\"}]");
-    Assert.assertTrue(MSTAGE_DERIVED_FIELDS.isValid(state));
+    Assert.assertFalse(MSTAGE_DERIVED_FIELDS.isValid(state));
   }
 
   @Test

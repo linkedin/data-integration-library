@@ -23,6 +23,7 @@ public interface StaticConstants {
   String KEY_WORD_EOF = "EOF";
   String KEY_WORD_EPOC = "epoc";
   String KEY_WORD_FIELDS = "fields";
+  String KEY_WORD_FORMAT = "format";
   String KEY_WORD_FORMULA = "formula";
   String KEY_WORD_FROM = "from";
   String KEY_WORD_HTTP_OK = "ok";
@@ -54,6 +55,7 @@ public interface StaticConstants {
   String KEY_WORD_STRING = "string";
   String KEY_WORD_SYMBOLS = "symbols";
   String KEY_WORD_TIMESTAMP = "timestamp";
+  String KEY_WORD_TIMEZONE = "timezone";
   String KEY_WORD_TO = "to";
   String KEY_WORD_TYPE = "type";
   String KEY_WORD_UNITS = "units";
@@ -71,6 +73,9 @@ public interface StaticConstants {
   String KEY_WORD_JSON = "json";
   String KEY_WORD_CSV = "csv";
   String KEY_WORD_AVRO = "avro";
+
+  String TZ_UTC = "UTC";
+  String TZ_LOS_ANGELES = "America/Los_Angeles";
 
   String PROPERTY_DELIMINATOR = ".";
   String REGEXP_DEFAULT_PATTERN = ".*";

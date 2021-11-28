@@ -31,20 +31,24 @@ of jobs can help configure them quicker.
 
 ## [Json Path](json-path.md)
 
+Json structures are nested by nature. JsonObjects can have children JsonObjects or JsonArrays, and JsonArray
+can have JsonObjects or JsonArrays. Each field in a JsonObject is called a path segment, and each element index
+in a JsonObject is also called a path segment.
+
+Json Path is a string of segments used to identify a nested element in a Json structure. For JsonObject,
+each segment represents a field name of the structure; for JsonArray, each segment represents an index of
+a record within the array.
+
 ## [Pagination](pagination.md)
 
 Pagination is typically used to fetch a large dataset from cloud over HTTP, where
 one fetch can only optimally get a limited chunk of data. In such case,
-the data is fetched through a series of pages. 
-
-## [Schema](schema.md)
+the data is fetched through a series of pages.
 
 ## [Secondary Input](secondary-input.md)
 
 Secondary inputs provides additional directives to job execution, in addition to
 the primary inputs of job execution, which is its metadata, i.e, job configurations.
-
-## [Secret Encryption](secret-encryption.md)
 
 ## [Session Control](session-control.md)
 
@@ -55,8 +59,6 @@ usage. Typical scenarios of using session control are:
 - [Asynchronous ingestion](../patterns/asynchronous-ingestion-pattern.md)
 - [Pagination](../concepts/pagination.md)
 - [Two-step file download ](../how-to/status-check-job.md)
-
-## [Single Flow](single-flow.md)
 
 ## [Variable](variables.md)
 

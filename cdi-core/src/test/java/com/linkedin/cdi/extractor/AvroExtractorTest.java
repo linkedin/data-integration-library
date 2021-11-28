@@ -178,8 +178,6 @@ public class AvroExtractorTest {
 
   @Test
   public void testAddDerivedFields() throws Exception {
-    avroExtractor.setTimezone("America/Los_Angeles");
-
     // derived field is in unsupported type and the source is non-existent
     Map<String, Map<String, String>> derivedFields = ImmutableMap.of("formula",
         ImmutableMap.of("type", "non-epoc", "source", "start_time", "format", "yyyy-MM-dd"));
@@ -245,7 +243,7 @@ public class AvroExtractorTest {
     DateTimeFormatter datetimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
     fieldValue = AvroUtils.getFieldValue(res, "current_date");
     Assert.assertTrue(fieldValue.isPresent());
-    Assert.assertEquals((long)fieldValue.get(), datetimeFormatter.parseDateTime("2020-06-01").getMillis());
+    Assert.assertEquals((long)fieldValue.get(), datetimeFormatter.withZone(DateTimeZone.forID("America/Los_Angeles")).parseDateTime("2020-06-01").getMillis());
 
     // derived field is NOT in the specified format
     derivedFields = ImmutableMap.of("current_date",

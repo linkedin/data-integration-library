@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.util;
 
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -100,5 +101,41 @@ public class DateTimeUtilsTest {
   @Test(expectedExceptions = NullPointerException.class)
   public void parse_nullTimezone_illegalArgumentException() {
     DateTimeUtils.parse("", null);
+  }
+
+  @Test
+  public void testParseWithCustomFormat() {
+    // test UTC, GMT
+    Assert.assertEquals(DateTimeUtils.parse("20210101", "yyyyMMdd", "UTC").getMillis(), 1609459200000L);
+    Assert.assertEquals(DateTimeUtils.parse("20210101", "yyyyMMdd", "GMT").getMillis(), 1609459200000L);
+
+    // test default timezone
+    Assert.assertEquals(DateTimeUtils.parse("20210101", "yyyyMMdd", "America/Los_Angeles").getMillis(), 1609488000000L);
+    Assert.assertEquals(DateTimeUtils.parse("20210101", "yyyyMMdd", "").getMillis(), 1609488000000L);
+    Assert.assertEquals(DateTimeUtils.parse("20210101", "yyyyMMdd", null).getMillis(), 1609488000000L);
+  }
+
+  @Test(expectedExceptions = RuntimeException.class)
+  public void testParseWithCustomFormatException1() {
+    // incorrectly call, end up with wrong function
+    Assert.assertEquals(DateTimeUtils.parse("20210101", "yyyyMMdd").getMillis(), 0);
+  }
+
+  @Test(expectedExceptions = RuntimeException.class)
+  public void testParseWithCustomFormatException2() {
+    Assert.assertEquals(DateTimeUtils.parse("20210101", "yyyy-MM-dd", "GMT").getMillis(), 1609459200000L);
+    //Assert.assertEquals(DateTimeUtils.parse("20210101", "yyyyMMdd", "America/Los_Angeles").getMillis(), 1609488000000L);
+  }
+
+  @Test(expectedExceptions = RuntimeException.class)
+  public void testParseWithCustomFormatException3() {
+    Assert.assertEquals(DateTimeUtils.parse("2021010100", "yyyy-MM-dd", "GMT").getMillis(), 1609459200000L);
+    //Assert.assertEquals(DateTimeUtils.parse("20210101", "yyyyMMdd", "America/Los_Angeles").getMillis(), 1609488000000L);
+  }
+
+  @Test
+  public void testJodaTime() {
+    // difference less than 10 seconds
+    Assert.assertTrue(Math.abs(DateTime.now().getMillis() - DateTime.now().withZone(DateTimeZone.UTC).getMillis()) < 10 * 1000L);
   }
 }

@@ -6,6 +6,7 @@ package com.linkedin.cdi.util;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -131,5 +132,26 @@ public interface DateTimeUtils {
       }
     }
     return false;
+  }
+  /**
+   * Parse the datetime string against a custom datetime format. This version
+   * doesn't try the best effort to guess the actual format.
+   *
+   * Acceptable timezones are: UTC, GMT, America/Los_Angeles, America/New_York, etc
+   *
+   * @param dtString datetime string
+   * @param dtFormat  format of datetime string
+   * @param tzString timezone of the epoch value
+   * @return the parsed Date Time object
+   */
+  static DateTime parse(String dtString, String dtFormat, String tzString) {
+    try {
+      DateTimeZone datetimeZone = DateTimeZone.forID(StringUtils.isBlank(tzString) ? DEFAULT_TIMEZONE : tzString);
+      DateTimeFormatter datetimeFormatter = DateTimeFormat.forPattern(dtFormat).withZone(datetimeZone);
+      return datetimeFormatter.parseDateTime(
+          dtString.length() > dtFormat.length() ? dtString.substring(0, dtFormat.length()) : dtString);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 }

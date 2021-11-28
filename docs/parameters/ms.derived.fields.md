@@ -31,7 +31,7 @@ The formula can be specified by "type", "source", and "format".
 
 DIL supports 6 types of derived fields:
 
-- `epoc`: it provides a time value field in the form of epoc (millisecond level). 
+- `epoc`: it provides a time value field in the form of epoch (millisecond level). 
 - `regexp`: it provides a string value field by extracting the value from another field using a Java REGEXP pattern
 - `string`: it provides a string value field by taking from another field, which can be a nested field, without transformation
 - `integer`: it provides a integer value field by taking from another integer field, which can be a nested field, without transformation
@@ -41,9 +41,14 @@ DIL supports 6 types of derived fields:
 DIL supports 3 sources of derivation:
 - from another field in the payload, in this case, the source can be the field name, or a JsonPath that leads to the field
 - from a dynamic DIL [variable](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/variables.md)
-- from predefined DIL symbols, which can be CURRENTDATE, or PxD (see [date interval](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/iso-date-interval.md))
-
-When the type is `epoc`, a format is required to specify how to convert the source to the desired EPOC value.  
+- from predefined DIL symbols, which can be `CURRENTDATE`, or `PxD` (see [date interval](https://github.com/linkedin/data-integration-library/blob/master/docs/concepts/iso-date-interval.md))
+  - `CURRENTDATE` is calculated in UTC timezone if no timezone is specified
+  - `PXD` is calculated in America/Los_Angeles timezone if no timezone is specified
+  
+When the type is `epoc`, a format is required to specify how to convert the source to the desired epoch value, and 
+a `timezone` can optionally specified. If no format is specified, the source must be a long value, which represents
+a timestamp in milli-seconds. `timezone` can take values like `UTC`, `America/Los_Angeles`, `GMT` etc. Timezone values
+are case-sensitive. 
 
 ### Example 1: the following defines a derived field using regular expression to subtract part of a source field </p>
 `[{
