@@ -78,24 +78,7 @@ public interface PropertyCollection {
   BooleanProperties MSTAGE_DATA_EXPLICIT_EOF = new BooleanProperties("ms.data.explicit.eof", Boolean.FALSE);
   JsonObjectProperties MSTAGE_DATA_DEFAULT_TYPE = new JsonObjectProperties("ms.data.default.type");
   StringProperties MSTAGE_DATA_FIELD = new StringProperties("ms.data.field");
-  JsonArrayProperties MSTAGE_DERIVED_FIELDS = new JsonArrayProperties("ms.derived.fields") {
-    @Override
-    public boolean isValid(State state) {
-      if (super.isValid(state) && !isBlank(state)) {
-        // Derived fields should meet general JsonArray configuration requirements
-        // and contain only JsonObject items that each has a "name" element and a "formula" element
-        JsonArray derivedFields = GSON.fromJson(state.getProp(getConfig()), JsonArray.class);
-        for (JsonElement field : derivedFields) {
-          if (!field.isJsonObject()
-              || !field.getAsJsonObject().has(KEY_WORD_NAME)
-              || !field.getAsJsonObject().has(KEY_WORD_FORMULA)) {
-            return false;
-          }
-        }
-      }
-      return super.isValid(state);
-    }
-  };
+  DerivedFieldsProperties MSTAGE_DERIVED_FIELDS = new DerivedFieldsProperties("ms.derived.fields");
 
   /**
    * Deprecated

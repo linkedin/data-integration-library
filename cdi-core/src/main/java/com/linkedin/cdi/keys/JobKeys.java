@@ -91,7 +91,7 @@ public class JobKeys {
     setTotalCountField(MSTAGE_TOTAL_COUNT_FIELD.get(state));
     setSourceUri(MSTAGE_SOURCE_URI.get(state));
     setDefaultFieldTypes(parseDefaultFieldTypes(state));
-    setDerivedFields(parseDerivedFields(state));
+    setDerivedFields(MSTAGE_DERIVED_FIELDS.getAsMap(state));
     setOutputSchema(parseOutputSchema(state));
     setTargetSchema(MSTAGE_TARGET_SCHEMA.get(state));
     setEncryptionField(MSTAGE_ENCRYPTION_FIELDS.get(state));
@@ -367,39 +367,6 @@ public class JobKeys {
           }.getType());
     }
     return new HashMap<>();
-  }
-
-  /**
-   * Sample derived field configuration:
-   * [{"name": "activityDate", "formula": {"type": "epoc", "source": "fromDateTime", "format": "yyyy-MM-dd'T'HH:mm:ss'Z'"}}]
-   *
-   * Currently, only "epoc" and "string" are supported as derived field type.
-   * For epoc type:
-   * - Data will be saved as milliseconds in long data type.
-   * - And the source data is supposed to be a date formatted as a string.
-   *
-   * TODO: support more types.
-   *
-   * @return derived fields and their definitions
-   */
-  @VisibleForTesting
-  Map<String, Map<String, String>> parseDerivedFields(State state) {
-    if (!MSTAGE_DERIVED_FIELDS.isValidNonblank(state)) {
-      return new HashMap<>();
-    }
-
-    Map<String, Map<String, String>> derivedFields = new HashMap<>();
-    JsonArray jsonArray = MSTAGE_DERIVED_FIELDS.get(state);
-    for (JsonElement field: jsonArray) {
-
-      // change the formula part, which is JsonObject, into map
-      derivedFields.put(field.getAsJsonObject().get("name").getAsString(),
-          GSON.fromJson(
-              field.getAsJsonObject().get("formula").getAsJsonObject().toString(),
-              new TypeToken<HashMap<String, String>>() { }.getType()));
-    }
-
-    return derivedFields;
   }
 
   /**
