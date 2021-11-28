@@ -32,6 +32,7 @@ import org.apache.gobblin.configuration.SourceState;
 import org.apache.gobblin.configuration.WorkUnitState;
 import org.apache.gobblin.source.workunit.WorkUnit;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.mockito.Mockito;
@@ -230,7 +231,6 @@ public class JsonExtractorTest {
     Map<String, Map<String, String>> derivedFields = ImmutableMap.of("formula",
         ImmutableMap.of("type", "non-epoc", "source", "start_time", "format", "yyyy-MM-dd"));
     when(jobKeys.getDerivedFields()).thenReturn(derivedFields);
-    jsonExtractor.setTimezone("America/Los_Angeles");
     JsonObject row = new JsonObject();
     JsonObject pushDowns = new JsonObject();
     JsonObject actual;
@@ -364,7 +364,7 @@ public class JsonExtractorTest {
     actual = Whitebox.invokeMethod(jsonExtractor, "addDerivedFields", row);
     Assert.assertEquals(actual.entrySet().size(), 9);
     DateTimeFormatter datetimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-    DateTime dateTime = datetimeFormatter.parseDateTime("2019-11-01");
+    DateTime dateTime = datetimeFormatter.withZone(DateTimeZone.forID("America/Los_Angeles")).parseDateTime("2019-11-01");
     Assert.assertEquals(actual.get("dateString").toString(), String.valueOf(dateTime.getMillis()));
     Assert.assertEquals(actual.get("dateTimeString").toString(), "\"2019-11-01 12:00:00\"");
     Assert.assertEquals(actual.get("someInteger").toString(), "123456");

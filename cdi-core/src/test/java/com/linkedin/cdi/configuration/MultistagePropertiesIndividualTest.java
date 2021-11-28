@@ -270,4 +270,17 @@ public class MultistagePropertiesIndividualTest {
     Assert.assertEquals((long) MSTAGE_SECONDARY_INPUT.getAuthenticationRetry(state).get("delayInSec"), 300L);
     Assert.assertEquals((long) MSTAGE_SECONDARY_INPUT.getAuthenticationRetry(state).get("retryCount"), 3);
   }
+
+  @Test
+  public void testDerivedFieldsProperty() {
+    SourceState state = new SourceState();
+    state.setProp("ms.derived.fields", "[{\"name\": \"dummy\", \"formula\": {\"type\": \"epoc\", \"source\": \"CURRENTDATE\"}}]");
+    Assert.assertTrue(MSTAGE_DERIVED_FIELDS.isValid(state));
+
+    state.setProp("ms.derived.fields", "[{\"name\": \"dummy\", \"formula\": {\"type\": \"epoc\", \"source\": \"CURRENTDATE\", \"timezone\": \"UTC\"}}]");
+    Assert.assertTrue(MSTAGE_DERIVED_FIELDS.isValid(state));
+
+    state.setProp("ms.derived.fields", "[{\"name\": \"dummy\", \"formula\": {\"type\": \"epoc\", \"source\": \"CURRENTDATE\", \"timezone\": \"nozone\"}}]");
+    Assert.assertFalse(MSTAGE_DERIVED_FIELDS.isValid(state));
+  }
 }

@@ -6,10 +6,12 @@ package com.linkedin.cdi.configuration;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.gobblin.configuration.State;
+import org.joda.time.DateTimeZone;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
@@ -32,8 +34,21 @@ public class DerivedFieldsProperties extends JsonArrayProperties {
       for (JsonElement field : derivedFields) {
         if (!field.isJsonObject()
             || !field.getAsJsonObject().has(KEY_WORD_NAME)
-            || !field.getAsJsonObject().has(KEY_WORD_FORMULA)) {
+            || !field.getAsJsonObject().has(KEY_WORD_FORMULA)
+            || !field.getAsJsonObject().get(KEY_WORD_FORMULA).isJsonObject()) {
           return false;
+        }
+
+        JsonObject formula = field.getAsJsonObject().get(KEY_WORD_FORMULA).getAsJsonObject();
+        if (formula.has(KEY_WORD_TYPE) && formula.get(KEY_WORD_TYPE).getAsString().equals(KEY_WORD_EPOC)) {
+          if (formula.has(KEY_WORD_TIMEZONE)) {
+            String timezone = formula.get(KEY_WORD_TIMEZONE).getAsString();
+            try {
+              DateTimeZone.forID(timezone);
+            } catch (Exception e) {
+              return false;
+            }
+          }
         }
       }
     }
