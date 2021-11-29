@@ -26,6 +26,7 @@ public interface StaticConstants {
   String KEY_WORD_FORMAT = "format";
   String KEY_WORD_FORMULA = "formula";
   String KEY_WORD_FROM = "from";
+  String KEY_WORD_HEADER = "header";
   String KEY_WORD_HTTP_OK = "ok";
   String KEY_WORD_INTEGER = "integer";
   String KEY_WORD_IS_NULLABLE = "isNullable";
@@ -57,6 +58,7 @@ public interface StaticConstants {
   String KEY_WORD_TIMESTAMP = "timestamp";
   String KEY_WORD_TIMEZONE = "timezone";
   String KEY_WORD_TO = "to";
+  String KEY_WORD_TOKEN = "token";
   String KEY_WORD_TYPE = "type";
   String KEY_WORD_UNITS = "units";
   String KEY_WORD_UNKNOWN = "unknown";

@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpKeys extends JobKeys {
   private static final Logger LOG = LoggerFactory.getLogger(HttpKeys.class);
-  private JsonObject authentication = new JsonObject();
   private JsonObject httpRequestHeaders = new JsonObject();
   private Map<String, String> httpRequestHeadersWithAuthentication = new HashMap<>();
   private String httpRequestMethod = HttpRequestMethod.GET.toString();
@@ -37,14 +36,6 @@ public class HttpKeys extends JobKeys {
     LOG.debug("Http Request Method: {}", httpRequestMethod);
     LOG.debug("Http Statuses: {}", httpStatuses);
     LOG.debug("Initial values of dynamic parameters: {}", initialParameters);
-  }
-
-  public JsonObject getAuthentication() {
-    return authentication;
-  }
-
-  public void setAuthentication(JsonObject authentication) {
-    this.authentication = authentication;
   }
 
   public JsonObject getHttpRequestHeaders() {
