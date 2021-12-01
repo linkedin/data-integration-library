@@ -253,7 +253,7 @@ public class MultistagePropertiesIndividualTest {
 
     state.setProp("ms.work.unit.parallelism.max", "0");
     Assert.assertTrue(MSTAGE_WORK_UNIT_PARALLELISM_MAX.isValid(state));
-    Assert.assertEquals(MSTAGE_WORK_UNIT_PARALLELISM_MAX.get(state).intValue(), 100);
+    Assert.assertEquals(MSTAGE_WORK_UNIT_PARALLELISM_MAX.get(state).intValue(), 500);
 
     state.setProp("ms.work.unit.parallelism.max", "0L");
     Assert.assertFalse(MSTAGE_WORK_UNIT_PARALLELISM_MAX.isValid(state));
