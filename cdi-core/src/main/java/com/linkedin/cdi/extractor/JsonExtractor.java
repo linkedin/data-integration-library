@@ -225,7 +225,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
     } catch (Exception e) {
       LOG.error("Source Error: {}", e.getMessage());
       state.setWorkingState(WorkUnitState.WorkingState.FAILED);
-      return false;
+      throw new RuntimeException(e);
     }
 
     LOG.debug("Checking parsed Json object");
