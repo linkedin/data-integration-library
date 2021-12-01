@@ -414,11 +414,5 @@ public interface PropertyCollection {
           .put("ms.converter.keep.null.strings", MSTAGE_CSV)
           .put("csv.max.failures", MSTAGE_CSV)
           .put("sftpConn.timeout", MSTAGE_SFTP_CONN_TIMEOUT_MILLIS)
-          .put("gaap.http.maxConnectionsPerRoute", MSTAGE_HTTP_CONN_PER_ROUTE_MAX)
-          .put("gaap.http.maxConnections", MSTAGE_HTTP_CONN_MAX)
-          .put("gaap.trustStorePath", MSTAGE_SSL)
-          .put("gaap.authType", MSTAGE_CONNECTION_CLIENT_FACTORY)
-          .put("ms.kraken.enabled", MSTAGE_CONNECTION_CLIENT_FACTORY)
-          .put("gobblinGaapHttpClientFactory.authType", MSTAGE_CONNECTION_CLIENT_FACTORY)
           .build();
 }
