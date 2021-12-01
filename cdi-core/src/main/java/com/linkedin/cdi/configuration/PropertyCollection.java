@@ -241,7 +241,7 @@ public interface PropertyCollection {
   };
 
   // default: 100, minimum: 0, maximum: 1000, 0 = default value
-  IntegerProperties MSTAGE_WORK_UNIT_PARALLELISM_MAX = new IntegerProperties("ms.work.unit.parallelism.max", 100, 1000, 0) {
+  IntegerProperties MSTAGE_WORK_UNIT_PARALLELISM_MAX = new IntegerProperties("ms.work.unit.parallelism.max", 500, 5000, 0) {
     @Override
     protected Integer getValidNonblankWithDefault(State state) {
       int value = super.getValidNonblankWithDefault(state);
