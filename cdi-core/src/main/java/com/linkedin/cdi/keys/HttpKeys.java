@@ -29,7 +29,6 @@ public class HttpKeys extends JobKeys {
 
   @Override
   public void logDebugAll() {
-    super.logDebugAll();
     LOG.debug("These are values in HttpSource");
     LOG.debug("Http Request Headers: {}", httpRequestHeaders);
     //LOG.debug("Http Request Headers with Authentication: {}", httpRequestHeadersWithAuthentication.toString());

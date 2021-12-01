@@ -24,7 +24,6 @@ public class JdbcKeys extends JobKeys {
 
   @Override
   public void logDebugAll() {
-    super.logDebugAll();
     LOG.debug("These are values in JdbcSource");
     LOG.debug("JDBC statement: {}", jdbcStatement);
     LOG.debug("Initial values of dynamic parameters: {}", initialParameterValues);

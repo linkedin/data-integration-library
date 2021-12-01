@@ -18,7 +18,6 @@ public class SftpKeys extends JobKeys {
 
   @Override
   public void logDebugAll() {
-    super.logDebugAll();
     LOG.debug("These are values in SftpSource:");
     LOG.debug("sftp source path: {}", filesPath);
     LOG.debug("path separator: {}", pathSeparator);
