@@ -142,11 +142,14 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
       definedWatermarks.add(new WatermarkDefinition(ACTIVATION_WATERMARK_NAME, activations));
     }
 
-    // get previous high watermarks by each watermark partition or partition combinations
+    // Get previous high watermarks by each watermark partition or partition combinations
     // if there are multiple partitioned watermarks, such as one partitioned datetime watermark
-    // and one partitioned activation (unit) watermark
-    Map<String, Long> previousHighWatermarks = getPreviousHighWatermarks();
-    state.setProp(ConfigurationKeys.EXTRACT_IS_FULL_KEY, checkFullExtractState(state, previousHighWatermarks));
+    // and one partitioned activation (unit) watermark.
+    // Ignore previous high watermark in back fill mode, and avoid doing a full extract
+    Map<String, Long> previousHighWatermarks = MSTAGE_BACKFILL.get(state)
+        ? new HashMap<>() : getPreviousHighWatermarks();
+    state.setProp(ConfigurationKeys.EXTRACT_IS_FULL_KEY, MSTAGE_BACKFILL.get(state)
+        ? Boolean.FALSE : checkFullExtractState(state, previousHighWatermarks));
 
     // generated work units based on watermarks defined and previous high watermarks
     List<WorkUnit> wuList = generateWorkUnits(definedWatermarks, previousHighWatermarks);
