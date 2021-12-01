@@ -40,30 +40,7 @@ public interface PropertyCollection {
   };
 
   JsonObjectProperties MSTAGE_ACTIVATION_PROPERTY = new JsonObjectProperties("ms.activation.property");
-  JsonObjectProperties MSTAGE_AUTHENTICATION = new JsonObjectProperties("ms.authentication") {
-    final List<String> methods = Lists.newArrayList("basic", "bearer", "oauth", "custom");
-    @Override
-    public boolean isValid(State state) {
-      if (super.isValid(state) && !super.isBlank(state)) {
-        // avoid using the get() method of JsonObjectProperties as that will recursively call isValid()
-        JsonObject auth = GSON.fromJson(state.getProp(getConfig()), JsonObject.class);
-        if(!auth.has(KEY_WORD_METHOD) || !auth.has(KEY_WORD_ENCRYPTION)) {
-          return false;
-        }
-
-        if (!auth.get(KEY_WORD_METHOD).isJsonPrimitive() || !auth.get(KEY_WORD_ENCRYPTION).isJsonPrimitive()) {
-          return false;
-        }
-
-        String method = auth.get(KEY_WORD_METHOD).getAsString().toLowerCase();
-        if (methods.stream().noneMatch(x -> x.equals(method))) {
-          return false;
-        }
-      }
-      return super.isValid(state);
-    }
-  };
-
+  AuthenticationProperties MSTAGE_AUTHENTICATION = new AuthenticationProperties("ms.authentication");
   BooleanProperties MSTAGE_BACKFILL = new BooleanProperties("ms.backfill", Boolean.FALSE);
 
   // default: 0, minimum: 0, maximum: -
@@ -437,11 +414,5 @@ public interface PropertyCollection {
           .put("ms.converter.keep.null.strings", MSTAGE_CSV)
           .put("csv.max.failures", MSTAGE_CSV)
           .put("sftpConn.timeout", MSTAGE_SFTP_CONN_TIMEOUT_MILLIS)
-          .put("gaap.http.maxConnectionsPerRoute", MSTAGE_HTTP_CONN_PER_ROUTE_MAX)
-          .put("gaap.http.maxConnections", MSTAGE_HTTP_CONN_MAX)
-          .put("gaap.trustStorePath", MSTAGE_SSL)
-          .put("gaap.authType", MSTAGE_CONNECTION_CLIENT_FACTORY)
-          .put("ms.kraken.enabled", MSTAGE_CONNECTION_CLIENT_FACTORY)
-          .put("gobblinGaapHttpClientFactory.authType", MSTAGE_CONNECTION_CLIENT_FACTORY)
           .build();
 }
