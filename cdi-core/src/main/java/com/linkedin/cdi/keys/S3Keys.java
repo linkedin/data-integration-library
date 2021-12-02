@@ -23,7 +23,6 @@ public class S3Keys extends JobKeys {
 
   @Override
   public void logDebugAll() {
-    super.logDebugAll();
     LOG.debug("These are values in S3SourceV2:");
     LOG.debug("S3 Bucket: {}", bucket);
     LOG.debug("S3 endpoint: {}", endpoint);
