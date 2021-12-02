@@ -6,6 +6,11 @@ Each system might require credentials be supplied in different ways. The authent
 methods are very system dependent. DIL generalizes the authentication mechanism so that
 many authentication schemes can be configured in similar way. 
 
+## [Backfill](backfill.md)
+
+Backfilling is to reprocess a chunk of data in the past that is beyond the look-back process using grace
+period.
+
 ## [Encryption Methods](encryption-method.md)
 
 There are several types of encryption, and each can engage different methods. Encryption can be used in the following scenarios:

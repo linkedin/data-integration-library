@@ -29,9 +29,10 @@ including parameters and payloads to data lake through Kafka.
 ms.authentication job property defines the authentication of a request. It works with HTTP protocol only 
 for now, but could be used in other protocols. 
 
-## ms.backfill
+## [ms.backfill](ms.backfill.md)
 
-This is for future back fill automation. It has no use currently.  
+Backfilling is to reprocess a chunk of data in the past that is beyond the look-back process using grace
+period. 
 
 ## [ms.call.interval.millis](ms.call.interval.millis.md)
 
