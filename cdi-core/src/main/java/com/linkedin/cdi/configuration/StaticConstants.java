@@ -16,6 +16,7 @@ public interface StaticConstants {
   String KEY_WORD_CATEGORY = "category";
   String KEY_WORD_COLUMN_NAME = "columnName";
   String KEY_WORD_COMMA = ",";
+  String KEY_WORD_CUSTOM = "custom";
   String KEY_WORD_DATA_IS_NULLABLE = "isNullable";
   String KEY_WORD_DATA_TYPE = "dataType";
   String KEY_WORD_DATA_TYPE_TYPE = "dataType.type";
@@ -29,6 +30,7 @@ public interface StaticConstants {
   String KEY_WORD_HEADER = "header";
   String KEY_WORD_HTTP_OK = "ok";
   String KEY_WORD_INTEGER = "integer";
+  String KEY_WORD_ISO = "ISO";
   String KEY_WORD_IS_NULLABLE = "isNullable";
   String KEY_WORD_ITEMS = "items";
   String KEY_WORD_MAP = "map";
