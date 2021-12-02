@@ -73,7 +73,6 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   protected final static List<String> SUPPORTED_DERIVED_FIELD_TYPES =
       Arrays.asList(KEY_WORD_EPOC, KEY_WORD_STRING, KEY_WORD_REGEXP, KEY_WORD_BOOLEAN, KEY_WORD_INTEGER, KEY_WORD_NUMBER);
   protected static final String COMMA_STR = ",";
-  protected final static String DEFAULT_TIMEZONE = "America/Los_Angeles";
   protected WorkUnitStatus workUnitStatus = WorkUnitStatus.builder().build();
   protected WorkUnitState state = null;
   protected MultistageSchemaBasedFilter<?> rowFilter = null;
@@ -405,33 +404,40 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
 
   /**
    * read the source and derive epoc from an existing field and convert it to a epoch value in the specified timezone
+   *
+   * Order of conversion:
+   * 1. If there is a format specified, try the specified format first. In this case, the timezone is also required.
+   *    Without timezone America/Los_Angeles is assumed. Actual data is also cut to length of the format string if
+   *    it is longer than the format.
+   * 2. If a format is unspecified (blank), or the specified format doesn't match the actual data, it will try the following
+   *    additional steps:
+   *    2.a. try conversion using the standard ISO date time format without timezone offset,
+   *         assuming data itself has no timezone offset in it; The input timezone is used if provided,
+   *         otherwise America/Los_Angeles is used.
+   *    2.b. try conversion using the standard ISO date time format with timezone offset,
+   *         assuming data itself has timezone offset in it; The input timezone is ignored even if it is provided
    * @param format specified format of datetime string
    * @param strValue pre-fetched value from the data source
    * @param timezone source data timezone
    * @return the epoc string: empty if failed to format strValue in the specified way
    */
   protected String deriveEpoc(String format, String strValue, String timezone) {
-    // the source value must be a datetime string in the specified format
-    try {
-      return String.valueOf(DateTimeUtils.parse(strValue, format, timezone).getMillis());
-    } catch (Exception e) {
+    String message = StringUtils.EMPTY;
+    if (StringUtils.isNotBlank(format)) {
       try {
-        return String.valueOf(DateTimeUtils.parse(strValue, timezone).getMillis());
-      } catch (Exception e1) {
-        failWorkUnit(e1.getMessage() + e.getMessage());
-        return StringUtils.EMPTY;
+        return String.valueOf(DateTimeUtils.parse(strValue, format, timezone).getMillis());
+      } catch (Exception e) {
+        // no logging here because if the format is wrong, the error will be printed for each row
+        message = e.getMessage();
       }
     }
-  }
 
-  /**
-   * read the source and derive epoc from an existing field and convert it to a epoch value in the LA timezone
-   * @param format specified format of datetime string
-   * @param strValue pre-fetched value from the data source
-   * @return the epoc string: empty if failed to format strValue in the specified way
-   */
-  protected String deriveEpoc(String format, String strValue) {
-    return deriveEpoc(format, strValue, TZ_LOS_ANGELES);
+    try {
+      return String.valueOf(DateTimeUtils.parse(strValue, timezone).getMillis());
+    } catch (Exception e) {
+      failWorkUnit(e.getMessage() +  message);
+      return StringUtils.EMPTY;
+    }
   }
 
   /***
@@ -485,8 +491,8 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
     String format = derivedFieldDef.getOrDefault(KEY_WORD_FORMAT, StringUtils.EMPTY);
 
     // use default timezone when it is unspecified or specified but has blank values
-    String timezone = derivedFieldDef.getOrDefault(KEY_WORD_TIMEZONE, DEFAULT_TIMEZONE);
-    DateTimeZone timeZone = DateTimeZone.forID(StringUtils.isBlank(timezone) ? DEFAULT_TIMEZONE : timezone);
+    String timezone = derivedFieldDef.getOrDefault(KEY_WORD_TIMEZONE, TZ_LOS_ANGELES);
+    DateTimeZone timeZone = DateTimeZone.forID(StringUtils.isBlank(timezone) ? TZ_LOS_ANGELES : timezone);
 
     // get the base value from date times or variables
     if (source.equalsIgnoreCase(CURRENT_DATE)) {
@@ -507,7 +513,9 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
         if (longValue != Long.MIN_VALUE) {
           strValue = String.valueOf(longValue);
         } else if (StringUtils.isNotBlank(format)) {
-          strValue = deriveEpoc(format, strValue, timezone);
+          strValue = format.equalsIgnoreCase(KEY_WORD_ISO)
+              ? deriveEpoc(StringUtils.EMPTY, strValue, timezone)
+              : deriveEpoc(format, strValue, timezone);
         } else {
           // Otherwise, the strValue should be a LONG string derived from a dynamic variable source
           if (!LongValidator.getInstance().isValid(strValue)) {

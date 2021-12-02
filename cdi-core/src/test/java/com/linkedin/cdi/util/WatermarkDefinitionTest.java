@@ -11,7 +11,7 @@ import org.joda.time.DateTimeZone;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import static com.linkedin.cdi.util.DateTimeUtils.*;
+import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
 @Test
@@ -208,7 +208,7 @@ public class WatermarkDefinitionTest {
     Assert.assertEquals(definitions.getDateTime("2020-01-01 10:00:30").toString(),
         "2020-01-01T10:00:30.000-08:00");
 
-    definitions.setTimezone(DEFAULT_TIMEZONE);
+    definitions.setTimezone(TZ_LOS_ANGELES);
     Assert.assertEquals(definitions.getDateTime("2020-01-01 10:00:30").toString(),
         "2020-01-01T10:00:30.000-08:00");
   }

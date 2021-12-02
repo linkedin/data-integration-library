@@ -46,9 +46,18 @@ DIL supports 3 sources of derivation:
   - `PXD` is calculated in America/Los_Angeles timezone if no timezone is specified
   
 When the type is `epoc`, a format is required to specify how to convert the source to the desired epoch value, and 
-a `timezone` can optionally specified. If no format is specified, the source must be a long value, which represents
-a timestamp in milli-seconds. `timezone` can take values like `UTC`, `America/Los_Angeles`, `GMT` etc. Timezone values
-are case-sensitive. 
+a `timezone` can optionally specified. 
+
+- If no format is specified, the source must be a long value string, which represents a timestamp in milli-seconds. 
+- If there is a format specified, and it is not "iso" (case-insensitive), try the specified format first. In this case, the timezone is also required.
+  Without timezone America/Los_Angeles is assumed. Actual data is also cut to length of the format string if it is longer than the format.
+- If format is "iso" (case-insensitive), or the specified format doesn't match the actual data, it will try the following steps:
+  - try conversion using the standard ISO datetime format without timezone offset, assuming data itself has no timezone offset in it; 
+    The input timezone is used if provided, otherwise America/Los_Angeles is used.
+  - try conversion using the standard ISO date time format with timezone offset, assuming data itself has timezone offset in it; 
+    The input timezone is ignored even if it is provided.
+  
+When `timezone` is specified, it can take values like `UTC`, `America/Los_Angeles`, `GMT` etc. Timezone values are case-sensitive. 
 
 ### Example 1: the following defines a derived field using regular expression to subtract part of a source field </p>
 `[{
@@ -67,6 +76,7 @@ are case-sensitive.
     "type": "epoc",
     "source": "started",
     "format": "yyyy-MM-dd"
+    "timezone": "UTC"
   }
 }]`
 
@@ -94,5 +104,17 @@ Then the derived field can be defined as:
 ### Example 5: the following defines an epoc timestamp field based on flow execution time </p>
 `[{"name": "extractedDate", "formula": {"type": "epoc", "source": "CURRENTDATE"}}]`
 
+### Example 6: the following defines an epoc timestamp field from a field of dynamic format </p>
+
+When each row has differently formatted datetime values, and the values are one of ISO date time formats:
+
+`[{
+  "name": "start",
+  "formula": {
+    "type": "epoc",
+    "source": "started",
+    "format": "iso"
+  }
+}]`
 
 [back to summary](summary.md#msderivedfields)

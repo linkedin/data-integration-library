@@ -12,6 +12,8 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import static com.linkedin.cdi.configuration.StaticConstants.*;
+
 
 /**
  * a general datetime parsing utility
@@ -23,7 +25,6 @@ import org.joda.time.format.DateTimeFormatter;
  */
 
 public interface DateTimeUtils {
-  String DEFAULT_TIMEZONE = "America/Los_Angeles";
   DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
   Map<String, DateTimeFormatter> FORMATS = new ImmutableMap.Builder<String, DateTimeFormatter>()
       .put("\\d{4}-\\d{2}-\\d{2}", DateTimeFormat.forPattern("yyyy-MM-dd"))
@@ -83,7 +84,7 @@ public interface DateTimeUtils {
       .build();
 
   static DateTime parse(String dtString) {
-    return parse(dtString, DEFAULT_TIMEZONE);
+    return parse(dtString, TZ_LOS_ANGELES);
   }
 
   /**
@@ -95,7 +96,7 @@ public interface DateTimeUtils {
    * @return the parsed Date Time object
    */
   static DateTime parse(String dtString, String timezone) {
-    DateTimeZone timeZone = DateTimeZone.forID(timezone.isEmpty() ? DEFAULT_TIMEZONE : timezone);
+    DateTimeZone timeZone = DateTimeZone.forID(timezone.isEmpty() ? TZ_LOS_ANGELES : timezone);
     try {
       for (String format : FORMATS.keySet()) {
         if (dtString.matches(format)) {
@@ -146,7 +147,7 @@ public interface DateTimeUtils {
    */
   static DateTime parse(String dtString, String dtFormat, String tzString) {
     try {
-      DateTimeZone datetimeZone = DateTimeZone.forID(StringUtils.isBlank(tzString) ? DEFAULT_TIMEZONE : tzString);
+      DateTimeZone datetimeZone = DateTimeZone.forID(StringUtils.isBlank(tzString) ? TZ_LOS_ANGELES : tzString);
       DateTimeFormatter datetimeFormatter = DateTimeFormat.forPattern(dtFormat).withZone(datetimeZone);
       return datetimeFormatter.parseDateTime(
           dtString.length() > dtFormat.length() ? dtString.substring(0, dtFormat.length()) : dtString);
