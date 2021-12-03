@@ -44,4 +44,17 @@ every once a while (e.g., every 15 minutes) until the status turns to ready or t
 downloading scenario, the status checking job can keep checking the availability of source data until they are
 present or timeout.
 
+# [How to Bootstrap](bootstrap.md)
+
+Bootstrap is to extract the whole history of a snapshot_append dataset from the source.
+
+# [How to Re-bootstrap](re-bootstrap.md)
+
+Re-bootstrap is to re-extract the whole history of a snapshot_append dataset from the source.
+
+# [How to Backfill](backfill.md)
+
+Backfilling is to reprocess a chunk of data in the past that is beyond the look-back process using grace
+period. Backfill works for incrementally processed flows; there is no need for backfill in snapshot only flows.
+
 
