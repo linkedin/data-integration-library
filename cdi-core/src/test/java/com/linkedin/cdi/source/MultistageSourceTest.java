@@ -90,22 +90,6 @@ public class MultistageSourceTest {
     Assert.assertEquals(MSTAGE_WORK_UNIT_PACING_SECONDS.getMillis(state).longValue(), 10000L);
   }
 
-  @Test
-  public void testGetWorkUnitsTooManyPartitions() {
-    SourceState state = new SourceState();
-    state.setProp("ms.watermark",
-        "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"2000-01-01\", \"to\": \"-\"}}]");
-    state.setProp("extract.table.type", "SNAPSHOT_ONLY");
-    state.setProp("extract.namespace", "test");
-    state.setProp("extract.table.name", "table1");
-    state.setProp("ms.work.unit.partition", "hourly");
-    state.setProp("ms.pagination", "{}");
-    MultistageSource source = new MultistageSource();
-    List<WorkUnit> wuList = source.getWorkunits(state);
-    // Expected max partition allowed maps to MultistageSource.MAX_DATETIME_PARTITION
-    Assert.assertEquals(wuList.size(), 3 * 30 * 24);
-  }
-
   @Test (expectedExceptions = RuntimeException.class)
   public void testGetWorkUnitsMinimumUnits() {
     SourceState state = new SourceState();
