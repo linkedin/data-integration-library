@@ -58,12 +58,11 @@ or `yyyy-MM-ddTHH:mm:ss.SSSSSSz`. For example: "2020-01-01". Hour and below grai
 are optional. Timezone is optional, and the default is PST. 
 - **-(hyphen)**: Hyphen represents the current date time. It will be converted to 
 system date during the work unit generation phase. 
-- **PxDTyH([ISO 8601 duration format](https://en.wikipedia.org/wiki/ISO_8601#Durations))**:
+- **PxDTyHzM([ISO 8601 duration format](https://en.wikipedia.org/wiki/ISO_8601#Durations))**:
 A ISO duration is interpreted as a datetime 
-that is `PxDTyH` **preceding** current date time. For example, if the definition
+that is `PxDTyHzM` **preceding** current date time. For example, if the definition
 is P1D, then it means a date time value (milliseconds) of 1 day before current
-date time (milliseconds). Apparently, hypen (-) is just a shorthand for P0D. 
-This format of presentation is interpreted per system date. 
+date time (milliseconds). Apparently, hypen (-) is just a shorthand for P0DT0H0M. 
 
 _The `from` value of a datetime watermark is usually static_.
 The importance of keeping `from` static is that partitions are generated 
@@ -98,15 +97,16 @@ _On the contrary, `to` value of a datetime watermark is usually dynamic_. Most
 commonly, it is "-". The `to` value can be PxD if the reference timeframe has to 
 end by certain number of days ago. 
 
-For multi-day partitioning, i.e. monthly and weekly partitioning, the `to` value
-is rounded to day level to avoid generating empty partitions under certain situations.
-For example, 
-without rounding, a weekly partition from Monday (milliseconds of midnight) to
-Monday (milliseconds of current time) could be generated on Mondays. That kind of 
-partitions can generate an empty range if the watermark is formatted as
-yyyy-MM-dd strings. In order to avoid rounding of `to` value to day level, 
-`to` can be defined as "P0DT0H", indicating DIL to round only to hour level. 
-  
+When `from` or `to` are specified using IOS duration format, the actual date time is rounded. 
+- PxD will round to day level by truncating hours and below precision
+- PxDTyH will round to hour level by truncating minutes and below precision
+- PxDTyHzM will round to minute level by truncating seconds and below precision
+
+When `from` or `to` are specified using IOS duration format, it can have an optional timezone code. 
+The ISO duration string and timezone code are concatenated by a ".". The timezone codes includes UTC, GMT, Amerca/Los_Angeles etc., for example:
+- `P0D.UTC`
+- `P0D.America/Los_Angeles`
+
 #### datetime watermark examples
 
 `ms.watermark=[{"name": "system","type": "datetime","range": {"from": "2019-01-01", "to": "-"}}]`

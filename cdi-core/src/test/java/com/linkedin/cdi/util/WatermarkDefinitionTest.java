@@ -51,14 +51,15 @@ public class WatermarkDefinitionTest {
     String expectedInDateTime = String.format("(%s,%s)",
         "2020-04-02T00:00:00.000-07:00",
         DateTime.now().withZone(timeZone).dayOfMonth().roundFloorCopy());
-    String jsonDef = "[{\"name\":\"system\",\"type\":\"datetime\",\"range\":{\"from\":\"2020-04-02\",\"to\":\"-\"}}]";
-    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef, false, WorkUnitPartitionTypes.WEEKLY,
+    String jsonDef1 = "[{\"name\":\"system\",\"type\":\"datetime\",\"range\":{\"from\":\"2020-04-02\",\"to\":\"-\"}}]";
+    String jsonDef2 = "[{\"name\":\"system\",\"type\":\"datetime\",\"range\":{\"from\":\"2020-04-02\",\"to\":\"P0D\"}}]";
+    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef2, false, WorkUnitPartitionTypes.WEEKLY,
         expectedInMillis, expectedInDateTime);
-    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef, true, WorkUnitPartitionTypes.WEEKLY,
+    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef2, true, WorkUnitPartitionTypes.WEEKLY,
         expectedInMillis, expectedInDateTime);
-    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef, false, WorkUnitPartitionTypes.MONTHLY,
+    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef2, false, WorkUnitPartitionTypes.MONTHLY,
         expectedInMillis, expectedInDateTime);
-    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef, true, WorkUnitPartitionTypes.MONTHLY,
+    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef2, true, WorkUnitPartitionTypes.MONTHLY,
         expectedInMillis, expectedInDateTime);
 
     // Testing with 'to' as 'two days ago(P2D)'
@@ -68,14 +69,14 @@ public class WatermarkDefinitionTest {
     expectedInDateTime = String.format("(%s,%s)",
         "2020-04-02T00:00:00.000-07:00",
         DateTime.now().withZone(timeZone).minusDays(2).dayOfMonth().roundFloorCopy());
-    jsonDef = "[{\"name\":\"system\",\"type\":\"datetime\",\"range\":{\"from\":\"2020-04-02\",\"to\":\"P2D\"}}]";
-    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef, false, WorkUnitPartitionTypes.WEEKLY,
+    jsonDef1 = "[{\"name\":\"system\",\"type\":\"datetime\",\"range\":{\"from\":\"2020-04-02\",\"to\":\"P2D\"}}]";
+    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef1, false, WorkUnitPartitionTypes.WEEKLY,
         expectedInMillis, expectedInDateTime);
-    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef, true, WorkUnitPartitionTypes.WEEKLY,
+    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef1, true, WorkUnitPartitionTypes.WEEKLY,
         expectedInMillis, expectedInDateTime);
-    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef, false, WorkUnitPartitionTypes.MONTHLY,
+    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef1, false, WorkUnitPartitionTypes.MONTHLY,
         expectedInMillis, expectedInDateTime);
-    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef, true, WorkUnitPartitionTypes.MONTHLY,
+    helperPartitionPrecisionAtDayLevelForWeeklyAndMonthlyPartitionTypes(jsonDef1, true, WorkUnitPartitionTypes.MONTHLY,
         expectedInMillis, expectedInDateTime);
   }
 
@@ -113,10 +114,6 @@ public class WatermarkDefinitionTest {
     // If partial partition is set to true, time should not round to 00:00:00-000
     Assert.assertNotEquals(definitions.getRangeInDateTime().getRight(),
         DateTime.now().withZone(timeZone).dayOfMonth().roundFloorCopy());
-    definitions = new WatermarkDefinition(defArray.get(0).getAsJsonObject(), false);
-    // If partial partition is set to false, time should be rounded to 00:00:00-000
-    Assert.assertEquals(definitions.getRangeInDateTime().getRight(),
-        DateTime.now().withZone(timeZone).dayOfMonth().roundFloorCopy());
   }
 
   @Test
@@ -127,37 +124,24 @@ public class WatermarkDefinitionTest {
     definitions = new WatermarkDefinition("primary", "2020-01-01", "P1D", false);
     WatermarkDefinition definitionsIsPartial = new WatermarkDefinition("primary", "2020-01-01", "P1D", true);
 
+    // P1D means truncates to day level
     Assert.assertEquals(definitions.getRangeInDateTime().getRight(),
         DateTime.now().withZone(timeZone).minusDays(1).dayOfMonth().roundFloorCopy());
-
-    // the millis second difference can often fail the test
-    // truncating the seconds and milli seconds to ensure success
-    Assert.assertEquals(definitionsIsPartial.getRangeInDateTime().getRight().minuteOfDay().roundFloorCopy(),
-        DateTime.now().withZone(timeZone).minusDays(1).minuteOfDay().roundFloorCopy());
 
     // P2DT5H
     definitions = new WatermarkDefinition("primary", "2020-01-01", "P2DT5H", false);
     definitionsIsPartial = new WatermarkDefinition("primary", "2020-01-01", "P2DT5H", true);
 
     Assert.assertEquals(definitions.getRangeInDateTime().getRight(),
-        DateTime.now().withZone(timeZone).minusDays(2).minusHours(5).dayOfMonth().roundFloorCopy());
-
-    // the millis second difference can often fail the test
-    // truncating the seconds and milli seconds to ensure success
-    Assert.assertEquals(definitionsIsPartial.getRangeInDateTime().getRight().minuteOfDay().roundFloorCopy(),
-        DateTime.now().withZone(timeZone).minusDays(2).minusHours(5).minuteOfDay().roundFloorCopy());
+        DateTime.now().withZone(timeZone).minusDays(2).minusHours(5).hourOfDay().roundFloorCopy());
 
     // P0DT7H
     definitions = new WatermarkDefinition("primary", "2020-01-01", "P0DT7H", false);
     definitionsIsPartial = new WatermarkDefinition("primary", "2020-01-01", "P0DT7H", true);
 
     Assert.assertEquals(definitions.getRangeInDateTime().getRight(),
-        DateTime.now().withZone(timeZone).minusHours(7).dayOfMonth().roundFloorCopy());
+        DateTime.now().withZone(timeZone).minusHours(7).hourOfDay().roundFloorCopy());
 
-    // the millis second difference can often fail the test
-    // truncating the seconds and milli seconds to ensure success
-    Assert.assertEquals(definitionsIsPartial.getRangeInDateTime().getRight().minuteOfDay().roundFloorCopy(),
-        DateTime.now().withZone(timeZone).minusHours(7).minuteOfDay().roundFloorCopy());
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
@@ -205,10 +189,6 @@ public class WatermarkDefinitionTest {
   @Test
   public void testGetDateTimeII() {
     definitions = new WatermarkDefinition("primary", "[{\"secondary\":\"2018\"}]");
-    Assert.assertEquals(definitions.getDateTime("2020-01-01 10:00:30").toString(),
-        "2020-01-01T10:00:30.000-08:00");
-
-    definitions.setTimezone(TZ_LOS_ANGELES);
     Assert.assertEquals(definitions.getDateTime("2020-01-01 10:00:30").toString(),
         "2020-01-01T10:00:30.000-08:00");
   }

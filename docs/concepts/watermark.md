@@ -27,7 +27,7 @@ before current day. `m` can be any natural number between 0 and 23,
 it defines m hours before the current time. The hour part is optional.
 Examples: P0D, P1D, P0DT7H. 
 
-"**-**" (Hyphen) can be used in `to` as a shortcut for "P0D".
+"**-**" (Hyphen) can be used in `to` as a shortcut for "P0DT0H0M".
 
 The `from` datetime is usually static, and `to` datetime is usually dynamic. 
 see [ms.watermark](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/ms.watermark.md). 

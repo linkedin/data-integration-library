@@ -16,6 +16,7 @@ import java.util.List;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.gobblin.configuration.State;
+import org.joda.time.DateTimeZone;
 
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
@@ -69,18 +70,41 @@ public class WatermarkProperties extends JsonArrayProperties {
             return false;
           }
 
+          // FROM has to be either a valid date time string or a valid pattern
           String from = range.get(KEY_WORD_FROM).getAsString();
-          if (!from.equals("-")
-              && !from.matches("P\\d+D(T\\d+H){0,1}")
-              && !DateTimeUtils.check(from)) {
+          if (!DateTimeUtils.check(from)
+              && !from.matches(REGEXP_TIME_DURATION_PATTERN)) {
             return false;
           }
 
+          // check timezone string in the FROM value
+          if (from.matches(REGEXP_TIME_DURATION_PATTERN)) {
+            if (from.contains("\\.")) {
+              try {
+                DateTimeZone.forID(from.split("\\.")[1]);
+              } catch (Exception e) {
+                return false;
+              }
+            }
+          }
+
+          // TO has to be either a valid date time string or a valid pattern, including "-"
           String to = range.get(KEY_WORD_TO).getAsString();
           if (!to.equals("-")
-              && !to.matches("P\\d+D(T\\d+H){0,1}")
+              && !to.matches(REGEXP_TIME_DURATION_PATTERN)
               && !DateTimeUtils.check(to)) {
             return false;
+          }
+
+          // check timezone string in the TO value
+          if (to.matches(REGEXP_TIME_DURATION_PATTERN)) {
+            if (to.contains("\\.")) {
+              try {
+                DateTimeZone.forID(to.split("\\.")[1]);
+              } catch (Exception e) {
+                return false;
+              }
+            }
           }
         }
 
@@ -111,7 +135,7 @@ public class WatermarkProperties extends JsonArrayProperties {
    * @param state state object
    * @return date range
    */
-  public Pair<String, String> getRanges(State state) {
+  public Pair<String, String> getRange(State state) {
     JsonArray dateWatermark = JsonUtils.filter(KEY_WORD_TYPE, "datetime", get(state));
     if (dateWatermark.isJsonNull()) {
       return DATETIME_WATERMARK_DEFAULT;
