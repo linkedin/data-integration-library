@@ -83,6 +83,10 @@ public interface StaticConstants {
 
   String PROPERTY_DELIMINATOR = ".";
   String REGEXP_DEFAULT_PATTERN = ".*";
+  String REGEXP_TIME_DURATION_PATTERN = "P\\d+D(T\\d+H)?(\\d+M)?(\\..*)?";
+  String REGEXP_DAY_ONLY_DURATION_PATTERN = "P\\d+D(\\..*)?";
+  String REGEXP_HOUR_ONLY_DURATION_PATTERN = "P\\d+D(T\\d+H)(\\..*)?";
+
   String DOC_BASE_URL = "https://github.com/linkedin/data-integration-library/blob/master/docs";
 
   String EXCEPTION_WORK_UNIT_MINIMUM = "Job requires a minimum of %s work unit(s) to proceed because ms.work.unit.min.units = %s.";

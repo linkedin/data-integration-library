@@ -75,7 +75,6 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
   final static private String CURRENT_DATE_SYMBOL = "-";
   final static private String ACTIVATION_WATERMARK_NAME = "activation";
   // Avoid too many partition created from misconfiguration, Months * Days * Hours
-  final private static int MAX_DATETIME_PARTITION = 3 * 30 * 24;
 
   protected SourceState sourceState = null;
   JobKeys jobKeys = new JobKeys();
@@ -361,12 +360,6 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
           MSTAGE_WORK_UNIT_PARTIAL_PARTITION.get(sourceState));
     } else {
       partitions.add(new ImmutablePair<>(datetimeRange.getLeft().getMillis(), datetimeRange.getRight().getMillis()));
-    }
-    // Safety check if too many partitions created
-    if (partitions.size() > MAX_DATETIME_PARTITION) {
-      // Preserve the last N partitions
-      partitions = partitions.subList(partitions.size() - MAX_DATETIME_PARTITION, partitions.size());
-      LOG.warn("Too many partitions, created {}, only processing the last {}", partitions.size(), MAX_DATETIME_PARTITION);
     }
     return partitions;
   }

@@ -220,12 +220,12 @@ public class MultistagePropertiesIndividualTest {
     // normal datetime watermark
     state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\",\"range\": {\"from\": \"2019-01-01\", \"to\": \"-\"}}]");
     Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
-    Assert.assertEquals(MSTAGE_WATERMARK.getRanges(state).getRight(), "-");
+    Assert.assertEquals(MSTAGE_WATERMARK.getRange(state).getRight(), "-");
 
     // normal datetime watermark and normal unit watermark
     state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"2021-08-21\", \"to\": \"-\"}}, {\"name\": \"bucketId\", \"type\": \"unit\", \"units\": \"null,0,1,2,3,4,5,6,7,8,9\"}]");
     Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
-    Assert.assertEquals(MSTAGE_WATERMARK.getRanges(state).getLeft(), "2021-08-21");
+    Assert.assertEquals(MSTAGE_WATERMARK.getRange(state).getLeft(), "2021-08-21");
     Assert.assertEquals(MSTAGE_WATERMARK.getUnits(state), Lists.newArrayList("null,0,1,2,3,4,5,6,7,8,9".split(",")));
 
     state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"2020-01-01\", \"to\": \"2020-01-31\"}}]");
@@ -244,6 +244,26 @@ public class MultistagePropertiesIndividualTest {
     // YYYYMMDD format is not supported for now
     state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"20091201\", \"to\": \"-\"}}]");
     Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+
+    // P0D is valid
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"P0D\", \"to\": \"P0D\"}}]");
+    Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
+
+    // P0DT0H is valid
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"P0DT0H\", \"to\": \"P0DT0H\"}}]");
+    Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
+
+    // P0DT0H0M is valid
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"P0DT0H0M\", \"to\": \"P0DT0H0M\"}}]");
+    Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
+
+    // P0DT0H0M.UTC is valid
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"P0DT0H0M.UTC\", \"to\": \"P0DT0H0M.UTC\"}}]");
+    Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
+
+    // P0DT0H0M.America/Los_Angeles is valid
+    state.setProp("ms.watermark", "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"P0DT0H0M.America/Los_Angeles\", \"to\": \"P0DT0H0M.America/Los_Angeles\"}}]");
+    Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
   }
 
   @Test
