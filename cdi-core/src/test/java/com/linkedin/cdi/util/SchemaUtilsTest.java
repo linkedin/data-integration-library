@@ -18,25 +18,30 @@ public class SchemaUtilsTest {
 
   @Test
   public void testIsValidOutputSchema() {
-    // valid schema
+    // valid schema, subset same order
     List<String> schemaColumns = Arrays.asList("a", "b");
     List<String> sourceColumns = Arrays.asList("a", "B", "C");
-    Assert.assertTrue(SchemaUtils.isValidOutputSchema(schemaColumns, sourceColumns));
+    Assert.assertTrue(SchemaUtils.isValidSchemaDefinition(schemaColumns, sourceColumns, 0));
 
-    // valid schema
+    // valid schema, subset with derived fields
+    schemaColumns = Arrays.asList("a", "b", "x");
+    sourceColumns = Arrays.asList("a", "b");
+    Assert.assertTrue(SchemaUtils.isValidSchemaDefinition(schemaColumns, sourceColumns, 1));
+
+    // valid schema, subset with skipped columns
     schemaColumns = Arrays.asList("a", "c");
     sourceColumns = Arrays.asList("a", "B", "C");
-    Assert.assertTrue(SchemaUtils.isValidOutputSchema(schemaColumns, sourceColumns));
+    Assert.assertTrue(SchemaUtils.isValidSchemaDefinition(schemaColumns, sourceColumns, 0));
 
-    // some columns in the schema is nowhere to be found in the source
+    // some columns in the schema is not in the source
     schemaColumns = Arrays.asList("a", "e");
     sourceColumns = Arrays.asList("a", "B", "C");
-    Assert.assertFalse(SchemaUtils.isValidOutputSchema(schemaColumns, sourceColumns));
+    Assert.assertFalse(SchemaUtils.isValidSchemaDefinition(schemaColumns, sourceColumns, 0));
 
-    // order mismatch
+    // order mismatch is allowed
     schemaColumns = Arrays.asList("c", "a", "b");
     sourceColumns = Arrays.asList("a", "B", "C");
-    Assert.assertFalse(SchemaUtils.isValidOutputSchema(schemaColumns, sourceColumns));
+    Assert.assertTrue(SchemaUtils.isValidSchemaDefinition(schemaColumns, sourceColumns, 0));
   }
 
   @Test

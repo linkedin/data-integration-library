@@ -147,14 +147,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
    */
   @Override
   public JsonArray getSchema() {
-    LOG.debug("Retrieving schema definition");
-    JsonArray schemaArray = super.getOrInferSchema();
-    Assert.assertNotNull(schemaArray);
-    if (jobKeys.getDerivedFields().size() > 0 && JsonUtils.get(StaticConstants.KEY_WORD_COLUMN_NAME,
-        jobKeys.getDerivedFields().keySet().iterator().next(), StaticConstants.KEY_WORD_COLUMN_NAME, schemaArray) == JsonNull.INSTANCE) {
-      schemaArray.addAll(addDerivedFieldsToAltSchema());
-    }
-    return schemaArray;
+    return getSchemaArray();
   }
 
   @Nullable

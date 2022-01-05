@@ -98,7 +98,7 @@ public class MultistagePropertiesIndividualTest {
     csv.addProperty("defaultFieldType", "xxx");
     csv.addProperty("fieldSeparator", "u0003");
     csv.addProperty("recordSeparator", "u0003");
-    csv.addProperty("columnProjection", "xxx");
+    csv.addProperty("columnProjection", "1,2,3");
     csv.addProperty("maxFailures", 1);
     csv.addProperty("keepNullString", true);
     state.setProp("ms.csv", csv.toString());
@@ -124,6 +124,11 @@ public class MultistagePropertiesIndividualTest {
     state.setProp("ms.csv", csv.toString());
     Assert.assertFalse(MSTAGE_CSV.isValid(state));
 
+    // column projection has to be numbers or ranges of numbers
+    csv = new JsonObject();
+    csv.addProperty("columnProjection", "x,y,z");
+    state.setProp("ms.csv", csv.toString());
+    Assert.assertFalse(MSTAGE_CSV.isValid(state));
   }
 
   @Test

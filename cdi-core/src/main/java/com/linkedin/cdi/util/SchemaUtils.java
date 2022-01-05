@@ -7,7 +7,9 @@ package com.linkedin.cdi.util;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonNull;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,34 +24,38 @@ public class SchemaUtils {
   }
 
   /**
-   * A schema is valid when all its valid schema are present in source and in the same order.
-   * Column names' matching is case insensitive.
-   * @param schemaColumns column names defined in the output schema
+   * A schema definition is valid when all defined columns are present in the source.
+   * - To determine existence, column names are case insensitive.
+   * - The order of columns can be different.
+   * - Defined columns can contain extra ones to allow derived fields.
+   *
+   * @param definedColumns column names defined in the output schema
    * @param sourceColumns column names at the source
-   * @return true if all columns are matching and false other wise
+   * @param derivedFields the number of derived fields
+   * @return true if first N columns are all existing in source and false other wise
    *
    *
-   * Example 1: schemaColumns: [A, c], sourceColumns: [a, B, C] ==> true
-   * Example 2: schemaColumns: [A, e], sourceColumns: [a, B, C] ==> false
+   * Example 1: definedColumns: [A, c], sourceColumns: [a, B, C] ==> true, B in source will be ignored in projection
+   * Example 2: definedColumns: [A, e], sourceColumns: [a, B, C] ==> false
+   * Example 3: definedColumns: [A, B, C], sourceColumns: [A, B] ==> true, C is assumed to be a derived field
    *
    */
-  public static boolean isValidOutputSchema(List<String> schemaColumns, List<String> sourceColumns) {
-    int i = 0;
-    int j = 0;
-    while (i < sourceColumns.size() && j < schemaColumns.size()) {
-      if (sourceColumns.get(i).equalsIgnoreCase(schemaColumns.get(j))) {
-        j++;
+  public static boolean isValidSchemaDefinition(
+      List<String> definedColumns,
+      List<String> sourceColumns,
+      int derivedFields) {
+    Set<String> columns = new HashSet<>();
+    sourceColumns.forEach(x -> columns.add(x.toLowerCase()));
+
+    for (int i = 0; i < definedColumns.size() - derivedFields; i++) {
+      if (!columns.contains(definedColumns.get(i).toLowerCase())) {
+        LOG.error("Defined Schema does not match source.");
+        LOG.error("Schema column: {}", definedColumns);
+        LOG.error("Source columns: {}", sourceColumns);
+        return false;
       }
-      i++;
     }
-    boolean isValidSchema = j == schemaColumns.size();
-    if (!isValidSchema) {
-      LOG.error(
-          "Schema columns and source columns do not match: " + "undefined columns in schema or column order mismatch");
-      LOG.debug("Schema column: {}", schemaColumns);
-      LOG.debug("Source columns: {}", sourceColumns);
-    }
-    return isValidSchema;
+    return true;
   }
 
   /**
