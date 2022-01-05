@@ -7,11 +7,11 @@ package com.linkedin.cdi.configuration;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
 import com.linkedin.cdi.util.CsvUtils;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
 
-import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -57,6 +57,10 @@ public class CsvProperties extends JsonObjectProperties{
       if (value.has(COLUMN_PROJECTION)) {
         String columnProjections = value.get(COLUMN_PROJECTION).getAsString();
         if (columnProjections.trim().isEmpty()) {
+          return false;
+        }
+
+        if (expandColumnProjection(columnProjections).size() == 0) {
           return false;
         }
       }
@@ -160,12 +164,12 @@ public class CsvProperties extends JsonObjectProperties{
     return -1;
   }
 
-  public String getColumnProjection(State state) {
+  public List<Integer> getColumnProjection(State state) {
     JsonObject value = get(state);
     if (value.has(COLUMN_PROJECTION)) {
-      return value.get(COLUMN_PROJECTION).getAsString();
+      return expandColumnProjection(value.get(COLUMN_PROJECTION).getAsString());
     }
-    return StringUtils.EMPTY;
+    return new ArrayList<>();
   }
 
   public Long getMaxFailures(State state) {
@@ -182,5 +186,47 @@ public class CsvProperties extends JsonObjectProperties{
       return value.get(KEEP_NULL_STRING).getAsBoolean();
     }
     return false;
+  }
+
+  /**
+   * Expand a column projection string into a list of indices
+   * @param columnProjection columns to project
+   * @return a list of column indices
+   */
+  private List<Integer> expandColumnProjection(String columnProjection) {
+    List<Integer> expandedColumnProjection = new ArrayList<>();
+    if (StringUtils.isNotBlank(columnProjection)) {
+      for (String val : columnProjection.split(",")) {
+        if (val.matches("^(\\d+)-(\\d+)$")) {  // range
+          try {
+            int left = Integer.parseInt(val.split("-")[0]);
+            int right = Integer.parseInt(val.split("-")[1]);
+            if (left < 0 || right < 0 || left >= right) {
+              return Lists.newArrayList();
+            } else {
+              for (int i = left; i <= right; i++) {
+                expandedColumnProjection.add(i);
+              }
+            }
+          } catch (Exception e) {
+            return Lists.newArrayList();
+          }
+        } else if (val.matches("^\\d+$")) {  // single number
+          try {
+            int col = Integer.parseInt(val);
+            if (col < 0) {
+              return Lists.newArrayList();
+            } else {
+              expandedColumnProjection.add(col);
+            }
+          } catch (Exception e) {
+            return Lists.newArrayList();
+          }
+        } else {  // unknown patterns
+          return Lists.newArrayList();
+        }
+      }
+    }
+    return expandedColumnProjection;
   }
 }

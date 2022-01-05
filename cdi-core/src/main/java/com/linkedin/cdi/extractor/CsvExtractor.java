@@ -85,8 +85,7 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
     // check if user has defined the output schema
     if (jobKeys.hasOutputSchema()) {
       JsonArray outputSchema = jobKeys.getOutputSchema();
-      csvExtractorKeys.setColumnProjection(expandColumnProjection(MSTAGE_CSV.getColumnProjection(state),
-          outputSchema.size()));
+      csvExtractorKeys.setColumnProjection(MSTAGE_CSV.getColumnProjection(state));
       // initialize the column name to index map based on the schema when derived fields are present
       if (jobKeys.getDerivedFields().entrySet().size() > 0) {
         buildColumnToIndexMap(outputSchema);
@@ -113,14 +112,7 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
    */
   @Override
   public String getSchema() {
-    LOG.debug("Retrieving schema definition");
-    JsonArray schemaArray = super.getOrInferSchema();
-    Assert.assertNotNull(schemaArray);
-    if (jobKeys.getDerivedFields().size() > 0 && JsonUtils.get(StaticConstants.KEY_WORD_COLUMN_NAME,
-        jobKeys.getDerivedFields().keySet().iterator().next(), StaticConstants.KEY_WORD_COLUMN_NAME, schemaArray) == JsonNull.INSTANCE) {
-      schemaArray.addAll(addDerivedFieldsToAltSchema());
-    }
-    return schemaArray.toString();
+    return getSchemaArray().toString();
   }
 
   /**
@@ -262,51 +254,9 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
   protected void setRowFilter(JsonArray schemaArray) {
     if (rowFilter == null) {
       if (MSTAGE_ENABLE_SCHEMA_BASED_FILTERING.get(state)) {
-        rowFilter = new CsvSchemaBasedFilter(new JsonIntermediateSchema(schemaArray), csvExtractorKeys);
+        rowFilter = new CsvSchemaBasedFilter(schemaArray, csvExtractorKeys);
       }
     }
-  }
-
-  /**
-   * Expand a column projection input string
-   * @param columnProjection columns to project
-   * @param numColumnsInPredefinedSchema number of columns
-   * @return a set of column indices
-   */
-  private Set<Integer> expandColumnProjection(String columnProjection, int numColumnsInPredefinedSchema) {
-    Set<Integer> expandedColumnProjection = new HashSet<>();
-    if (columnProjection != null && columnProjection.length() > 0) {
-      for (String val : columnProjection.split(",")) {
-        if (val.matches("^(\\d+)-(\\d+)$")) {  // range
-          int left = Integer.parseInt(val.split("-")[0]);
-          int right = Integer.parseInt(val.split("-")[1]);
-          if (left < 0 || right < 0 || left >= right) {
-            failWorkUnit(String.format("Invalid range in column projection input %s", val));
-            break;
-          } else {
-            for (int i = left; i <= right; i++) {
-              expandedColumnProjection.add(i);
-            }
-          }
-        } else if (val.matches("^\\d+$")) {  // single number
-          int col = Integer.parseInt(val);
-          if (col < 0) {
-            failWorkUnit(String.format("Invalid index in column projection input %s", val));
-            break;
-          } else {
-            expandedColumnProjection.add(col);
-          }
-        } else {  // unknown patterns
-          failWorkUnit(String.format("Invalid value in column projection input %s", val));
-          break;
-        }
-      }
-
-      if (expandedColumnProjection.size() != numColumnsInPredefinedSchema) {
-        failWorkUnit("The number of columns in column projection does not match the size of the predefined schema");
-      }
-    }
-    return expandedColumnProjection;
   }
 
   /**
@@ -391,7 +341,8 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
           List<String> schemaColumns =
               new ArrayList<>(new JsonIntermediateSchema(jobKeys.getOutputSchema()).getColumns().keySet());
           List<String> headerRow = Arrays.asList(csvExtractorKeys.getHeaderRow());
-          csvExtractorKeys.setIsValidOutputSchema(SchemaUtils.isValidOutputSchema(schemaColumns, headerRow));
+          csvExtractorKeys.setIsValidOutputSchema(
+              SchemaUtils.isValidSchemaDefinition(schemaColumns, headerRow, jobKeys.getDerivedFields().size()));
         }
       }
       linesRead++;
