@@ -4,11 +4,13 @@
 
 package com.linkedin.cdi.keys;
 
+import com.beust.jcommander.internal.Lists;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +37,7 @@ public class CsvExtractorKeys extends ExtractorKeys {
   // This is necessary as the input stream can only be read once
   private Deque<String[]> sampleRows = new ArrayDeque<>();
   private String[] headerRow;
-  private Set<Integer> columnProjection = new HashSet<>();
+  private List<Integer> columnProjection = Lists.newArrayList();
   private Boolean isValidOutputSchema = true;
   private String defaultFieldType = StringUtils.EMPTY;
 
@@ -99,11 +101,11 @@ public class CsvExtractorKeys extends ExtractorKeys {
     this.headerRow = headerRow;
   }
 
-  public Set<Integer> getColumnProjection() {
+  public List<Integer> getColumnProjection() {
     return columnProjection;
   }
 
-  public void setColumnProjection(Set<Integer> columnProjection) {
+  public void setColumnProjection(List<Integer> columnProjection) {
     this.columnProjection = columnProjection;
   }
 

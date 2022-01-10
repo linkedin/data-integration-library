@@ -71,4 +71,11 @@ every job execution, and then the updated access token can be read in through se
 access token is read in through secondary input, it is stored in a variable. And that variable can then
 be referenced in the `token` field. 
 
+## Example 3: Custom Token Authentication
+
+The following configuration works for an API that requires "x-apikey" header, instead of "Authorization" header. 
+The token should be provided directly without encryption.
+
+`ms.authentication={"method": "custom", "encryption": "none", "header": "x-apikey", "token": "xxxx"}`
+
 [back to summary](summary.md#msauthentication)
