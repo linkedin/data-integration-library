@@ -127,7 +127,7 @@ ext.externalDependency = [
     "googleAnalytics": "com.google.apis:google-api-services-analytics:v3-rev134-1.22.0",
     "googleDrive": "com.google.apis:google-api-services-drive:v3-rev42-1.22.0",
     "googleWebmasters": "com.google.apis:google-api-services-webmasters:v3-rev17-1.22.0",
-    "opencsv": "com.opencsv:opencsv:3.8",
+    "opencsv": "com.opencsv:opencsv:3.9",
     "grok": "io.thekraken:grok:0.1.5",
     "hadoopAdl" : "org.apache.hadoop:hadoop-azure-datalake:3.0.0-alpha2",
     "orcMapreduce":"org.apache.orc:orc-mapreduce:1.6.5:nohive",

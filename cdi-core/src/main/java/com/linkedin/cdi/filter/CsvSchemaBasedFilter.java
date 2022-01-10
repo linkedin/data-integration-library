@@ -5,7 +5,6 @@
 package com.linkedin.cdi.filter;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.linkedin.cdi.keys.CsvExtractorKeys;
 import com.linkedin.cdi.util.JsonIntermediateSchema;
 import java.util.Arrays;
@@ -13,8 +12,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
 /**
@@ -26,41 +23,22 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
 public class CsvSchemaBasedFilter extends MultistageSchemaBasedFilter<String[]> {
   private static final Logger LOG = LoggerFactory.getLogger(CsvSchemaBasedFilter.class);
   final private CsvExtractorKeys csvExtractorKeys;
-  final private JsonArray schemaArray;
 
   public CsvSchemaBasedFilter(JsonArray schema, CsvExtractorKeys csvExtractorKeys) {
     super(new JsonIntermediateSchema(schema));
     this.csvExtractorKeys = csvExtractorKeys;
-    this.schemaArray = schema;
   }
 
   @Override
   public String[] filter(String[] input) {
-    List<Integer> columnProjection = csvExtractorKeys.getColumnProjection();
-
-    if (columnProjection.isEmpty()
-        && csvExtractorKeys.getHeaderRow() != null
-        && csvExtractorKeys.getIsValidOutputSchema()) {
-      // use the header and schema to generate column projection, then filter
-      String[] headerRow = csvExtractorKeys.getHeaderRow();
-      for (JsonElement column: schemaArray) {
-        for (int i = 0; i < headerRow.length; i++) {
-          if (headerRow[i].equalsIgnoreCase(column.getAsJsonObject().get(KEY_WORD_COLUMN_NAME).getAsString())) {
-            columnProjection.add(i);
-          }
-        }
-      }
-      csvExtractorKeys.setColumnProjection(columnProjection);
+    if (!csvExtractorKeys.getColumnProjection().isEmpty()) {
+      return filter(input, csvExtractorKeys.getColumnProjection());
     }
 
-    if (columnProjection.size() > 0) {
-      return filter(input, columnProjection);
-    } else {
-      LOG.info("Defaulting to project first N columns");
-      // take first N column, where N is the number of columns in the schema
-      // if the schema's size larger than input, then the extra columns will be padded with null
-      return Arrays.copyOf(input, schema.getColumns().size());
-    }
+    // LOG.debug("Defaulting to project first N columns");
+    // take first N column, where N is the number of columns in the schema
+    // if the schema's size larger than input, then the extra columns will be padded with null
+    return Arrays.copyOf(input, schema.getColumns().size());
   }
 
   /**
@@ -77,6 +55,12 @@ public class CsvSchemaBasedFilter extends MultistageSchemaBasedFilter<String[]> 
     String[] output = new String[columnProjection.size()];
     for (int i = 0; i < output.length; i++) {
       if (columnProjection.get(i) < input.length) {
+        if (columnProjection.get(i) >= input.length) {
+          LOG.info("Input columns: {}", input.length);
+          LOG.info("Column projection at position {} is {}", i, columnProjection.get(i));
+          LOG.info("Input: {}", Arrays.toString(input));
+          throw new RuntimeException("Index in column projection out of bound");
+        }
         output[i] = input[columnProjection.get(i)];
       } else {
         output[i] = StringUtils.EMPTY;

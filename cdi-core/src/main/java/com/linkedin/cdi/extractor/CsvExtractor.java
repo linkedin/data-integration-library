@@ -5,15 +5,14 @@
 package com.linkedin.cdi.extractor;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.linkedin.cdi.configuration.StaticConstants;
 import com.linkedin.cdi.filter.CsvSchemaBasedFilter;
 import com.linkedin.cdi.keys.CsvExtractorKeys;
 import com.linkedin.cdi.keys.ExtractorKeys;
@@ -21,7 +20,6 @@ import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.preprocessor.InputStreamProcessor;
 import com.linkedin.cdi.preprocessor.StreamProcessor;
 import com.linkedin.cdi.util.JsonIntermediateSchema;
-import com.linkedin.cdi.util.JsonUtils;
 import com.linkedin.cdi.util.SchemaBuilder;
 import com.linkedin.cdi.util.SchemaUtils;
 import com.opencsv.CSVParser;
@@ -46,7 +44,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.WorkUnitState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 
 import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
@@ -151,11 +148,14 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
       String[] row = readerIterator.next();
       CsvSchemaBasedFilter csvSchemaBasedFilter = (CsvSchemaBasedFilter) rowFilter;
       if (csvSchemaBasedFilter != null) {
-        row = csvSchemaBasedFilter.filter(row);
-        // when column projection is specified, the filter data should be the same size as the column projection
-        if (csvExtractorKeys.getColumnProjection().size() > 0 && row.length != csvExtractorKeys.getColumnProjection()
-            .size()) {
-          failWorkUnit("Some indicies in column projection are out of bound");
+        try {
+          if (csvExtractorKeys.getColumnProjection().isEmpty()
+              && csvExtractorKeys.getHeaderRow() != null) {
+            csvExtractorKeys.setColumnProjection(mapColumnsDynamically(this.getSchemaArray()));
+          }
+          row = csvSchemaBasedFilter.filter(row);
+        } catch (Exception e) {
+          failWorkUnit("CSV column projection error");
         }
       }
       return addDerivedFields(row);
@@ -448,5 +448,32 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
   @Override
   protected boolean isFirst(long starting) {
     return csvExtractorKeys.getCsvIterator() == null;
+  }
+
+  /**
+   * Dynamically map column index to defined schema
+   * This dynamic column projection should be called no more than once for each batch
+   * @param schemaArray defined schema array
+   * @return dynamically mapped column projection
+   */
+  private List<Integer> mapColumnsDynamically(JsonArray schemaArray) {
+    if (!csvExtractorKeys.getColumnProjection().isEmpty()) {
+      return csvExtractorKeys.getColumnProjection();
+    }
+
+    List<Integer> columnProjection = Lists.newArrayList();
+    if (csvExtractorKeys.getHeaderRow() != null
+        && csvExtractorKeys.getIsValidOutputSchema()) {
+      // use the header and schema to generate column projection, then filter
+      String[] headerRow = csvExtractorKeys.getHeaderRow();
+      for (JsonElement column: schemaArray) {
+        for (int i = 0; i < headerRow.length; i++) {
+          if (headerRow[i].equalsIgnoreCase(column.getAsJsonObject().get(KEY_WORD_COLUMN_NAME).getAsString())) {
+            columnProjection.add(i);
+          }
+        }
+      }
+    }
+    return columnProjection;
   }
 }
