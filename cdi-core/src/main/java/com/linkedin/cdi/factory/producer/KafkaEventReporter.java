@@ -68,7 +68,7 @@ public class KafkaEventReporter implements EventReporter<IndexedRecord> {
 
   @Override
   public void close() {
-    if (producer != null && producer instanceof Closeable) {
+    if (producer != null) {
       producer.close();
     }
   }
