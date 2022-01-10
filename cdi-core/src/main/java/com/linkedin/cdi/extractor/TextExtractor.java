@@ -26,8 +26,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
 import javax.annotation.Nullable;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.gobblin.configuration.WorkUnitState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,15 +35,18 @@ import org.testng.Assert;
 /**
  * TextExtractor takes an InputStream, applies proper preprocessors, and returns a String output
  */
-@Slf4j
 public class TextExtractor extends MultistageExtractor<JsonArray, JsonObject> {
-  private static final Logger logger = LoggerFactory.getLogger(TextExtractor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TextExtractor.class);
 
   private final static int TEXT_EXTRACTOR_BYTE_LIMIT = 1048576;
   private final static int BUFFER_SIZE = 8192;
   private final static String TEXT_EXTRACTOR_SCHEMA =
       "[{\"columnName\":\"output\",\"isNullable\":true,\"dataType\":{\"type\":\"string\"}}]";
-  @Getter
+
+  public JsonExtractorKeys getJsonExtractorKeys() {
+    return jsonExtractorKeys;
+  }
+
   private JsonExtractorKeys jsonExtractorKeys = new JsonExtractorKeys();
 
   public TextExtractor(WorkUnitState state, JobKeys jobKeys) {
@@ -100,7 +101,7 @@ public class TextExtractor extends MultistageExtractor<JsonArray, JsonObject> {
       this.jsonExtractorKeys.setTotalCount(1);
       StringBuffer output = new StringBuffer();
       if (workUnitStatus.getBuffer() == null) {
-        logger.warn("Received a NULL InputStream, end the work unit");
+        LOG.warn("Received a NULL InputStream, end the work unit");
         return null;
       } else {
         try {
@@ -118,7 +119,7 @@ public class TextExtractor extends MultistageExtractor<JsonArray, JsonObject> {
           JsonObject outputJson = addDerivedFields(jsonObject);
           return outputJson;
         } catch (Exception e) {
-          logger.error("Error while extracting from source or writing to target", e);
+          LOG.error("Error while extracting from source or writing to target", e);
           this.state.setWorkingState(WorkUnitState.WorkingState.FAILED);
           return null;
         }
@@ -142,12 +143,12 @@ public class TextExtractor extends MultistageExtractor<JsonArray, JsonObject> {
         output.append(String.valueOf(buffer, 0, len));
         totalBytes += len;
         if (totalBytes > TEXT_EXTRACTOR_BYTE_LIMIT) {
-          logger.warn("Download limit of {} bytes reached for text extractor ", TEXT_EXTRACTOR_BYTE_LIMIT);
+          LOG.warn("Download limit of {} bytes reached for text extractor ", TEXT_EXTRACTOR_BYTE_LIMIT);
           break;
         }
       }
       is.close();
-      logger.info("TextExtractor: written {} bytes ", totalBytes);
+      LOG.info("TextExtractor: written {} bytes ", totalBytes);
     } catch (IOException e) {
       throw new RuntimeException("Unable to extract text in TextExtractor", e);
     }
