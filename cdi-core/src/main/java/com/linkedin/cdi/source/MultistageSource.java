@@ -11,7 +11,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.linkedin.cdi.event.EventHelper;
 import com.linkedin.cdi.extractor.MultistageExtractor;
+import com.linkedin.cdi.factory.producer.EventReporter;
+import com.linkedin.cdi.factory.producer.EventReporterFactory;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.util.EndecoUtils;
 import com.linkedin.cdi.util.WatermarkDefinition;
@@ -77,6 +80,7 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
   // Avoid too many partition created from misconfiguration, Months * Days * Hours
 
   protected SourceState sourceState = null;
+  protected EventReporter eventReporter;
   JobKeys jobKeys = new JobKeys();
 
   public SourceState getSourceState() {
@@ -110,6 +114,12 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
   public List<WorkUnit> getWorkunits(SourceState state) {
     sourceState = state;
     initialize(state);
+    eventReporter = MSTAGE_METRICS_ENABLED.get(state) ? EventReporterFactory.getEventReporter(state) : null;
+
+    if (eventReporter != null) {
+      // JobKeys initialization event
+      eventReporter.send(EventHelper.createInitializationEvent(state, getClass().getName()));
+    }
 
     if (!jobKeys.validate(state)) {
       throw new RuntimeException("Some parameters are invalid, job will do nothing until they are fixed.");
@@ -169,6 +179,11 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
         // and payloads will not be loaded until the Connection executes the command
         wu.setProp(MSTAGE_PAYLOAD_PROPERTY.toString(), payloads);
     }
+
+    if (eventReporter != null) {
+      // Send workunit creation event
+      eventReporter.send(EventHelper.createWorkunitCreationEvent(state,wuList,getClass().getName()));
+    }
     return wuList;
   }
 
@@ -203,6 +218,10 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
     for (MultistageExtractor<S, D> extractor: extractorState.keySet()) {
       extractor.closeConnection();
     }
+    if (eventReporter != null) {
+      eventReporter.close();
+    }
+
   }
 
   List<WorkUnit> generateWorkUnits(List<WatermarkDefinition> definitions, Map<String, Long> previousHighWatermarks) {

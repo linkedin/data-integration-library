@@ -179,5 +179,8 @@ ext.externalDependency = [
     "gobblin-runtime": "org.apache.gobblin:gobblin-runtime:" + gobblinVersion,
     "gobblin-sql": "org.apache.gobblin:gobblin-sql:" + gobblinVersion,
     "gobblin-utility": "org.apache.gobblin:gobblin-utility:" + gobblinVersion,
-    "commonsValidator": "commons-validator:commons-validator:1.6"
+    "commonsValidator": "commons-validator:commons-validator:1.6",
+    "li-apache-kafka-clients" : "com.linkedin.kafka.clients:li-apache-kafka-clients:1.0.39",
+    "kafkaAvroSerde" : "io.confluent:kafka-streams-avro-serde:5.5.1"
+
 ]
