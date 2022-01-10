@@ -6,7 +6,7 @@ buildscript {
   ext.avroVersion = '1.8.1'
   ext.awsVersion = '2.10.15'
   ext.findBugsVersion = '3.0.0'
-  ext.gobblinVersion = '0.15.0-dev-9467'
+  ext.gobblinVersion = '0.17.0-dev-174'
   ext.hadoopVersion = '2.3.0'
   ext.hiveVersion = '1.0.1'
   ext.javaVersion = JavaVersion.VERSION_1_8

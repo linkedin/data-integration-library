@@ -34,6 +34,7 @@ dependencies {
   compile externalDependency.'commonsLang3'
   compile externalDependency.'testng'
   compile externalDependency.'jhyde'
+  compile externalDependency.'opencsv'
 
   runtime externalDependency.'gobblin-azkaban'
   runtime externalDependency.'gobblin-kafka-08'
@@ -75,6 +76,7 @@ configurations {
   all*.exclude group: 'ch.qos.logback'
   all*.exclude group: 'com.ibm.icu', module: 'icu4j'
   all*.exclude group: 'org.pentaho'
+  all*.exclude group: 'org.slf4j', module: 'log4j-over-slf4j'
 }
 
 shadowJar {
