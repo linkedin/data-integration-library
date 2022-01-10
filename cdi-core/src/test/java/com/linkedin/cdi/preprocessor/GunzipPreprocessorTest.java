@@ -20,11 +20,7 @@ public class GunzipPreprocessorTest {
   void testGunzip() throws IOException {
     InputStream inputStream = getClass().getResourceAsStream("/gzip/cc-index.paths.gz");
     GunzipProcessor preprocessor = new GunzipProcessor(null);
-    CSVReader reader = new CSVReaderBuilder(new InputStreamReader(preprocessor.process(inputStream)))
-        .withCSVParser(new CSVParserBuilder().withSeparator(',').build())
-        .withSkipLines(0)
-        .build();
-
+    CSVReader reader = new CSVReader(new InputStreamReader(preprocessor.process(inputStream)),',');
     Assert.assertEquals(302, reader.readAll().size());
   }
 

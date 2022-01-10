@@ -65,10 +65,7 @@ public class GpgPreprocessorTest {
     params.addProperty("action", "decrypt");
     GpgDecryptProcessor preprocessor = new GpgDecryptProcessor(params);
     Whitebox.setInternalState(preprocessor, "codec", mockedCodec);
-    CSVReader reader = new CSVReaderBuilder(new InputStreamReader(preprocessor.process(inputStream)))
-        .withCSVParser(new CSVParserBuilder().withSeparator(',').build())
-        .withSkipLines(0)
-        .build();
+    CSVReader reader = new CSVReader(new InputStreamReader(preprocessor.process(inputStream)),',');
 
     Assert.assertEquals(2, reader.readAll().size());
   }
@@ -84,10 +81,7 @@ public class GpgPreprocessorTest {
     params.addProperty("keystore_password", "gpgTest");
     GpgDecryptProcessor preprocessor = new GpgDecryptProcessor(params);
     Whitebox.setInternalState(preprocessor, "codec", mockedCodec);
-    CSVReader reader = new CSVReaderBuilder(new InputStreamReader(preprocessor.process(inputStream)))
-        .withCSVParser(new CSVParserBuilder().withSeparator(',').build())
-        .withSkipLines(0)
-        .build();
+    CSVReader reader = new CSVReader(new InputStreamReader(preprocessor.process(inputStream)), ',');
 
     Assert.assertEquals(2, reader.readAll().size());
   }
