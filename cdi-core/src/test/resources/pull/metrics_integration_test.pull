@@ -1,0 +1,45 @@
+## This is a dummy file to reference the metrics usagegit
+source.class=com.linkedin.cdi.source.SftpSource
+ms.extractor.class=com.linkedin.cdi.extractor.CsvExtractor
+ms.connection.client.factory=com.linkedin.cdi.factory.DefaultConnectionClientFactory
+
+converter.classes=org.apache.gobblin.converter.csv.CsvToJsonConverterV2,org.apache.gobblin.converter.avro.JsonIntermediateToAvroConverter
+dataset.urn=com.linkedin.metrics.test
+
+extract.namespace=metrics_test
+extract.table.name=metricsDemo
+extract.table.type=SNAPSHOT_ONLY
+extract.is.full=true
+
+job.name=Test Integration pull file for metrics usage
+taskexecutor.threadpool.size=1
+gobblin.log.levelOverride=INFO
+
+converter.avro.max.conversion.failures=10
+ms.source.uri=/user/test.csv
+
+state.store.type=fs
+fs.uri=file://localhost/
+state.store.fs.uri=file://localhost/
+data.publisher.final.dir=/tmp/gobblin/job-output/${extract.table.name}
+
+writer.destination.type=HDFS
+writer.output.format=AVRO
+
+source.conn.username=test_user
+source.conn.host=ftp.example.com
+source.conn.private.key=/path/to/private_key
+source.conn.port=22
+ms.sftp.conn.timeout.millis=60000
+
+ms.csv={"columnHeaderIndex": 0, "fieldSeparator": "|"}
+
+ms.metrics.enabled=true
+ms.kafka.events.topic.name=CdiTrackingEvent
+bootstrap.servers=kafka.test.company.com:<port>
+value.serializer=io.confluent.kafka.serializers.KafkaAvroSerializer
+kafka.schemaRegistry.class=org.apache.gobblin.kafka.schemareg.LiKafkaSchemaRegistry
+kafka.schemaRegistry.url=http://schemaregistry.test.company.com:<port>/schemaRegistry/schemas
+
+# ssl properties
+## Refer to https://kafka.apache.org/documentation/#producerconfigs for SSL properties

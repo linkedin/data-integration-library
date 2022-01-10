@@ -6,5 +6,5 @@
 
 <suppressions>
   <suppress checks=".*"
-            files="^(.*gen-java.*)|(.*mainGenerated.*)$"/>
+            files="^(.*gen-java.*)|(.*mainGenerated.*)|(.*generatedJava.*)$"/>
 </suppressions>
