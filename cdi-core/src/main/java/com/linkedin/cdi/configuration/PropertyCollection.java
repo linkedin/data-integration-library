@@ -144,8 +144,16 @@ public interface PropertyCollection {
   StringProperties MSTAGE_JDBC_STATEMENT = new StringProperties("ms.jdbc.statement");
   StringProperties MSTAGE_KAFKA_BROKERS = new StringProperties("ms.kafka.brokers");
   StringProperties MSTAGE_KAFKA_SCHEMA_REGISTRY_URL = new StringProperties("ms.kafka.schema.registry.url");
+  StringProperties MSTAGE_KAFKA_SCHEMA_REGISTRY_CLASS = new StringProperties("ms.kafka.schema.registry.class");
   StringProperties MSTAGE_KAFKA_CLIENT_ID = new StringProperties("ms.kafka.clientId");
   StringProperties MSTAGE_KAFKA_TOPIC_NAME = new StringProperties("ms.kafka.audit.topic.name");
+  StringProperties MSTAGE_KAFKA_EVENT_TOPIC_NAME = new StringProperties("ms.kafka.events.topic.name");
+  BooleanProperties MSTAGE_METRICS_ENABLED = new BooleanProperties("ms.metrics.enabled", Boolean.FALSE);
+  StringProperties MSTAGE_KAFKA_VALUE_SERIALIZER = new StringProperties("ms.kafka.value.serializer");
+  StringProperties MSTAGE_KAFKA_KEY_SERIALIZER = new StringProperties("ms.kafka.key.serializer");
+  StringProperties MSTAGE_REPORTER_CLASS = new StringProperties("ms.reporter.class",
+      "com.linkedin.cdi.factory.producer.KafkaEventReporter");
+
 
   // default: 500, minimum: 1, maximum: -
   LongProperties MSTAGE_NORMALIZER_BATCH_SIZE = new LongProperties("ms.normalizer.batch.size", 500L, Long.MAX_VALUE, 1L);

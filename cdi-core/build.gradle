@@ -1,4 +1,30 @@
+plugins {
+  id "com.commercehub.gradle.plugin.avro-base" version "0.9.1"
+}
+
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.commercehub.gradle.plugin.avro-base'
+
+task generateAvro(type: com.commercehub.gradle.plugin.avro.GenerateAvroJavaTask) {
+  source("src/main/avro")
+  outputDir = file("src/main/generatedJava")
+}
+
+compileJava {
+  dependsOn tasks.generateAvro
+}
+
+sourceSets {
+  main {
+    java {
+      srcDir 'src/main/generatedJava'
+    }
+    resources {
+      srcDir 'src/main/avro'
+    }
+  }
+}
+
 jacoco {
   toolVersion = '0.8.0'
 }
@@ -34,6 +60,7 @@ dependencies {
   compile externalDependency.'commonsLang3'
   compile externalDependency.'testng'
   compile externalDependency.'jhyde'
+  compile externalDependency.'li-apache-kafka-clients'
   compile externalDependency.'opencsv'
 
   runtime externalDependency.'gobblin-azkaban'
@@ -44,6 +71,7 @@ dependencies {
   runtime externalDependency.'gobblin-sql'
   runtime externalDependency.'gson'
   runtime externalDependency.'jodaTime'
+  //runtime externalDependency.'kafkaAvroSerde'
 
   testCompile externalDependency.'jmockit'
   testCompile externalDependency.'powermock-core'

@@ -4,9 +4,7 @@
 
 package com.linkedin.cdi.factory;
 
-import com.jcraft.jsch.Session;
 import com.linkedin.cdi.factory.reader.SchemaReader;
-import com.linkedin.cdi.factory.sftp.SftpChannelClient;
 import com.linkedin.cdi.factory.sftp.SftpClient;
 import java.sql.Connection;
 import org.apache.gobblin.configuration.State;
