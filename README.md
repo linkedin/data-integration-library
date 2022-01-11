@@ -64,10 +64,11 @@ To contribute, please use submit Pull Request (PR) for committers to merge.
 
 # User Guides
 
-- [1. Job Properties](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/summary.md)
-- [2. Job Properties by Category](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/categories.md)
-- [3. Deprecated Job Properties](https://github.com/linkedin/data-integration-library/blob/master/docs/parameters/deprecated.md)
+- [1. Job Properties](docs/parameters/summary.md)
+- [2. Job Properties by Category](docs/parameters/categories.md)
+- [3. Deprecated Job Properties](docs/parameters/deprecated.md)
 - [4. Flow Design Patterns](docs/patterns/summary.md)
 - [5. How-tos](docs/how-to/summary.md)
 - [6. Key Concepts](docs/concepts/summary.md)
-- [7. Sample Flow Configurations](docs/sample-configs/summary.md)
+- [7. Key Components](docs/components/summary.md)
+- [8. Sample Flow Configurations](docs/sample-configs/summary.md)
