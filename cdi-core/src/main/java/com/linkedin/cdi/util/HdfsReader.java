@@ -212,7 +212,7 @@ public class HdfsReader {
       if (valueObject == null || fieldType == Schema.Type.NULL) {
         jsonObject.add(field, JsonNull.INSTANCE);
       } else if (fieldType == Schema.Type.STRING) {
-        jsonObject.addProperty(field, EncryptionUtils.decryptGobblin(valueObject.toString(), state));
+        jsonObject.addProperty(field, SecretManager.getInstance(state).decrypt(valueObject.toString()));
       } else if (fieldType == Schema.Type.ARRAY) {
         jsonObject.add(field, gson.fromJson(valueObject.toString(), JsonArray.class));
       } else if (fieldType == Schema.Type.RECORD) {

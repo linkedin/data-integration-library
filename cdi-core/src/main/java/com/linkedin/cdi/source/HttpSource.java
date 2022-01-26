@@ -10,7 +10,7 @@ import com.google.gson.reflect.TypeToken;
 import com.linkedin.cdi.connection.HttpConnection;
 import com.linkedin.cdi.extractor.MultistageExtractor;
 import com.linkedin.cdi.keys.HttpKeys;
-import com.linkedin.cdi.util.EncryptionUtils;
+import com.linkedin.cdi.util.SecretManager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -124,7 +124,7 @@ public class HttpSource extends MultistageSource<Schema, GenericRecord> {
     JsonObject decrypted = new JsonObject();
     for (Map.Entry<String, JsonElement> entry: headers.entrySet()) {
       String key = entry.getKey();
-      decrypted.addProperty(key, EncryptionUtils.decryptGobblin(headers.get(key).getAsString(), state));
+      decrypted.addProperty(key, SecretManager.getInstance(state).decrypt(headers.get(key).getAsString()));
     }
     return decrypted;
   }

@@ -40,19 +40,19 @@ public class EncryptionUtilsTest extends PowerMockTestCase {
   @Test
   void testDecryption() {
     when(passwordManager.readPassword(ENC_PASSWORD)).thenReturn(PLAIN_PASSWORD);
-    Assert.assertEquals(EncryptionUtils.decryptGobblin(ENC_PASSWORD, state), PLAIN_PASSWORD);
-    Assert.assertEquals(EncryptionUtils.decryptGobblin(PLAIN_PASSWORD, state), PLAIN_PASSWORD);
+    Assert.assertEquals(SecretManager.getInstance(state).decrypt(ENC_PASSWORD), PLAIN_PASSWORD);
+    Assert.assertEquals(SecretManager.getInstance(state).decrypt(PLAIN_PASSWORD), PLAIN_PASSWORD);
   }
 
   @Test
   void testEncryption() {
     when(passwordManager.encryptPassword(PLAIN_PASSWORD)).thenReturn(ENC_PASSWORD);
     when(passwordManager.readPassword(ENC_PASSWORD)).thenReturn(PLAIN_PASSWORD);
-    Assert.assertEquals(EncryptionUtils.decryptGobblin(EncryptionUtils.encryptGobblin(PLAIN_PASSWORD, state), state),
+    Assert.assertEquals(SecretManager.getInstance(state).decrypt(SecretManager.getInstance(state).encrypt(PLAIN_PASSWORD)),
         PLAIN_PASSWORD);
 
     when(passwordManager.encryptPassword(ENC_PASSWORD)).thenReturn(ENC_PASSWORD);
-    Assert.assertEquals(EncryptionUtils.decryptGobblin(EncryptionUtils.encryptGobblin(ENC_PASSWORD, state), state),
+    Assert.assertEquals(SecretManager.getInstance(state).decrypt(SecretManager.getInstance(state).encrypt(ENC_PASSWORD)),
         PLAIN_PASSWORD);
   }
 

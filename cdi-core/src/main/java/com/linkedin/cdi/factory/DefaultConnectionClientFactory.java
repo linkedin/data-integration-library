@@ -8,7 +8,7 @@ import com.linkedin.cdi.factory.reader.JsonFileReader;
 import com.linkedin.cdi.factory.reader.SchemaReader;
 import com.linkedin.cdi.factory.sftp.SftpChannelClient;
 import com.linkedin.cdi.factory.sftp.SftpClient;
-import com.linkedin.cdi.util.EncryptionUtils;
+import com.linkedin.cdi.util.SecretManager;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import org.apache.gobblin.configuration.State;
@@ -63,9 +63,9 @@ public class DefaultConnectionClientFactory implements ConnectionClientFactory {
   public Connection getJdbcConnection(String jdbcUrl, String userId, String cryptedPassword, State state) {
     try {
       return DriverManager.getConnection(
-          EncryptionUtils.decryptGobblin(jdbcUrl, state),
-          EncryptionUtils.decryptGobblin(userId, state),
-          EncryptionUtils.decryptGobblin(cryptedPassword, state));
+          SecretManager.getInstance(state).decrypt(jdbcUrl),
+          SecretManager.getInstance(state).decrypt(userId),
+          SecretManager.getInstance(state).decrypt(cryptedPassword));
     } catch (Exception e) {
       LOG.error("Error creating JDBC connection", e);
       throw new RuntimeException(e);

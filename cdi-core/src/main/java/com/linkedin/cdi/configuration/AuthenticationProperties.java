@@ -7,7 +7,7 @@ package com.linkedin.cdi.configuration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
-import com.linkedin.cdi.util.EncryptionUtils;
+import com.linkedin.cdi.util.SecretManager;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -85,10 +85,10 @@ public class AuthenticationProperties extends JsonObjectProperties {
 
     String token = "";
     if (authentication.has(KEY_WORD_TOKEN)) {
-      token = EncryptionUtils.decryptGobblin(authentication.get(KEY_WORD_TOKEN).getAsString(), state);
+      token = SecretManager.getInstance(state).decrypt(authentication.get(KEY_WORD_TOKEN).getAsString());
     } else {
-      String u = EncryptionUtils.decryptGobblin(SOURCE_CONN_USERNAME.get(state), state);
-      String p = EncryptionUtils.decryptGobblin(SOURCE_CONN_PASSWORD.get(state), state);
+      String u = SecretManager.getInstance(state).decrypt(SOURCE_CONN_USERNAME.get(state));
+      String p = SecretManager.getInstance(state).decrypt(SOURCE_CONN_PASSWORD.get(state));
       token = u + ":" + p;
     }
 

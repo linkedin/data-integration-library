@@ -44,17 +44,6 @@ public class JsonParameterTest {
   }
 
   @Test
-  public void testParameterEncryption() {
-    String expected = "{\"test-parameter\":\"password\"}";
-    String encrypted = "ENC(M6nV+j0lhqZ36RgvuF5TQMyNvBtXmkPl)";
-    String masterKeyLoc = this.getClass().getResource("/key/master.key").toString();
-    SourceState state = new SourceState();
-    state.setProp(ENCRYPT_KEY_LOC.toString(), masterKeyLoc);
-    JsonArray jsonArray = gson.fromJson(new InputStreamReader(this.getClass().getResourceAsStream("/json/parameter-encryption.json")), JsonArray.class);
-    Assert.assertEquals(expected, JsonParameter.getParametersAsJsonString(jsonArray.toString(), new JsonObject(), state));
-  }
-
-  @Test
   public void testJsonParameterConstructor() {
     JsonObject object = new JsonObject();
     JsonParameter jsonParameter = new JsonParameter(null, object, state);
