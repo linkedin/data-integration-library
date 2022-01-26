@@ -11,19 +11,17 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import com.linkedin.cdi.configuration.StaticConstants;
 import com.linkedin.cdi.filter.JsonSchemaBasedFilter;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.keys.JsonExtractorKeys;
-import com.linkedin.cdi.util.EncryptionUtils;
 import com.linkedin.cdi.util.JsonUtils;
 import com.linkedin.cdi.util.ParameterTypes;
 import com.linkedin.cdi.util.SchemaBuilder;
+import com.linkedin.cdi.util.SecretManager;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -40,7 +38,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.WorkUnitState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 
 import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
@@ -555,7 +552,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
       // this function assumes that the final value to be encrypted will always be a JsonPrimitive object and in case of
       // of JsonObject it will iterate recursively.
       if (value.isJsonPrimitive() && encryptionFields.contains(new JsonPrimitive(absoluteKey))) {
-        String valStr = EncryptionUtils.encryptGobblin(value.isJsonNull() ? "" : value.getAsString(), state);
+        String valStr = SecretManager.getInstance(state).encrypt(value.isJsonNull() ? "" : value.getAsString());
         output.add(key, new JsonPrimitive(valStr));
       } else if (value.isJsonObject()) {
         output.add(key, encryptJsonFields(absoluteKey, value));

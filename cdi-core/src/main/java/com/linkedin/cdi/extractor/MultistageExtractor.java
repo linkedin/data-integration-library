@@ -19,7 +19,6 @@ import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.preprocessor.StreamProcessor;
 import com.linkedin.cdi.util.DateTimeUtils;
-import com.linkedin.cdi.util.EncryptionUtils;
 import com.linkedin.cdi.util.HdfsReader;
 import com.linkedin.cdi.util.InputStreamUtils;
 import com.linkedin.cdi.util.JsonIntermediateSchema;
@@ -27,6 +26,7 @@ import com.linkedin.cdi.util.JsonParameter;
 import com.linkedin.cdi.util.JsonUtils;
 import com.linkedin.cdi.util.ParameterTypes;
 import com.linkedin.cdi.util.SchemaBuilder;
+import com.linkedin.cdi.util.SecretManager;
 import com.linkedin.cdi.util.VariableUtils;
 import com.linkedin.cdi.util.WorkUnitStatus;
 import java.io.IOException;
@@ -378,7 +378,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
             for (Map.Entry<String, JsonElement> entry : preprocessorParams.entrySet()) {
               String key = entry.getKey();
               String value = preprocessorParams.get(key).getAsString();
-              String decryptedValue = EncryptionUtils.decryptGobblin(value, state);
+              String decryptedValue = SecretManager.getInstance(state).decrypt(value);
               preprocessorParams.addProperty(key, decryptedValue);
             }
           }
