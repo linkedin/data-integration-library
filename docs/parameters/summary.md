@@ -308,7 +308,7 @@ the primary inputs of job execution, which is its metadata, i.e, job configurati
 ## [ms.secret.manager.class](ms.secret.manager.class.md)
 
 `ms.secret.manager.class` specifies the SecretManager class to use for secrets
-and confidential data encryption and decryption.
+encryption and decryption.
 
 ## [ms.session.key.field](ms.session.key.field.md)
 
