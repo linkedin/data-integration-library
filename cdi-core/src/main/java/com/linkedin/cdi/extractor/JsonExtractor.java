@@ -18,6 +18,7 @@ import com.linkedin.cdi.filter.JsonSchemaBasedFilter;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.keys.JsonExtractorKeys;
+import com.linkedin.cdi.util.EncryptionUtils;
 import com.linkedin.cdi.util.JsonUtils;
 import com.linkedin.cdi.util.ParameterTypes;
 import com.linkedin.cdi.util.SchemaBuilder;
@@ -552,7 +553,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
       // this function assumes that the final value to be encrypted will always be a JsonPrimitive object and in case of
       // of JsonObject it will iterate recursively.
       if (value.isJsonPrimitive() && encryptionFields.contains(new JsonPrimitive(absoluteKey))) {
-        String valStr = SecretManager.getInstance(state).encrypt(value.isJsonNull() ? "" : value.getAsString());
+        String valStr = EncryptionUtils.encryptGobblin(value.isJsonNull() ? "" : value.getAsString(), state);
         output.add(key, new JsonPrimitive(valStr));
       } else if (value.isJsonObject()) {
         output.add(key, encryptJsonFields(absoluteKey, value));
