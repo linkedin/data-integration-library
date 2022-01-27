@@ -63,6 +63,7 @@ public class JdbcUtilsTest extends PowerMockTestCase {
    */
   @Test
   public void testParseColumnTypeNotNull() {
+    Assert.assertEquals(JdbcUtils.parseColumnType(Types.BIT), JsonElementTypes.BOOLEAN);
     Assert.assertEquals(JdbcUtils.parseColumnType(Types.BOOLEAN), JsonElementTypes.BOOLEAN);
     Assert.assertEquals(JdbcUtils.parseColumnType(Types.DATE), JsonElementTypes.TIMESTAMP);
     Assert.assertEquals(JdbcUtils.parseColumnType(Types.TIMESTAMP), JsonElementTypes.TIMESTAMP);
@@ -109,6 +110,7 @@ public class JdbcUtilsTest extends PowerMockTestCase {
    */
   @Test
   public void testParseColumnTypeNullable() {
+    Assert.assertEquals(JdbcUtils.parseColumnType(Types.BIT, true), JsonElementTypes.NULLABLEBOOLEAN);
     Assert.assertEquals(JdbcUtils.parseColumnType(Types.BOOLEAN, true), JsonElementTypes.NULLABLEBOOLEAN);
     Assert.assertEquals(JdbcUtils.parseColumnType(Types.DATE, true), JsonElementTypes.NULLABLETIMESTAMP);
     Assert.assertEquals(JdbcUtils.parseColumnType(Types.TIMESTAMP, true), JsonElementTypes.NULLABLETIMESTAMP);
