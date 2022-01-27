@@ -305,6 +305,11 @@ on a pattern. By default, it will replace all blank spaces, $, and @ to undersco
 Secondary inputs provides additional directives to job execution, in addition to
 the primary inputs of job execution, which is its metadata, i.e, job configurations. 
 
+## [ms.secret.manager.class](ms.secret.manager.class.md)
+
+`ms.secret.manager.class` specifies the SecretManager class to use for secrets
+encryption and decryption.
+
 ## [ms.session.key.field](ms.session.key.field.md)
 
 Session is a state management mechanism over stateless connections.

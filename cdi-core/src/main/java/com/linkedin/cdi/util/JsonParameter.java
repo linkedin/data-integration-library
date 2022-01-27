@@ -150,9 +150,8 @@ public class JsonParameter {
         break;
       case LIST:
         // allow encryption on LIST type parameters
-        parsedObject.addProperty(name, EncryptionUtils.decryptGobblin(
-            parseListParameter(paramObject.get("value"), state),
-            state));
+        parsedObject.addProperty(name, SecretManager.getInstance(state).decrypt(
+            parseListParameter(paramObject.get("value"), state)));
         break;
 
       case JSONARRAY:

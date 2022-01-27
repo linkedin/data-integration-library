@@ -10,7 +10,7 @@ import com.linkedin.cdi.factory.ConnectionClientFactory;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.keys.S3Keys;
-import com.linkedin.cdi.util.EncryptionUtils;
+import com.linkedin.cdi.util.SecretManager;
 import com.linkedin.cdi.util.WorkUnitStatus;
 import java.net.URI;
 import java.time.Duration;
@@ -198,8 +198,8 @@ public class S3Connection extends MultistageConnection {
     AwsCredentialsProvider credentialsProvider = AnonymousCredentialsProvider.create();
     if (StringUtils.isNotBlank(s3SourceV2Keys.getAccessKey()) || StringUtils.isNotEmpty(s3SourceV2Keys.getSecretId())) {
       AwsCredentials credentials =
-          AwsBasicCredentials.create(EncryptionUtils.decryptGobblin(s3SourceV2Keys.getAccessKey(), state),
-              EncryptionUtils.decryptGobblin(s3SourceV2Keys.getSecretId(), state));
+          AwsBasicCredentials.create(SecretManager.getInstance(state).decrypt(s3SourceV2Keys.getAccessKey()),
+              SecretManager.getInstance(state).decrypt(s3SourceV2Keys.getSecretId()));
       credentialsProvider = StaticCredentialsProvider.create(credentials);
     }
     return credentialsProvider;
