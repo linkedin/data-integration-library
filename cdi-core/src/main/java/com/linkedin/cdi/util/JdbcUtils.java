@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 
 public interface JdbcUtils {
   Map<Integer, JsonElementTypes> SQL_2_AVRO_TYPE_MAPPING = new ImmutableMap.Builder<Integer, JsonElementTypes>()
+      .put(Types.BIT, JsonElementTypes.BOOLEAN)
       .put(Types.BOOLEAN, JsonElementTypes.BOOLEAN)
 
       .put(Types.DATE, JsonElementTypes.TIMESTAMP)
