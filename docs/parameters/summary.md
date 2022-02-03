@@ -244,22 +244,9 @@ The choices are `toupper`, `tolower`, or `none`
 `ms.jdbc.statement` specifies the SQL statement for data retrieval. The value
 can be any validate statement on any JDBC source.
 
-## [ms.kafka.brokers](ms.kafka.brokers.md)
+## [ms.kafka](ms.kafka)
 
-This specifies the Kafka broker host, such as `kafka.corp.com:1234`
-
-## [ms.kafka.clientId](ms.kafka.clientId.md)
-
-This specifies the Kafka client id, such as `dil-audit`
-
-## [ms.kafka.schema.registry.url](ms.kafka.schema.registry.url.md)
-
-`ms.kafka.schema.registry.url` specifies the auditing schema registry URL.
-
-## [ms.kafka.audit.topic.name](ms.kafka.audit.topic.name.md)
-
-`ms.kafka.audit.topic.name` specifies the auditing topic name, where
-DIL wil send auditing events to if auditing is enabled.
+[`ms.kafka`](ms.kafka.md) specifies the Kafka producer config, all the essential producer config can be grouped under this object.  
 
 ## [ms.normalizer.batch.size](ms.normalizer.batch.size.md)
 

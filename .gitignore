@@ -55,5 +55,5 @@ package-lock.json
 
 # generated java files
 **/gen-java/
-
+**/generatedJava
 temp/
