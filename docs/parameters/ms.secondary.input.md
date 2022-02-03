@@ -20,7 +20,7 @@ the primary inputs of job execution, which is its metadata, i.e, job configurati
 
 `ms.secondary.input` property has attributes to support the following functions:
 
-- **location**: from where the HDFS data will be loaded as secondary input
+- **location**: a HDFS directory (not file) from where the data will be loaded as secondary input
 - **fields**: fields that needs to be extracted and added into the work unit state
 - **filters**: rules to include/exclude records from secondary input
 - **Tags**: specify the type of secondary input
