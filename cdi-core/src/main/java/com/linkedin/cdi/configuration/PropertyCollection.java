@@ -142,15 +142,8 @@ public interface PropertyCollection {
   JsonObjectProperties MSTAGE_HTTP_STATUS_REASONS = new JsonObjectProperties("ms.http.status.reasons");
   StringProperties MSTAGE_JDBC_SCHEMA_REFACTOR = new StringProperties("ms.jdbc.schema.refactor", "none");
   StringProperties MSTAGE_JDBC_STATEMENT = new StringProperties("ms.jdbc.statement");
-  StringProperties MSTAGE_KAFKA_BROKERS = new StringProperties("ms.kafka.brokers");
-  StringProperties MSTAGE_KAFKA_SCHEMA_REGISTRY_URL = new StringProperties("ms.kafka.schema.registry.url");
-  StringProperties MSTAGE_KAFKA_SCHEMA_REGISTRY_CLASS = new StringProperties("ms.kafka.schema.registry.class");
-  StringProperties MSTAGE_KAFKA_CLIENT_ID = new StringProperties("ms.kafka.clientId");
-  StringProperties MSTAGE_KAFKA_TOPIC_NAME = new StringProperties("ms.kafka.audit.topic.name");
-  StringProperties MSTAGE_KAFKA_EVENT_TOPIC_NAME = new StringProperties("ms.kafka.events.topic.name");
   BooleanProperties MSTAGE_METRICS_ENABLED = new BooleanProperties("ms.metrics.enabled", Boolean.FALSE);
-  StringProperties MSTAGE_KAFKA_VALUE_SERIALIZER = new StringProperties("ms.kafka.value.serializer");
-  StringProperties MSTAGE_KAFKA_KEY_SERIALIZER = new StringProperties("ms.kafka.key.serializer");
+  KafkaProperties MSTAGE_KAFKA_PROPERTIES = new KafkaProperties("ms.kafka");
   StringProperties MSTAGE_REPORTER_CLASS = new StringProperties("ms.reporter.class",
       "com.linkedin.cdi.factory.producer.KafkaEventReporter");
 
@@ -343,10 +336,7 @@ public interface PropertyCollection {
       MSTAGE_HTTP_STATUS_REASONS,
       MSTAGE_JDBC_SCHEMA_REFACTOR,
       MSTAGE_JDBC_STATEMENT,
-      MSTAGE_KAFKA_BROKERS,
-      MSTAGE_KAFKA_SCHEMA_REGISTRY_URL,
-      MSTAGE_KAFKA_CLIENT_ID,
-      MSTAGE_KAFKA_TOPIC_NAME,
+      MSTAGE_KAFKA_PROPERTIES,
       MSTAGE_NORMALIZER_BATCH_SIZE,
       MSTAGE_OUTPUT_SCHEMA,
       MSTAGE_PAGINATION,

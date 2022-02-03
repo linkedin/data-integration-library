@@ -8,6 +8,13 @@ The following job properties are essential for auditing function:
 - [ms.kafka.schema.registry.url](ms.kafka.schema.registry.url.md)
 - [ms.kafka.audit.topic.name](ms.kafka.audit.topic.name.md)
 
+# Monitoring Properties
+
+The following job properties are essential for monitoring:
+
+- [ms.metrics.enabled](ms.metrics.enabled.md)
+- [ms.kafka](ms.kafka.md)
+
 # Authentication Properties
 
 The following are related to authentication:
