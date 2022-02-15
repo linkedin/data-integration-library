@@ -1,0 +1,35 @@
+# This job uses IMDB public dataset available at https://www.imdb.com/interfaces/
+
+source.class=com.linkedin.cdi.source.HttpSource
+ms.extract.preprocessors=com.linkedin.cdi.preprocessor.GunzipProcessor
+ms.extractor.class=com.linkedin.cdi.extractor.CsvExtractor
+converter.classes=org.apache.gobblin.converter.csv.CsvToJsonConverterV2,org.apache.gobblin.converter.avro.JsonIntermediateToAvroConverter
+ms.http.client.factory=com.linkedin.cdi.factory.DefaultConnectionClientFactory
+
+dataset.urn=com.cdi.example.imdb.ratings
+extract.namespace=imdb
+extract.table.name=title_ratings
+extract.table.type=SNAPSHOT_ONLY
+extract.is.full=true
+job.name=ImdbTitleRatings
+
+ms.output.schema=[{"columnName":"tconst","isNullable":"true","dataType":{"type":"string"}},{"columnName":"averageRating","isNullable":"true","dataType":{"type":"string"}},{"columnName":"numVotes","isNullable":"true","dataType":{"type":"string"}}]
+ms.source.uri=https://datasets.imdbws.com/title.ratings.tsv.gz
+
+ms.csv={"columnHeaderIndex": 0, "fieldSeparator": "u0009"}
+ms.http.statuses={"success": [200, 201, 202], "warning": [404]}
+ms.http.request.method=GET
+
+ms.http.response.type={"Content-Type":"binary/octet-stream"}
+
+fs.uri=file://localhost/
+state.store.fs.uri=file://localhost/
+data.publisher.final.dir=/tmp/gobblin/job-output
+
+writer.destination.type=HDFS
+writer.output.format=AVRO
+
+taskexecutor.threadpool.size=1
+workunit.retry.enabled=false
+task.maxretries=0
+Xmx=1G

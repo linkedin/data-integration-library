@@ -61,7 +61,10 @@ dependencies {
   compile externalDependency.'testng'
   compile externalDependency.'jhyde'
   compile externalDependency.'li-apache-kafka-clients'
-  compile externalDependency.'opencsv'
+  //compile externalDependency.'opencsv'
+  implementation(externalDependency.'opencsv') {
+    force = true
+  }
 
   runtime externalDependency.'gobblin-azkaban'
   runtime externalDependency.'gobblin-kafka-08'

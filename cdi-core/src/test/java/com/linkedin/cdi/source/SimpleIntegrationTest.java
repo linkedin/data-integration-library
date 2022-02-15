@@ -14,8 +14,17 @@ public class SimpleIntegrationTest {
   @Test(enabled = false)
   void fileDumpJobTask() throws Exception {
     Logger.getRootLogger().setLevel(Level.INFO);
-    EmbeddedGobblin job = new EmbeddedGobblin("SimpleIntegrationTest Job");
+    EmbeddedGobblin job = new EmbeddedGobblin("SimpleIntegrationTestJob");
     Assert.assertTrue(job.jobFile(getClass().getResource("/pull/metrics_integration_test.pull").getPath())
+        .run()
+        .isSuccessful());
+  }
+
+  @Test(enabled = false)
+  void httpIntegrationTask() throws Exception {
+    Logger.getRootLogger().setLevel(Level.INFO);
+    EmbeddedGobblin job = new EmbeddedGobblin("IMDB_Ratings_ingestion");
+    Assert.assertTrue(job.jobFile(getClass().getResource("/pull/imdb-example.pull").getPath())
         .run()
         .isSuccessful());
   }
