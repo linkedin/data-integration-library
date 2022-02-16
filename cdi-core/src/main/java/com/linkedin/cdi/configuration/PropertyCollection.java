@@ -167,6 +167,11 @@ public interface PropertyCollection {
   };
 
   JsonArrayProperties MSTAGE_PAYLOAD_PROPERTY = new JsonArrayProperties("ms.payload.property");
+  // default: 50K, minimum: 1, maximum: -
+  LongProperties MSTAGE_RANGE_GENERATOR_BATCH_SIZE = new LongProperties("ms.range.generator.batch.size", 50000L, Long.MAX_VALUE, 1L);
+  //  set highest possible value to 10 Zs
+  StringProperties MSTAGE_RANGE_GENERATOR_MAX_VALUE = new StringProperties("ms.range.generator.max.value", "zzzzzzzzzz");
+
   JsonObjectProperties MSTAGE_RETENTION =
       new JsonObjectProperties("ms.retention") {
         @Override
