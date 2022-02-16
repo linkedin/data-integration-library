@@ -15,9 +15,17 @@ import com.linkedin.cdi.util.JdbcUtils;
 import com.linkedin.cdi.util.ParameterTypes;
 import com.linkedin.cdi.util.SchemaBuilder;
 import com.linkedin.cdi.util.WorkUnitStatus;
+import com.opencsv.CSVWriter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -26,7 +34,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.gobblin.configuration.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,8 +181,7 @@ public class JdbcConnection extends MultistageConnection {
         wuStatus.setBuffer(new ByteArrayInputStream(toJson(resultSet,
             resultSet.getMetaData()).toString().getBytes(StandardCharsets.UTF_8)));
       } else if (MSTAGE_EXTRACTOR_CLASS.get(getState()).matches(".*CsvExtractor.*")) {
-        wuStatus.setBuffer(new ByteArrayInputStream(toCsv(resultSet,
-            resultSet.getMetaData()).getBytes(StandardCharsets.UTF_8)));
+        wuStatus.setBuffer(toCsvInputStream(resultSet, resultSet.getMetaData()));
       } else {
         stmt.close();
         throw new UnsupportedOperationException();
@@ -210,32 +216,6 @@ public class JdbcConnection extends MultistageConnection {
       jsonArray.add(jsonObject);
     }
     return jsonArray;
-  }
-
-  /**
-   * Converts a ResultSet to CSV
-   *
-   * for large dataset, this is more preferred
-   *
-   * @param resultSet the input result set
-   * @param resultSetMetadata the result set metadata
-   * @return a 2-dimensional string matrix representing a CSV file
-   * @throws SQLException SQL Exception from processing ResultSet
-   */
-  private String toCsv(final ResultSet resultSet, final ResultSetMetaData resultSetMetadata) throws SQLException {
-    StringBuilder builder = new StringBuilder();
-
-    while (resultSet.next()) {
-      for (int i = 0; i < resultSetMetadata.getColumnCount(); i++) {
-        builder.append(StringEscapeUtils.escapeCsv(JdbcUtils.parseColumnAsString(resultSet, resultSetMetadata, i + 1)));
-        if (i < resultSetMetadata.getColumnCount() - 1) {
-          builder.append(MSTAGE_CSV.getFieldSeparator(getState()));
-        } else {
-          builder.append(System.lineSeparator());
-        }
-      }
-    }
-    return builder.toString();
   }
 
   /**
@@ -275,5 +255,61 @@ public class JdbcConnection extends MultistageConnection {
       return resultSetMetadata.getColumnName(index1).toLowerCase();
     }
     return resultSetMetadata.getColumnName(index1);
+  }
+
+  /**
+   * Converts a ResultSet to CSV file and return an input stream from the file
+   *
+   * for large dataset, this is more preferred
+   *
+   * @param resultSet the input result set
+   * @param resultSetMetadata the result set metadata
+   * @return an InputStream
+   * @throws SQLException SQL Exception from processing ResultSet
+   */
+  private InputStream toCsvInputStream(final ResultSet resultSet, final ResultSetMetaData resultSetMetadata)
+      throws SQLException {
+    try {
+      Path path = Files.createTempFile(null, null);
+      File file = path.toFile();
+      file.deleteOnExit();
+      file.setReadable(true, true);
+
+      OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(path.toFile()), StandardCharsets.UTF_8);
+      CSVWriter csvWriter = new CSVWriter(writer,
+          MSTAGE_CSV.getFieldSeparator(getState()).charAt(0),
+          MSTAGE_CSV.getQuoteCharacter(getState()).charAt(0),
+          MSTAGE_CSV.getEscapeCharacter(getState()).charAt(0));
+
+      long lines = 0;
+      while (resultSet.next()) {
+        csvWriter.writeNext(getRowAsStringArray(resultSet, resultSetMetadata));
+        lines ++;
+      }
+
+      csvWriter.flush();
+      csvWriter.close();
+
+      LOG.info(String.format("Wrote %d lines to temp file %s", lines, path.toAbsolutePath()));
+      return Files.newInputStream(path);
+    } catch (IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
+  }
+
+  /**
+   * Converts one row from the ResultSet to CSV
+   *
+   * @param resultSet the input result set
+   * @param resultSetMetadata the result set metadata
+   * @return a string array including all fields
+   * @throws SQLException SQL Exception from processing ResultSet
+   */
+  private String[] getRowAsStringArray(final ResultSet resultSet, final ResultSetMetaData resultSetMetadata) throws SQLException {
+    String[] row = new String[resultSetMetadata.getColumnCount()];
+    for (int i = 0; i < resultSetMetadata.getColumnCount(); i++) {
+      row[i] = JdbcUtils.parseColumnAsString(resultSet, resultSetMetadata, i + 1);
+    }
+    return row;
   }
 }
