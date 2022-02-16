@@ -186,7 +186,7 @@ public class FileDumpExtractor extends MultistageExtractor<String, String> {
 
       // create output stream after renaming the file with proper extensions if needed
       // if there is a output preprocessor, like GPG encryptor, specified
-      OutputStream os = FileSystem.create(fs, new Path(path), logPermission);;
+      OutputStream os = FileSystem.create(fs, new Path(path), logPermission);
       for (StreamProcessor<?> transformer : extractorKeys.getPreprocessors()) {
         if (transformer instanceof OutputStreamProcessor) {
           os = ((OutputStreamProcessor) transformer).process(os);
