@@ -60,6 +60,7 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
 public class CsvExtractor extends MultistageExtractor<String, String[]> {
   private static final Logger LOG = LoggerFactory.getLogger(CsvExtractor.class);
   private final static Long SCHEMA_INFER_MAX_SAMPLE_SIZE = 100L;
+  final private static String[] EOF = KEY_WORD_EOF.split(KEY_WORD_COMMA);
   private CsvExtractorKeys csvExtractorKeys = new CsvExtractorKeys();
 
   public CsvExtractorKeys getCsvExtractorKeys() {
@@ -164,6 +165,11 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
       if (hasNextPage() && processInputStream(csvExtractorKeys.getProcessedCount())) {
         return readRecord(reuse);
       }
+    }
+
+    if (!this.eof && extractorKeys.getExplictEof()) {
+      eof = true;
+      return EOF;
     }
     return (String[]) endProcessingAndValidateCount();
   }
