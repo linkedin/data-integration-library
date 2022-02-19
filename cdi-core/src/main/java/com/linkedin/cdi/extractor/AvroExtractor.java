@@ -147,6 +147,11 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
         row = avroSchemaBasedFilter.filter(row);
       }
       return addDerivedFields(row);
+    } else {
+      connection.closeStream();
+      if (hasNextPage() && processInputStream(avroExtractorKeys.getProcessedCount())) {
+        return readRecord(reuse);
+      }
     }
 
     if (!this.eof && extractorKeys.getExplictEof()) {

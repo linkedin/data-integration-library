@@ -15,6 +15,7 @@ import com.linkedin.cdi.util.InputStreamUtils;
 import com.linkedin.cdi.util.WorkUnitStatus;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.gobblin.configuration.State;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HdfsConnection extends MultistageConnection {
   private static final Logger LOG = LoggerFactory.getLogger(HdfsConnection.class);
+  private Iterator<String> fileListIterator = null;
 
   public HdfsKeys getHdfsKeys() {
     return hdfsKeys;
@@ -77,6 +79,19 @@ public class HdfsConnection extends MultistageConnection {
   @Override
   public WorkUnitStatus execute(final WorkUnitStatus status) {
     Preconditions.checkNotNull(hdfsKeys.getSourceUri(), "ms.source.uri is missing or of wrong format");
+
+    // If pagination has started, paginating through the files.
+    // If no more files to process, then return directly. That should stop the
+    // pagination process.
+    if (fileListIterator != null) {
+      if (fileListIterator.hasNext()) {
+        status.setBuffer(readSingleFile(fileListIterator.next()));
+      } else {
+        status.setBuffer(null);
+      }
+      return status;
+    }
+
     URI uri = URI.create(getWorkUnitSpecificString(hdfsKeys.getSourceUri(),
         getExtractorKeys().getDynamicParameters()));
 
@@ -89,8 +104,9 @@ public class HdfsConnection extends MultistageConnection {
           readFileList(uri.getPath(), uri.getQuery().substring(URI_REGEXP_PATTERN.length()))));
     } else {
       List<String> files = readFileList(uri.getPath(), ".*");
-      if (files.size() > 0) {
-        status.setBuffer(readSingleFile(files.get(0)));
+      fileListIterator = files.iterator();
+      if (fileListIterator.hasNext()) {
+        status.setBuffer(readSingleFile(fileListIterator.next()));
       }
     }
     return status;
@@ -122,6 +138,29 @@ public class HdfsConnection extends MultistageConnection {
   @Override
   public WorkUnitStatus executeFirst(final WorkUnitStatus workUnitStatus) throws RetriableAuthenticationException {
     WorkUnitStatus status = super.executeFirst(workUnitStatus);
+    if (fsHelper == null) {
+      fsHelper = getHdfsClient();
+    }
+    return execute(status);
+  }
+
+  /**
+   * execute the HDFS read command (getFileStream)
+   * @param workUnitStatus prior work unit status
+   * @return the updated work unit status
+   * @throws RetriableAuthenticationException if retry is needed
+   */
+  @Override
+  public WorkUnitStatus executeNext(final WorkUnitStatus workUnitStatus) throws RetriableAuthenticationException {
+    WorkUnitStatus status = super.executeNext(workUnitStatus);
+
+    // If pagination has started already, but there is no more files to process,
+    // then return directly to stop the process
+    if (fileListIterator != null && !fileListIterator.hasNext()) {
+      workUnitStatus.setBuffer(null);
+      return workUnitStatus;
+    }
+
     if (fsHelper == null) {
       fsHelper = getHdfsClient();
     }
