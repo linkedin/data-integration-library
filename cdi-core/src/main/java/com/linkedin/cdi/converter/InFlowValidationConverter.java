@@ -148,7 +148,8 @@ public class InFlowValidationConverter extends Converter<Schema, Schema, Generic
       } else {
         rowCount.addAndGet(records.size());
       }
-    }    return rowCount.get();
+    }
+    return rowCount.get();
   }
 
   private void updateFailureCount(GenericRecord record) {
