@@ -212,6 +212,10 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
     if (connection != null) {
       connection.closeAll(StringUtils.EMPTY);
     }
+
+    // reset counters for retrying
+    extractorKeys.setProcessedCount(0);
+    workUnitStatus = WorkUnitStatus.builder().build();
   }
 
   /**
