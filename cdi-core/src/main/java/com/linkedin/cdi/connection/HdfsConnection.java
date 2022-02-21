@@ -59,19 +59,23 @@ public class HdfsConnection extends MultistageConnection {
   }
 
   /**
-   * Get a list of files if the URI has pattern match, else read the file at the URI.
+   * Get a list of files if the URI has pattern match, else read the files at the URI.
    *
    * In order to perform a list operation and output the list of files, the
    * ms.source.uri need to coded like /directory?RE=file-name-pattern. If the purpose
    * is to list all files, the file name pattern can be just ".*".
    *
-   * In order to perform a read of a file and output the content of the file as
-   * InputStream. ms.source.uri need to be full path without RE expression. If a
-   * partial path is given, then only a single file will be picked because there
-   * will be a list command performed before the read. A partial path could result
-   * in multiple files being listed, but then only the first file will be used.
+   * In order to perform a read of files and output the content of the file as
+   * InputStream, ms.source.uri need to be a path without RE expression.
    *
-   * So if the intention is to read a single file, support the full path to ms.source.uri.
+   * If a partial path is given without RE expression, there will be a list command performed before the read.
+   * The list of files will be processed through the pagination process, i.e., each
+   * file is read as a page. In such case ms.pagination has to be set so that pagination
+   * can take effect. If pagination is not enabled, then only the first file will
+   * be read.
+   *
+   * If the intention is to read a single file, support the full path to ms.source.uri without
+   * the RE expression.
    *
    * @param status prior work unit status
    * @return new work unit status

@@ -64,6 +64,7 @@ public interface StaticConstants {
   String KEY_WORD_TYPE = "type";
   String KEY_WORD_UNITS = "units";
   String KEY_WORD_UNKNOWN = "unknown";
+  String KEY_WORD_VALIDATION = "validation";
   String KEY_WORD_VALUES = "values";
   String KEY_WORD_THRESHOLD = "threshold";
   String KEY_WORD_CRITERIA = "criteria";
