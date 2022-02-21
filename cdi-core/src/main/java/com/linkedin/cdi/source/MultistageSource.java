@@ -175,13 +175,13 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
         wu.setProp(MSTAGE_ACTIVATION_PROPERTY.toString(),
             getUpdatedWorkUnitActivation(wu, authentications.get(0).getAsJsonObject()));
       }
-        // unlike activation secondary inputs, payloads will be processed in each work unit
-        // and payloads will not be loaded until the Connection executes the command
-        wu.setProp(MSTAGE_PAYLOAD_PROPERTY.toString(), payloads);
+      // unlike activation secondary inputs, payloads will be processed in each work unit
+      // and payloads will not be loaded until the Connection executes the command
+      wu.setProp(MSTAGE_PAYLOAD_PROPERTY.toString(), payloads);
     }
 
     if (eventReporter != null) {
-      // Send workunit creation event
+      // Send work unit creation event
       eventReporter.send(EventHelper.createWorkunitCreationEvent(state,wuList,getClass().getName()));
     }
     return wuList;

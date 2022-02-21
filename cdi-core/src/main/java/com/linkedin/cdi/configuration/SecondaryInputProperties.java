@@ -11,6 +11,7 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.linkedin.cdi.util.HdfsReader;
 import com.linkedin.cdi.util.JsonUtils;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,27 @@ public class SecondaryInputProperties extends JsonArrayProperties {
   private static final Logger LOG = LoggerFactory.getLogger(SecondaryInputProperties.class);
   final private static int RETRY_DELAY_IN_SEC_DEFAULT = 300;
   final private static int RETRY_COUNT_DEFAULT = 3;
+  final private static List<String> CATEGORY_NAMES = Lists.newArrayList();
+  final public static String CATEGORY = KEY_WORD_CATEGORY;
+
+  public enum Categories {
+    ACTIVATION(KEY_WORD_ACTIVATION),
+    AUTHENTICATION(KEY_WORD_AUTHENTICATION),
+    PAYLOAD(KEY_WORD_PAYLOAD),
+    VALIDATION(KEY_WORD_VALIDATION);
+    public final String name;
+    /**
+     * initialize the enum item with a default name
+     * @param name the title of the enum item
+     */
+    Categories(String name) {
+      this.name = name;
+    }
+
+    public boolean equals(String category) {
+      return category.equalsIgnoreCase(name);
+    }
+  }
 
   /**
    * Constructor with implicit default value
@@ -32,11 +54,11 @@ public class SecondaryInputProperties extends JsonArrayProperties {
    */
   SecondaryInputProperties(String config) {
     super(config);
+    Arrays.stream(Categories.values()).forEach(x -> CATEGORY_NAMES.add(x.name));
   }
 
   @Override
   public boolean isValid(State state) {
-    final List<String> categories = Lists.newArrayList("authentication", "activation", "payload");
     if (super.isValid(state) && !isBlank(state)) {
       JsonArray value = GSON.fromJson(state.getProp(getConfig()), JsonArray.class);
 
@@ -49,9 +71,9 @@ public class SecondaryInputProperties extends JsonArrayProperties {
 
       // check categories, make sure they are spelled properly
       for (JsonElement si : value) {
-        if (JsonUtils.get(KEY_WORD_CATEGORY, si.getAsJsonObject()) != JsonNull.INSTANCE) {
-          String category = JsonUtils.get(KEY_WORD_CATEGORY, si.getAsJsonObject()).getAsString();
-          if (categories.stream().noneMatch(x -> x.equals(category))) {
+        if (JsonUtils.get(CATEGORY, si.getAsJsonObject()) != JsonNull.INSTANCE) {
+          String category = JsonUtils.get(CATEGORY, si.getAsJsonObject()).getAsString();
+          if (CATEGORY_NAMES.stream().noneMatch(x -> x.equals(category))) {
             return false;
           }
         }
@@ -68,7 +90,7 @@ public class SecondaryInputProperties extends JsonArrayProperties {
    */
   public Map<String, JsonArray> readAuthenticationToken(State state) {
     Map<String, JsonArray> secondaryInputs = new HashMap<>();
-    JsonArray categoryData = secondaryInputs.computeIfAbsent(KEY_WORD_AUTHENTICATION, x -> new JsonArray());
+    JsonArray categoryData = secondaryInputs.computeIfAbsent(Categories.AUTHENTICATION.name, x -> new JsonArray());
     categoryData.addAll(new HdfsReader(state).readSecondary(getAuthenticationDefinition(state).getAsJsonObject()));
     return secondaryInputs;
   }
@@ -86,19 +108,16 @@ public class SecondaryInputProperties extends JsonArrayProperties {
         continue;
       }
 
-      String category = entry.getAsJsonObject().has(KEY_WORD_CATEGORY)
-          ? entry.getAsJsonObject().get(KEY_WORD_CATEGORY).getAsString()
-          : KEY_WORD_ACTIVATION;
+      String category = entry.getAsJsonObject().has(CATEGORY)
+          ? entry.getAsJsonObject().get(CATEGORY).getAsString()
+          : Categories.ACTIVATION.name;
 
       JsonArray categoryData = secondaryInputs.computeIfAbsent(category, x -> new JsonArray());
-      if (category.equalsIgnoreCase(KEY_WORD_ACTIVATION) || category.equalsIgnoreCase(KEY_WORD_AUTHENTICATION)) {
+      if (Categories.ACTIVATION.equals(category) || Categories.AUTHENTICATION.equals(category)) {
         categoryData.addAll(new HdfsReader(state).readSecondary(entry.getAsJsonObject()));
-      }
-
-      if (entry.getAsJsonObject().has(KEY_WORD_PATH) && category.equalsIgnoreCase(KEY_WORD_PAYLOAD)) {
+      } else if (entry.getAsJsonObject().has(KEY_WORD_PATH)) {
         categoryData.add(entry);
       }
-
     }
     return secondaryInputs;
   }
@@ -118,9 +137,9 @@ public class SecondaryInputProperties extends JsonArrayProperties {
    */
   private JsonObject getAuthenticationDefinition(State state) {
     for (JsonElement entry : get(state)) {
-      if (entry.isJsonObject() && entry.getAsJsonObject().has(KEY_WORD_CATEGORY)) {
-        String category = entry.getAsJsonObject().get(KEY_WORD_CATEGORY).getAsString();
-        if (category.equalsIgnoreCase(KEY_WORD_AUTHENTICATION)) {
+      if (entry.isJsonObject() && entry.getAsJsonObject().has(CATEGORY)) {
+        String category = entry.getAsJsonObject().get(CATEGORY).getAsString();
+        if (Categories.AUTHENTICATION.equals(category)) {
           return entry.getAsJsonObject();
         }
       }
