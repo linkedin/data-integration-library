@@ -123,6 +123,7 @@ public class HdfsConnection extends MultistageConnection {
    */
   @Override
   public boolean closeAll(String message) {
+    fileListIterator = null;
     try {
       fsHelper.close();
       fsHelper = null;
