@@ -24,4 +24,24 @@ inefficiency, a former backfill is needed. To carry out a former backfill, set t
 
 If the target period is too wide, it can be broke up to multiple segments, using a piecemeal backfill.  
 
+## Allow New Data Override Older Data
+
+To Allow recently back-filled data override older data in the target dataset, compaction should be set to 
+always use the latest data, which can be labeled by a timestamp tied to data ingestion time. 
+
+Typically, we do this to allow newly extracted data take priority over previously extracted data:
+
+```
+ms.derived.fields=[{"name": "dilExtractedDate", "formula": {"type": "epoc", "source": "CURRENTDATE"}}]
+extract.table.type=SNAPSHOT_APPEND
+extract.delta.fields=dilExtractedDate
+extract.primary.key.fields=<<primary keys>>
+```
+
+With above configuration, because back-filled data will always have a more recent timestamp in `dilExtractedDate`,
+the compaction tool wil keep the newer records, and purge the older records.
+
+The caveat is that when there are records deleted in the back-filled data, the deleted records will stay in 
+the target dataset. 
+
 [Back to Summary](summary.md#how-to-backfill)
