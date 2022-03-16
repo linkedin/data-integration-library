@@ -15,8 +15,6 @@ import com.linkedin.cdi.configuration.StaticConstants;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.keys.JsonExtractorKeys;
-import com.linkedin.cdi.preprocessor.InputStreamProcessor;
-import com.linkedin.cdi.preprocessor.StreamProcessor;
 import com.linkedin.cdi.util.JsonUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -105,13 +103,7 @@ public class TextExtractor extends MultistageExtractor<JsonArray, JsonObject> {
         return null;
       } else {
         try {
-          // apply preprocessors
           InputStream input = workUnitStatus.getBuffer();
-          for (StreamProcessor<?> transformer : extractorKeys.getPreprocessors()) {
-            if (transformer instanceof InputStreamProcessor) {
-              input = ((InputStreamProcessor) transformer).process(input);
-            }
-          }
           writeToStringBuffer(input, output);
           input.close();
           JsonObject jsonObject = new JsonObject();

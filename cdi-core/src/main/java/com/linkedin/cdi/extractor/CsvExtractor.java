@@ -17,8 +17,6 @@ import com.linkedin.cdi.filter.CsvSchemaBasedFilter;
 import com.linkedin.cdi.keys.CsvExtractorKeys;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
-import com.linkedin.cdi.preprocessor.InputStreamProcessor;
-import com.linkedin.cdi.preprocessor.StreamProcessor;
 import com.linkedin.cdi.util.JsonIntermediateSchema;
 import com.linkedin.cdi.util.SchemaBuilder;
 import com.linkedin.cdi.util.SchemaUtils;
@@ -203,12 +201,6 @@ public class CsvExtractor extends MultistageExtractor<String, String[]> {
     if (workUnitStatus.getBuffer() != null) {
       try {
         InputStream input = workUnitStatus.getBuffer();
-        for (StreamProcessor<?> transformer : extractorKeys.getPreprocessors()) {
-          if (transformer instanceof InputStreamProcessor) {
-            input = ((InputStreamProcessor) transformer).process(input);
-          }
-        }
-
         CSVParser parser = new CSVParserBuilder().withSeparator(MSTAGE_CSV.getFieldSeparator(state).charAt(0))
             .withQuoteChar(MSTAGE_CSV.getQuoteCharacter(state).charAt(0))
             .withEscapeChar(MSTAGE_CSV.getEscapeCharacter(state).charAt(0))
