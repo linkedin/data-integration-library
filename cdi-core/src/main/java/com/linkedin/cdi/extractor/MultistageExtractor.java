@@ -17,6 +17,7 @@ import com.linkedin.cdi.filter.JsonSchemaBasedFilter;
 import com.linkedin.cdi.filter.MultistageSchemaBasedFilter;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
+import com.linkedin.cdi.preprocessor.InputStreamProcessor;
 import com.linkedin.cdi.preprocessor.StreamProcessor;
 import com.linkedin.cdi.util.DateTimeUtils;
 import com.linkedin.cdi.util.HdfsReader;
@@ -253,6 +254,23 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
       this.failWorkUnit("Received a NULL WorkUnitStatus, fail the work unit");
       return false;
     }
+
+    try {
+      InputStream input = updatedStatus.getBuffer();
+      for (StreamProcessor<?> transformer : extractorKeys.getPreprocessors()) {
+        if (transformer instanceof InputStreamProcessor) {
+          input = ((InputStreamProcessor) transformer).process(input);
+        }
+      }
+      updatedStatus.setBuffer(input);
+    } catch (IOException e) {
+      LOG.error("Error applying preprocessors to the input stream: {}, cause: {}",
+          e.getMessage(),
+          e.getCause(),
+          e);
+      LOG.warn("Preprocessors are ignored because of IOException.");
+    }
+
     // update work unit status
     workUnitStatus.setBuffer(updatedStatus.getBuffer());
     workUnitStatus.setMessages(updatedStatus.getMessages());

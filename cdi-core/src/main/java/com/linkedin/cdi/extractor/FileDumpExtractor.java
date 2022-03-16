@@ -12,7 +12,6 @@ import com.google.gson.JsonObject;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.FileDumpExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
-import com.linkedin.cdi.preprocessor.InputStreamProcessor;
 import com.linkedin.cdi.preprocessor.OutputStreamProcessor;
 import com.linkedin.cdi.preprocessor.StreamProcessor;
 import com.linkedin.cdi.util.ParameterTypes;
@@ -143,15 +142,7 @@ public class FileDumpExtractor extends MultistageExtractor<String, String> {
     }
 
     try {
-
-      // apply preprocessors
       InputStream input = workUnitStatus.getBuffer();
-      for (StreamProcessor<?> transformer : extractorKeys.getPreprocessors()) {
-        if (transformer instanceof InputStreamProcessor) {
-          input = ((InputStreamProcessor) transformer).process(input);
-        }
-      }
-
       String fileName = fileDumpExtractorKeys.getFileDumpLocation() + "/"
           + fileDumpExtractorKeys.getFileName();
       if (jobKeys.isPaginationEnabled()) {
