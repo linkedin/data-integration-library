@@ -129,6 +129,9 @@ public class JsonParameter {
     JsonObject parsedObject = new JsonObject();
     String name = paramObject.get("name").getAsString();
     switch (type) {
+      case PRIMITIVE:
+        parsedObject.add(name, paramObject.getAsJsonPrimitive("value"));
+        break;
       // an OBJECT would assume the elements could have substitution variables
       case OBJECT:
         if (paramObject.get("value").isJsonObject()

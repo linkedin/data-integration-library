@@ -12,6 +12,7 @@ package com.linkedin.cdi.util;
  */
 
 public enum ParameterTypes {
+  PRIMITIVE("primitive"),
   LIST("list"),
   OBJECT("object"),
   WATERMARK("watermark"),
