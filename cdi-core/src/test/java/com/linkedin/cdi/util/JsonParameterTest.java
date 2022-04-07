@@ -171,4 +171,27 @@ public class JsonParameterTest {
     state.setProp(EXTRACT_IS_FULL.toString(), false);
     Assert.assertEquals(expected, JsonParameter.getParametersAsJsonString(msParameters4.toString(), new JsonObject(), state));
   }
+
+  @Test
+  public void testPrimitiveType() {
+    // int
+    JsonArray msParameters = gson.fromJson("[{\"name\": \"id\", \"type\": \"primitive\", \"value\": 114027}]", JsonArray.class);
+    String expected = "{\"id\":114027}";
+    Assert.assertEquals(expected, JsonParameter.getParametersAsJsonString(msParameters.toString(), new JsonObject(), state));
+
+    // string
+    msParameters = gson.fromJson("[{\"name\": \"id\", \"type\": \"primitive\", \"value\": \"114027\"}]", JsonArray.class);
+    expected = "{\"id\":\"114027\"}";
+    Assert.assertEquals(expected, JsonParameter.getParametersAsJsonString(msParameters.toString(), new JsonObject(), state));
+
+    // boolean
+    msParameters = gson.fromJson("[{\"name\": \"id\", \"type\": \"primitive\", \"value\": true}]", JsonArray.class);
+    expected = "{\"id\":true}";
+    Assert.assertEquals(expected, JsonParameter.getParametersAsJsonString(msParameters.toString(), new JsonObject(), state));
+
+    // float
+    msParameters = gson.fromJson("[{\"name\": \"id\", \"type\": \"primitive\", \"value\": 93.3453}]", JsonArray.class);
+    expected = "{\"id\":93.3453}";
+    Assert.assertEquals(expected, JsonParameter.getParametersAsJsonString(msParameters.toString(), new JsonObject(), state));
+  }
 }

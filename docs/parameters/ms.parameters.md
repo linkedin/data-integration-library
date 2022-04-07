@@ -42,6 +42,10 @@ will be carried as strings.
 
 The following types of parameters are designed: 
 
+- **primitive**: `primitive` type is for those cases where the value should not be quoted in the final request. 
+While `list` type is for those cases where the value should be quoted. 
+for e.g. for parameters like {"id":114027}, {"id":true}, {"id":93.3453}
+
 - **list**: list is the default type, which means a primitive string.
 
 - **object**: a `object` parameter contains recursively defined parameters.
