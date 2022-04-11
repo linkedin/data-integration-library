@@ -57,4 +57,17 @@ Re-bootstrap is to re-extract the whole history of a snapshot_append dataset fro
 Backfilling is to reprocess a chunk of data in the past that is beyond the look-back process using grace
 period. Backfill works for incrementally processed flows; there is no need for backfill in snapshot only flows.
 
+# [How to Partition a Pipeline](partition.md)
+
+With large datasets, data pipelines, both ingestion and egression pipelines, often have to be broken into smaller 
+chunks. This technique is often referred to as partitioning; however, this should not be confused with 
+dataset partitioning on storage. 
+
+Pipeline partitioning leverages work units. A work unit carries out small chunk of a bigger task. For example,
+to ingest 100 GB data, we can create 100 work units, and each ingest 1 GB data. 
+
+
+
+
+
 
