@@ -8,8 +8,8 @@ LinkedIn Data Integration Library (DIL) is a collection of generic data integrat
 - Generic components: data transmission protocol components and data format components are generically designed without one depending on another, greatly relieved the challenges in handling the variety of cloud APIs and services. 
 - Multistage architecture: data integration is never a one-step process, the library inherently supports multi-staged integration processes so that complex data integration scenarios can be handled with simple generic components. 
 - Bidirectional transmission: ingress and egress are just business logic in DIL, both work the same way and use the same set of configurations, as ingress to one end is egress to the other end.
-- Extensible ompression and encryption: users can easily add pluggable and extensible data compression and encryption algorithms.
-- Flexible pagaination: DIL supports a wide range of pagination methods to break large payloads to small chunks.
+- Extensible compression and encryption: users can easily add pluggable and extensible data compression and encryption algorithms.
+- Flexible pagination: DIL supports a wide range of pagination methods to break large payloads to small chunks.
 
 # Common Patterns used in production
 - Asynchronous bulk ingestion from Rest APIs, like Salesforce.com, to Data Lake (HDFS, S3, ADLS)
