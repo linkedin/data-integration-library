@@ -231,29 +231,35 @@ public class SchemaBuilder {
    * Hidden initialization function
    * @param name the name of the schema element
    * @param type the type of the schema element
-   * @param json the Json presentation of the schema element
+   * @param columnDef the Json presentation of the schema element
    */
-  private void parseAvroSchema(final String name, final int type, final JsonElement json) {
-    this.type = type == UNKNOWN ? getType(json) : type;
-    this.isNullable = !name.equals("root") && checkNullable(json.getAsJsonObject());
+  private void parseAvroSchema(final String name, final int type, final JsonElement columnDef) {
+    this.type = type == UNKNOWN ? getType(columnDef) : type;
+    this.isNullable = !name.equals("root") && columnDef.isJsonObject() && checkNullable(columnDef.getAsJsonObject());
     this.name = name;
     switch (this.type) {
       case RECORD:
         if (name.equals("root")) {
-          for (JsonElement field: json.getAsJsonArray()) {
+          for (JsonElement field: columnDef.getAsJsonArray()) {
             elements.add(new SchemaBuilder(field.getAsJsonObject().get(KEY_WORD_NAME).getAsString(), UNKNOWN, field));
           }
         } else {
-          for (JsonElement field: getFields(json.getAsJsonObject())) {
+          for (JsonElement field: getFields(columnDef.getAsJsonObject())) {
             elements.add(new SchemaBuilder(field.getAsJsonObject().get(KEY_WORD_NAME).getAsString(), UNKNOWN, field));
           }
         }
         break;
       case ARRAY:
-        elements.add(new SchemaBuilder("arrayItem", UNKNOWN, getItems(json.getAsJsonObject())));
+        elements.add(new SchemaBuilder("arrayItem", UNKNOWN, getItems(columnDef.getAsJsonObject())));
         break;
       default: //PRIMITIVE
-        this.primitiveType = getNestedType(json.getAsJsonObject());
+        if(columnDef.isJsonObject()) {
+          this.primitiveType = getNestedType(columnDef.getAsJsonObject());
+        } else if (columnDef.isJsonPrimitive()) {
+          this.primitiveType = columnDef.getAsString();
+        } else {
+          throw new RuntimeException("Primitive type definition can be only a simple string or a JSON object with a nested type.");
+        }
         break;
     }
   }
@@ -383,18 +389,20 @@ public class SchemaBuilder {
    * a primitive, a null, or a union of any two of them. However, the union shall not be
    * more than 2 types.
    *
-   * @param array the "array" schema element
+   * @param columnDef the "array" schema element
    * @return the array item
    */
-  private JsonObject getItems(JsonObject array) {
-    if (array.get(KEY_WORD_TYPE).isJsonObject()) {
-      return array.get(KEY_WORD_TYPE).getAsJsonObject().get(KEY_WORD_ITEMS).getAsJsonObject();
+  private JsonElement getItems(JsonObject columnDef) {
+    if (columnDef.get(KEY_WORD_TYPE).isJsonObject()) {
+      return columnDef.get(KEY_WORD_TYPE).getAsJsonObject().get(KEY_WORD_ITEMS);
+    } if (columnDef.get(KEY_WORD_TYPE).isJsonArray()) {
+      Set<JsonElement> union = new HashSet<>();
+      columnDef.get(KEY_WORD_TYPE).getAsJsonArray().iterator().forEachRemaining(union::add);
+      union.remove(JSON_NULL_STRING);
+      return union.iterator().next().getAsJsonObject().get(KEY_WORD_ITEMS);
+    } else {
+      throw new RuntimeException("Getting primitive while JSON array, for union type, or JSON object, for single type, are expected.");
     }
-
-    Set<JsonElement> union = new HashSet<>();
-    array.get(KEY_WORD_TYPE).getAsJsonArray().iterator().forEachRemaining(union::add);
-    union.remove(JSON_NULL_STRING);
-    return union.iterator().next().getAsJsonObject().get(KEY_WORD_ITEMS).getAsJsonObject();
   }
 
   /**
