@@ -160,7 +160,7 @@ public class HdfsConnection extends MultistageConnection {
     WorkUnitStatus status = super.executeNext(workUnitStatus);
 
     // If pagination has started already, but there is no more files to process,
-    // then return directly to stop the process.
+    // then return directly to stop the process
     if (fileListIterator != null && !fileListIterator.hasNext()) {
       workUnitStatus.setBuffer(null);
       return workUnitStatus;
