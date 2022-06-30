@@ -128,6 +128,8 @@ public class S3Connection extends MultistageConnection {
   }
 
   private ByteArrayInputStream handleUpload(String finalPrefix) {
+    // the path here should be a file path instead of a directory path. Planning should be done upfront at the Source
+    // level and here each connection would just read a single file
     String pathStr = getExtractorKeys().getPayloadsBinaryPath();
     Path path = new Path(pathStr);
     LOG.info("reading from path: {}", getExtractorKeys().getPayloadsBinaryPath());
