@@ -46,6 +46,7 @@ public class ExtractorKeys {
   private JsonObject dynamicParameters = new JsonObject();
   private Boolean explictEof;
   private JsonArray payloads = new JsonArray();
+  private String payloadsBinaryPath;
   private long processedCount = 0;
 
   public void incrProcessedCount() {
@@ -163,5 +164,13 @@ public class ExtractorKeys {
 
   public void setProcessedCount(long processedCount) {
     this.processedCount = processedCount;
+  }
+
+  public String getPayloadsBinaryPath() {
+    return payloadsBinaryPath;
+  }
+
+  public void setPayloadsBinaryPath(String payloadsBinaryPath) {
+    this.payloadsBinaryPath = payloadsBinaryPath;
   }
 }

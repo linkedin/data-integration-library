@@ -10,14 +10,22 @@ import com.linkedin.cdi.factory.ConnectionClientFactory;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.keys.S3Keys;
+import com.linkedin.cdi.util.JsonUtils;
 import com.linkedin.cdi.util.SecretManager;
 import com.linkedin.cdi.util.WorkUnitStatus;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.State;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
@@ -26,12 +34,15 @@ import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.utils.AttributeMap;
 
 import static com.linkedin.cdi.configuration.PropertyCollection.*;
@@ -72,6 +83,15 @@ public class S3Connection extends MultistageConnection {
 
     String finalPrefix = getWorkUnitSpecificString(s3SourceV2Keys.getPrefix(), getExtractorKeys().getDynamicParameters());
     LOG.debug("Final Prefix to get files list: {}", finalPrefix);
+    boolean shouldUpload = StringUtils.isNotEmpty(getExtractorKeys().getPayloadsBinaryPath());
+      // upload to S3 if payload is empty, otherwise download from S3
+    if (shouldUpload) {
+      ByteArrayInputStream byteArrayInputStream = handleUpload(finalPrefix);
+      if (byteArrayInputStream != null) {
+        status.setBuffer(byteArrayInputStream);
+      }
+      return status;
+    }
     try {
       List<String> files = getFilesList(finalPrefix).stream()
           .filter(objectKey -> objectKey.matches(s3SourceV2Keys.getFilesPattern()))
@@ -105,6 +125,38 @@ public class S3Connection extends MultistageConnection {
       return null;
     }
     return status;
+  }
+
+  private ByteArrayInputStream handleUpload(String finalPrefix) {
+    String pathStr = getExtractorKeys().getPayloadsBinaryPath();
+    Path path = new Path(pathStr);
+    LOG.info("reading from path: {}", getExtractorKeys().getPayloadsBinaryPath());
+    Configuration conf = new Configuration();
+    try (
+        FSDataInputStream fsDataInputStream = path.getFileSystem(conf).open(path);
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(fsDataInputStream)
+        ) {
+      long fileSize = path.getFileSystem(conf).getFileStatus(path).getLen();
+      String fileName = finalPrefix + "/" + path.getName();
+      LOG.info("writing to bucket {} and key {}", s3SourceV2Keys.getBucket(), fileName);
+      PutObjectRequest putObjectRequest = PutObjectRequest
+          .builder()
+          .bucket(s3SourceV2Keys.getBucket())
+          .key(fileName)
+          .build();
+      RequestBody requestBody = RequestBody.fromInputStream(bufferedInputStream, fileSize);
+      PutObjectResponse putObjectResponse = s3Client.putObject(putObjectRequest, requestBody);
+      LOG.info("retrieved put object response");
+
+      return new ByteArrayInputStream(
+          JsonUtils.GSON_WITH_SUPERCLASS_EXCLUSION
+              .toJson(putObjectResponse)
+              .getBytes(StandardCharsets.UTF_8));
+    } catch (IOException e) {
+      LOG.error("Encountered IO Exception when reading from path: {}", pathStr);
+      e.printStackTrace();
+      return null;
+    }
   }
 
   @Override
