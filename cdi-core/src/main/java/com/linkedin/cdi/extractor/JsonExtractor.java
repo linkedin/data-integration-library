@@ -583,7 +583,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
     for (Map.Entry<String, Map<String, String>> entry : derivedFields.entrySet()) {
       String source = entry.getValue().get("source");
       if (JsonUtils.has(data, source)) {
-        pushDowns.addProperty(entry.getKey(), data.get(source).getAsString());
+        pushDowns.addProperty(entry.getKey(), JsonUtils.get(data,source).getAsString());
         LOG.info("Identified push down value: {}", pushDowns);
       }
     }
