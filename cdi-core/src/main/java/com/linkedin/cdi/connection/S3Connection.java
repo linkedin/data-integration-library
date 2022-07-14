@@ -28,9 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.State;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileChecksum;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.util.MD5FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
@@ -145,8 +143,6 @@ public class S3Connection extends MultistageConnection {
         BufferedInputStream bufferedInputStream = new BufferedInputStream(fsDataInputStream)
         ) {
       long fileSize = path.getFileSystem(conf).getFileStatus(path).getLen();
-      FileChecksum fileChecksum = path.getFileSystem(conf).getFileChecksum(path);
-      LOG.info("fileCheckSum: {}", fileChecksum.toString());
       // HDFS uses MD5MD5CRC for checksum, and thus MD5 needs to be computed separately
       // to compare with the MD5 returned from S3
       // A more detailed explanation can be found here
