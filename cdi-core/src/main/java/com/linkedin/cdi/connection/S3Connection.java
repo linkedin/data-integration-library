@@ -5,19 +5,30 @@
 package com.linkedin.cdi.connection;
 
 import com.google.common.collect.Lists;
+import com.google.gson.JsonObject;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.factory.ConnectionClientFactory;
 import com.linkedin.cdi.keys.ExtractorKeys;
 import com.linkedin.cdi.keys.JobKeys;
 import com.linkedin.cdi.keys.S3Keys;
+import com.linkedin.cdi.util.JsonUtils;
 import com.linkedin.cdi.util.SecretManager;
 import com.linkedin.cdi.util.WorkUnitStatus;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.State;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
@@ -26,12 +37,15 @@ import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.utils.AttributeMap;
 
 import static com.linkedin.cdi.configuration.PropertyCollection.*;
@@ -72,6 +86,15 @@ public class S3Connection extends MultistageConnection {
 
     String finalPrefix = getWorkUnitSpecificString(s3SourceV2Keys.getPrefix(), getExtractorKeys().getDynamicParameters());
     LOG.debug("Final Prefix to get files list: {}", finalPrefix);
+    boolean shouldUpload = StringUtils.isNotEmpty(getExtractorKeys().getPayloadsBinaryPath());
+      // upload to S3 if payload is empty, otherwise download from S3
+    if (shouldUpload) {
+      ByteArrayInputStream byteArrayInputStream = handleUpload(finalPrefix);
+      if (byteArrayInputStream != null) {
+        status.setBuffer(byteArrayInputStream);
+      }
+      return status;
+    }
     try {
       List<String> files = getFilesList(finalPrefix).stream()
           .filter(objectKey -> objectKey.matches(s3SourceV2Keys.getFilesPattern()))
@@ -105,6 +128,60 @@ public class S3Connection extends MultistageConnection {
       return null;
     }
     return status;
+  }
+
+  private ByteArrayInputStream handleUpload(String finalPrefix) {
+    // the path here should be a file path instead of a directory path. Planning should be done upfront at the Source
+    // level and here each connection would just read a single file
+    String pathStr = getExtractorKeys().getPayloadsBinaryPath();
+    Path path = new Path(pathStr);
+    LOG.info("reading from path: {}", getExtractorKeys().getPayloadsBinaryPath());
+    Configuration conf = new Configuration();
+    try (
+        FSDataInputStream fsDataInputStream = path.getFileSystem(conf).open(path);
+        FSDataInputStream fsDataInputStreamForMD5 = path.getFileSystem(conf).open(path);
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(fsDataInputStream)
+        ) {
+      long fileSize = path.getFileSystem(conf).getFileStatus(path).getLen();
+      // HDFS uses MD5MD5CRC for checksum, and thus MD5 needs to be computed separately
+      // to compare with the MD5 returned from S3
+      // A more detailed explanation can be found here
+      // https://cloud.google.com/architecture/hadoop/validating-data-transfers
+      String md5Hex = DigestUtils.md5Hex(fsDataInputStreamForMD5);
+      String fileName = finalPrefix + "/" + path.getName();
+      String bucket = s3SourceV2Keys.getBucket();
+      LOG.info("writing to bucket {} and key {}", bucket, fileName);
+      PutObjectRequest putObjectRequest = PutObjectRequest
+          .builder()
+          .bucket(bucket)
+          .key(fileName)
+          .build();
+      RequestBody requestBody = RequestBody.fromInputStream(bufferedInputStream, fileSize);
+      PutObjectResponse putObjectResponse = s3Client.putObject(putObjectRequest, requestBody);
+      LOG.info("retrieved put object response");
+      String eTag = putObjectResponse.eTag();
+      // eTag starts and ends with an additional quote so removing them before comparing
+      String eTagTruncated = eTag.substring(1, eTag.length() - 1);
+      boolean md5Valid = true;
+      if (!eTagTruncated.equals(md5Hex)) {
+        LOG.error("md5 validation failed for bucket {} and key {}:"
+            + " {} from S3 is different from {} of the original file",
+            bucket, fileName, eTag, md5Hex);
+        md5Valid = false;
+      }
+      JsonObject jsonObject =
+          JsonUtils.GSON_WITH_SUPERCLASS_EXCLUSION.toJsonTree(putObjectResponse).getAsJsonObject();
+      jsonObject.addProperty("md5Valid", md5Valid);
+      jsonObject.addProperty("bucket", bucket);
+      jsonObject.addProperty("key", fileName);
+      return new ByteArrayInputStream(
+          jsonObject.toString().getBytes(StandardCharsets.UTF_8)
+      );
+    } catch (IOException e) {
+      LOG.error("Encountered IO Exception when reading from path: {}", pathStr);
+      e.printStackTrace();
+      return null;
+    }
   }
 
   @Override

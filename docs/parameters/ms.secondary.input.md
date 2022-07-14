@@ -87,6 +87,11 @@ is defined in `ms.watermark`. In execution, there will be 3 work units generated
 - `ms.secondary.input=[{"path": "/data/{{customerId}}", "fields": ["dummy"], "category": "payload"}]`
 - `ms.watermark=[{"name":"customerId","type":"unit","units":"customer1, customer2, customer3"}]`
 
+The `format` of payload defines in which format the payload should be read as. This field is optional and by default
+the input will be read as a Json array. However, if `"format":"binary"` is specified, then DIL will simply store the payload path string
+in `payloadsBinaryPath` field of extractor keys to be used later. Currently the binary format is only used in S3 upload use case
+where an input stream will be opened on the given path and then passed as the input to the `putObject` method for uploading to S3.
+
 The variable can only be a [job-level variables](../concepts/variables.md#job-level-variables) or a 
 [work-unit-level static variable](../concepts/variables.md#work-unit-level-static-variables).
 The variable cannot be a [work-unit-level dynamic variables](../concepts/variables.md#work-unit-level-dynamic-variables), like a pagination variable or a session variable.

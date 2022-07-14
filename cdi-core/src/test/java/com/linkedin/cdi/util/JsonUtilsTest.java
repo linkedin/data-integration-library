@@ -79,4 +79,13 @@ public class JsonUtilsTest {
     Assert.assertTrue(JsonUtils.filter("name1", "value1", sample).size() == 1);
     Assert.assertTrue(JsonUtils.filter("name1", "noneexist", sample).size() == 0);
   }
+
+  @Test
+  public void testGetAndCompare() {
+    Gson gson = new Gson();
+    JsonObject sample = gson.fromJson("{\"name1\": \"value1\", \"name2\": \"value2\"}", JsonObject.class);
+    Assert.assertTrue(JsonUtils.getAndCompare("name1", "value1", sample));
+    Assert.assertFalse(JsonUtils.getAndCompare("name1", "noneexist", sample));
+    Assert.assertFalse(JsonUtils.getAndCompare("name3", "noneexist", sample));
+  }
 }

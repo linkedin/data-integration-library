@@ -976,15 +976,29 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
     JsonArray records = new JsonArray();
     for (JsonElement entry : payloads) {
       try {
-        records.addAll(new HdfsReader(state).readSecondary(entry.getAsJsonObject()));
-        extractorKeys.setPayloads(records);
-        payloadIterator = records.iterator();
+        JsonObject entryObject = entry.getAsJsonObject();
+        if (shouldReadAsBinary(entryObject)) {
+          extractorKeys.setPayloadsBinaryPath(entryObject.get("path").getAsString());
+          LOG.info("using binary payload path: " + entryObject.get("path").getAsString());
+        }
+        else {
+          records.addAll(new HdfsReader(state).readSecondary(entry.getAsJsonObject()));
+          extractorKeys.setPayloads(records);
+          payloadIterator = records.iterator();
+        }
       } catch (Exception e) {
         // in exception, put payload definition as payload, keep iterator as null
         LOG.error(String.format(ERROR_READING_SECONDARY_INPUT, KEY_WORD_PAYLOAD, DATASET_URN.get(state)));
         extractorKeys.setPayloads(payloads);
       }
     }
+  }
+
+  /**
+   * read the input as a binary stream if the key "format" is set to "binary"
+   */
+  private boolean shouldReadAsBinary(JsonObject entryObject) {
+    return JsonUtils.getAndCompare("format", "binary", entryObject);
   }
 
   /**

@@ -6,6 +6,7 @@ package com.linkedin.cdi.util;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -19,6 +20,9 @@ import org.testng.Assert;
 
 public interface JsonUtils {
   Gson GSON = new Gson();
+  Gson GSON_WITH_SUPERCLASS_EXCLUSION = new GsonBuilder()
+      .setExclusionStrategies(new SuperclassExclusionStrategy())
+      .create();
 
   /**
    * This deepCopy is a workaround. When it is possible to upgrade Gson to 2.8.1+,
@@ -61,6 +65,15 @@ public interface JsonUtils {
   static boolean contains(String superString, JsonObject subObject) {
     JsonObject a = GSON.fromJson(superString, JsonObject.class);
     return contains(a, subObject);
+  }
+
+  /**
+   * Check if a JsonObject contains a key and compares its value with the given value
+   * @return if jsonObject doesn't have an element key, or its value of the element key differs with
+   * the value given, return false, else return true
+   */
+  static boolean getAndCompare(String key, String value, JsonObject jsonObject) {
+    return jsonObject.has(key) && jsonObject.get(key).getAsString().equals(value);
   }
 
   /**
