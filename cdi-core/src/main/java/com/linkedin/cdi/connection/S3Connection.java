@@ -261,7 +261,7 @@ public class S3Connection extends MultistageConnection {
     LOG.debug("Listing object by prefix: {}", finalPrefix);
     do {
       if (listObjectsV2Response != null) {
-        request = builder.continuationToken(listObjectsV2Response.continuationToken()).build();
+        request = builder.continuationToken(listObjectsV2Response.nextContinuationToken()).build();
       }
       listObjectsV2Response = s3Client.listObjectsV2(request);
       listObjectsV2Response.contents().forEach(f -> {
