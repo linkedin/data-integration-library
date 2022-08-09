@@ -247,12 +247,19 @@ public interface PropertyCollection {
     }
   };
 
-  // default: 100, minimum: 0, maximum: 1000, 0 = default value
-  IntegerProperties MSTAGE_WORK_UNIT_PARALLELISM_MAX = new IntegerProperties("ms.work.unit.parallelism.max", 500, 5000, 0) {
+  // default: 100, minimum: -1, maximum: 1000, 0 = default value, -1 = max int
+  IntegerProperties MSTAGE_WORK_UNIT_PARALLELISM_MAX = new IntegerProperties("ms.work.unit.parallelism.max", 500, 5000, -1) {
     @Override
     protected Integer getValidNonblankWithDefault(State state) {
       int value = super.getValidNonblankWithDefault(state);
-      return value == 0 ? getDefaultValue() : value;
+      switch (value) {
+        case 0:
+          return getDefaultValue();
+        case -1:
+          return Integer.MAX_VALUE;
+        default:
+          return value;
+      }
     }
   };
 
