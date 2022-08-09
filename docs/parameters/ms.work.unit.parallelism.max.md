@@ -57,9 +57,13 @@ will be processed in 1 job execution. In such case, the task executors will
 recursively process work units the same way based on thread pool size.
 
 Therefore, unless there are 100s or more work units for a job, it is not necessary 
-to set `ms.work.unit.parallelism.max`, or it can be set to 0 (default), which means no limit.
+to set `ms.work.unit.parallelism.max`, or it can be set to 0 (default), which means the default value mentioned above.
 
-If ms.work.unit.parallelism.max is set to any value greater than 0, and there are 
+If you don't want to impose a limit on the maximum number of work units, please set `ms.work.unit.parallelism.max`
+to -1. In this case, the limit will be set to 2147483647 (i.e., Integer.MAX_VALUE). Please note that this value is to be
+used by advanced users only as there is a chance of JVM going out of memory while creating the work units.
+
+If ms.work.unit.parallelism.max is set to any value greater than or equal to 0, and there are 
 more work units than ms.work.unit.parallelism.max, then the Gobblin job need to 
 be executed repeatedly until all work units are processed.
 
