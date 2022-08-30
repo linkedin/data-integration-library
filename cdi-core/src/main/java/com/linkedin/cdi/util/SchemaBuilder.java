@@ -470,6 +470,22 @@ public class SchemaBuilder {
     return buildAltSchema(new HashMap<>(), false, null, null, false);
   }
 
+  public JsonElement buildAltSchema(boolean recordTypeNullable) {
+    return buildAltSchema(new HashMap<>(), false, null, null, false, recordTypeNullable);
+  }
+
+  /**
+   * For backward compatibility.
+   * i.e. no explicit nullable setting for sub-tables (RECORD type)
+   */
+  public JsonElement buildAltSchema(Map<String, String> defaultTypes,
+      boolean enableCleansing,
+      String pattern,
+      String replacement,
+      boolean nullable) {
+    return buildAltSchema(defaultTypes, enableCleansing, pattern, replacement, nullable, false);
+  }
+
   /**
    * Build into a Avro flavored, but not true  Avro, schema that can be fed into
    * Json2Avro converter. Along the way, schema names are cleansed if special characters
@@ -486,19 +502,21 @@ public class SchemaBuilder {
    * @param pattern the search pattern of schema cleansing
    * @param replacement the replacement string for schema cleansing
    * @param nullable whether to force output all columns as nullable
+   * @param recordTypeNullable whether RECORD type can be explicitly set as nullable
    * @return the Avro flavored schema definition
    */
   public JsonElement buildAltSchema(Map<String, String> defaultTypes,
       boolean enableCleansing,
       String pattern,
       String replacement,
-      boolean nullable) {
+      boolean nullable,
+      boolean recordTypeNullable) {
     JsonObject nestedType = new JsonObject();
     if (this.type == RECORD
         || (this.type == ARRAY && this.elements.size() > 1)) {
       JsonArray fields = new JsonArray();
       for (SchemaBuilder field : elements) {
-        fields.add(field.buildAltSchema(defaultTypes, enableCleansing, pattern, replacement, nullable));
+        fields.add(field.buildAltSchema(defaultTypes, enableCleansing, pattern, replacement, nullable, recordTypeNullable));
       }
       if (name.equals("root") || type == ARRAY) {
         return fields;
@@ -513,7 +531,7 @@ public class SchemaBuilder {
         nestedType.addProperty(KEY_WORD_ITEMS, this.elements.get(0).getPrimitiveType());
       } else {
         nestedType.add(KEY_WORD_ITEMS,
-            this.elements.get(0).buildAltSchema(defaultTypes, enableCleansing, pattern, replacement, nullable));
+            this.elements.get(0).buildAltSchema(defaultTypes, enableCleansing, pattern, replacement, nullable, recordTypeNullable));
       }
     } else {
         nestedType.addProperty(KEY_WORD_TYPE, defaultTypes.getOrDefault(this.getName(), this.primitiveType));
@@ -521,8 +539,8 @@ public class SchemaBuilder {
 
     JsonObject column = new JsonObject();
     column.addProperty(KEY_WORD_COLUMN_NAME, enableCleansing ? name.replaceAll(pattern, replacement) : name);
-    // no explicit nullable setting for sub-tables
-    if (this.type != RECORD) {
+    // no explicit nullable setting for sub-tables, unless explicitly requested
+    if (this.type != RECORD || recordTypeNullable) {
       column.addProperty(KEY_WORD_DATA_IS_NULLABLE, nullable || this.isNullable);
     }
     column.add(KEY_WORD_DATA_TYPE, nestedType);
