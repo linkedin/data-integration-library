@@ -437,7 +437,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
       if (e.getAsJsonObject().has(member)) {
         e = e.getAsJsonObject().get(member);
         if (!members.hasNext()) {
-          return e.getAsString();
+          return e.isJsonNull() ? "null" : e.getAsString();
         }
       }
     }
