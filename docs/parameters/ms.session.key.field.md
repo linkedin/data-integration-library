@@ -25,14 +25,15 @@ a session in backend by a status field, a session cursor, or through
 `ms.session.key.field` specifies the key field in response in order to retrieve the 
 status for session control and the condition for termination.
 
-This property takes the form a JsonObject with a **name**, a **condition**, 
-and a **failCondition**.
+This property takes the form a JsonObject with a **name**, a **condition**, a **failCondition**,
+and a **initValue**.
 
 it takes the form a Json object with a "name", "condition", and "failCondition".
 - **name** specifies the field in response that gives session info, it is required
 - **condition** specifies when the session should stop.
 - **failCondition** specifies when the session should fail.
-- "condition" and "failCondition" are optional
+- **initValue** specifies the initial value of the session key. It is a string value such as "MDAzMzIwMDAwMXlqN3ZEQUFR"
+- "condition", "failCondition", and "initValue" are optional
 - "condition" takes precedence over "failCondition"
 
 The "name" element of ms.session.key.field is one of following:
@@ -95,6 +96,17 @@ URL parameters or request bodies if HttpSource is used.
 However, for the first HTTP request, because the 
 session variable has a NULL value, it will not be used in the request.
 
+The **initValue** parameter contains an optional initial session key value. 
+When **initValue** is not provided and a `session` type variable is defined in
+[ms.parameters](ms.parameters.md), the default behavior is used in which on the 
+initial request the session key is not included in the request URI or body, and on 
+subsequent requests it is included. When an initial value is provided, this value
+will be passed to the `session` type variable on the initial run. This can be useful
+in certain scenarios:
+- To start cursor pagination from a specific page key when working with one work unit
+- to use cursor pagination on a POST request URI in which typically the variables defined in
+  [ms.parameters](ms.parameters.md) are passed to the request body. 
+
 ### Examples
 
 In the following, the session key provides a stop condition:
@@ -117,5 +129,15 @@ Only when this field has the value "true", the source has finished
 streaming data. 
 
 - `ms.session.key.field={"name": "end_of_stream", "condition": {"regexp": "^true$"}}`
+
+In the following, the session key is used as a cursor in the URI for a POST request. We can reference the session variable
+defined in [ms.parameters](ms.parameters.md) inside [ms.source.uri](ms.source.uri.md) such as `<URI>/?next_page={{next_page}}`.
+On the initial request, the cursor value must be present otherwise the next_page variable would not be substituted. So, an
+initial value is defined in **ms.session.key.field** using "initValue". In this example, the API accepts an empty value
+for cursor as the same thing as no value. "" is substituted in as the initial cursor. Subsequent requests for cursor pagination
+work as normal.
+- `ms.source.uri`=`https://<URI>/?next_page={{next_page}}'`
+- `ms.session.key.field={"name": "next_page", "condition": {"regexp": ""}, "initValue": ""}`
+- `ms.parameters=[{"name":"next_page", "type":"session"}]`
 
 [back to summary](summary.md#mssessionkeyfield)

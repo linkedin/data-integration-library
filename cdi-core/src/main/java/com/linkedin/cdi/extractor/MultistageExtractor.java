@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
@@ -839,6 +840,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
    * Initial work unit variable values include
    * - watermarks defined for each work unit
    * - initial pagination defined at the source level
+   * - initial session key values.
    *
    * @return work unit specific initial parameters for the first request to source
    */
@@ -849,6 +851,14 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
     for (Map.Entry<ParameterTypes, Long> entry : jobKeys.getPaginationInitValues().entrySet()) {
       variableValues.addProperty(entry.getKey().toString(), entry.getValue());
     }
+
+    JsonObject sessionKeyField = jobKeys.getSessionKeyField();
+    if (Objects.nonNull(sessionKeyField)) {
+      if (sessionKeyField.has("initValue")) {
+        variableValues.addProperty(ParameterTypes.SESSION.toString(), sessionKeyField.get("initValue").toString());
+      }
+    }
+
     return variableValues;
   }
 
