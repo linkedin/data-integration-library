@@ -21,6 +21,8 @@ import com.linkedin.cdi.util.WorkUnitPartitionTypes;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
@@ -171,6 +173,18 @@ public class JobKeys {
       }
     }
     return retValue;
+  }
+
+  /**
+   * Return the optional initial session value if provided, otherwise return empty optional.
+   */
+  public Optional<String> getSessionInitialValue() {
+    if (Objects.nonNull(sessionKeyField)) {
+      if (sessionKeyField.has("initValue")) {
+        return Optional.of(sessionKeyField.get("initValue").toString());
+      }
+    }
+    return Optional.empty();
   }
 
   public boolean hasSourceSchema() {

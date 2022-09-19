@@ -15,6 +15,7 @@ import gobblin.configuration.SourceState;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
 import org.mockito.Mockito;

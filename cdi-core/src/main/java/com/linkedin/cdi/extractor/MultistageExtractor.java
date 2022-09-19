@@ -38,7 +38,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
@@ -852,12 +852,8 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
       variableValues.addProperty(entry.getKey().toString(), entry.getValue());
     }
 
-    JsonObject sessionKeyField = jobKeys.getSessionKeyField();
-    if (Objects.nonNull(sessionKeyField)) {
-      if (sessionKeyField.has("initValue")) {
-        variableValues.addProperty(ParameterTypes.SESSION.toString(), sessionKeyField.get("initValue").toString());
-      }
-    }
+    Optional<String> initialSessionValue = jobKeys.getSessionInitialValue();
+    initialSessionValue.ifPresent(sessionValue -> variableValues.addProperty(ParameterTypes.SESSION.toString(), sessionValue));
 
     return variableValues;
   }
