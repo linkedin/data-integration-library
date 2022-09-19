@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.SourceState;
 import org.apache.gobblin.configuration.WorkUnitState;
@@ -84,6 +85,7 @@ public class JsonExtractorTest {
     workUnit.setProp(DATASET_URN.getConfig(), DATA_SET_URN_KEY);
     when(source.getJobKeys()).thenReturn(jobKeys);
     when(jobKeys.getPaginationInitValues()).thenReturn(new HashMap<>());
+    when(jobKeys.getSessionInitialValue()).thenReturn(Optional.empty());
     when(jobKeys.getSchemaCleansingPattern()).thenReturn("(\\s|\\$|@)");
     when(jobKeys.getSchemaCleansingReplacement()).thenReturn("_");
     when(jobKeys.getSchemaCleansingNullable()).thenReturn(false);

@@ -112,6 +112,7 @@ public class AvroExtractorTest {
     // mock for source keys
     when(jobKeys.getOutputSchema()).thenReturn(outputJsonSchema);
     when(jobKeys.getDerivedFields()).thenReturn(new HashMap<>());
+    when(jobKeys.getSessionInitialValue()).thenReturn(java.util.Optional.empty());
 
     avroExtractor = new AvroExtractor(state, multiStageSource.getJobKeys());
     avroExtractor.setAvroExtractorKeys(avroExtractorKeys);
