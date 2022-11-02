@@ -48,6 +48,8 @@ public class HttpRequestMethodTest extends PowerMockTestCase {
   final static String CONTENT_TYPE = "Content-Type";
   final static String CONTENT_TYPE_VALUE = "application/x-www-form-urlencoded";
   final static String BASE_URI = "https://domain/%s/calls";
+  final static String BASE_URI_WITH_ONLYFROM_PARAMS = "https://domain/%s/calls?fdt=%s";
+  final static String BASE_URI_WITH_TOANDFROM_PARAMS = "https://domain/%s/calls?fdt=%s&tdt=%s";
   private static Gson gson = new Gson();
   private Map<String, String> headers;
   private String expected;
@@ -65,6 +67,54 @@ public class HttpRequestMethodTest extends PowerMockTestCase {
   @BeforeMethod
   public void setUp() {
     headers = new HashMap<>();
+  }
+
+  /**
+   * Test HttpGet_xe method with parameters
+   * Note: This works when the URI template has all the variable parameters.
+   * If there are any additional parameters, then URIBuilder encodes all parameters while building.
+   *
+   * @throws UnsupportedEncodingException
+   */
+  /*
+  @Test
+  public void testGetXeHttpGetRequest1() throws UnsupportedEncodingException {
+    expected = String.format(
+        "%s %s %s",
+        "GET",
+        String.format(BASE_URI_WITH_TOANDFROM_PARAMS, VERSION_2, FROM_DATETIME, URLEncoder.encode(TO_DATETIME, StandardCharsets.UTF_8.toString())),
+        HTTP_POST_FIX);
+    parameters = generateParameterString(FROM_DATETIME, TO_DATETIME, VERSION_2);
+    String uriTemplate = String.format(BASE_URI_WITH_ONLYFROM_PARAMS, "{{version}}", "{{fromDateTime}}");
+
+    HttpUriRequest getRequest =
+        HttpRequestMethod.GET_XE.getHttpRequest(
+            uriTemplate, parameters, headers);
+    Assert.assertEquals(getRequest.toString(), expected);
+
+    addContentType();
+    getRequest = HttpRequestMethod.GET_XE.getHttpRequest(uriTemplate, parameters, headers);
+    Assert.assertEquals(getRequest.toString(), expected);
+  }
+  */
+  @Test
+  public void testGetXeHttpGetRequest() throws UnsupportedEncodingException {
+    expected = String.format(
+        "%s %s %s",
+        "GET",
+        String.format(BASE_URI_WITH_TOANDFROM_PARAMS, VERSION_2, FROM_DATETIME, TO_DATETIME),
+        HTTP_POST_FIX);
+    parameters = generateParameterString(FROM_DATETIME, TO_DATETIME, VERSION_2);
+    String uriTemplate = String.format(BASE_URI_WITH_TOANDFROM_PARAMS, "{{version}}", "{{fromDateTime}}", "{{toDateTime}}");
+
+    HttpUriRequest getRequest =
+        HttpRequestMethod.GET_XE.getHttpRequest(
+            uriTemplate, parameters, headers);
+    Assert.assertEquals(getRequest.toString(), expected);
+
+    addContentType();
+    getRequest = HttpRequestMethod.GET_XE.getHttpRequest(uriTemplate, parameters, headers);
+    Assert.assertEquals(getRequest.toString(), expected);
   }
 
   /**

@@ -55,6 +55,27 @@ import org.slf4j.LoggerFactory;
  */
 
 public enum HttpRequestMethod {
+  /**
+   * Note: This works when the URI template has all the variable parameters.
+   * If there are any additional parameters, then URIBuilder encodes all parameters while building.
+   */
+  GET_XE("GET_XE") {
+    @Override
+    protected HttpUriRequest getHttpRequestContentJson(String uriTemplate,
+        JsonObject parameters, JsonObject payloads)
+        throws UnsupportedEncodingException {
+      Pair<String, JsonObject> replaced = VariableUtils.replaceWithTracking(uriTemplate, parameters, false);
+      //ignore payloads
+      return new HttpGet(appendParameters(replaced.getKey(), replaced.getValue()));
+    }
+
+    @Override
+    protected HttpUriRequest getHttpRequestContentUrlEncoded(String uriTemplate, JsonObject parameters)
+        throws UnsupportedEncodingException {
+      return getHttpRequestContentJson(uriTemplate, parameters, new JsonObject());
+    }
+  },
+
   GET("GET") {
     @Override
     protected HttpUriRequest getHttpRequestContentJson(String uriTemplate,
