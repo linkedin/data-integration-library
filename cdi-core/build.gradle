@@ -42,6 +42,7 @@ jacocoTestReport {
 apply from: "$rootDir/gradle/java-publishing.gradle"
 
 dependencies {
+  compile externalDependency.'avro'
   compile externalDependency.'gson'
   compile externalDependency.'gobblin-core'
   compile externalDependency.'gobblin-core-base'
