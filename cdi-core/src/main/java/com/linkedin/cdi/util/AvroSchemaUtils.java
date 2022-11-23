@@ -52,13 +52,9 @@ public interface AvroSchemaUtils {
    * @return copy of schema field
    */
   static Schema.Field deepCopySchemaField(Schema.Field field) {
-    Schema.Field f = new Schema.Field(field.name(), field.schema(), field.doc(), field.defaultVal(), field.order());
-    field.getObjectProps().forEach(
-        (propName, propValue) -> {
-          if (propValue instanceof String) f.addProp(propName, (String) propValue);
-        }
-    );
-    return f;
+      Schema.Field f = new Schema.Field(field.name(), field.schema(), field.doc(), field.defaultVal(), field.order());
+      field.getProps().forEach(f::addProp);
+      return f;
   }
 
   /**
