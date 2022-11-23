@@ -321,8 +321,13 @@ public class MultistageSource<S, D> extends AbstractSource<S, D> {
           ImmutablePair<Long, Long> dtPartitionModified = unitCutoffTime == -1L
               ? dtPartition : previousHighWatermarks.get(wuSignature).equals(dtPartition.left)
               ? dtPartition : new ImmutablePair<>(Long.max(unitCutoffTime, dtPartition.left), dtPartition.right);
-
           LOG.info(String.format(MSG_WORK_UNIT_INFO, wuSignature, dtPartitionModified));
+          if (jobKeys.shouldCleanseNoRangeWorkUnit()
+              && (long) dtPartitionModified.left == dtPartitionModified.right) {
+            LOG.info(String.format("Skipping no range work units with low watermark: %s, high watermark: %s",
+                dtPartitionModified.left, dtPartitionModified.right));
+            continue;
+          }
           WorkUnit workUnit = WorkUnit.create(extract,
               new WatermarkInterval(
                   new LongWatermark(dtPartitionModified.getLeft()),

@@ -85,11 +85,13 @@ public class JobKeys {
   private Boolean schemaCleansingNullable = false;
   private long minWorkUnits = 0;
   private long minWorkUnitRecords = 0;
+  private JsonObject auxKeys = new JsonObject();
 
   public void initialize(State state) {
     parsePaginationFields(state);
     parsePaginationInitialValues(state);
     setSessionKeyField(MSTAGE_SESSION_KEY_FIELD.get(state));
+    setAuxKeys(MSTAGE_AUX_KEYS.get(state));
     setTotalCountField(MSTAGE_TOTAL_COUNT_FIELD.get(state));
     setSourceUri(MSTAGE_SOURCE_URI.get(state));
     setDefaultFieldTypes(parseDefaultFieldTypes(state));
@@ -157,6 +159,13 @@ public class JobKeys {
       return sessionKeyField.get("condition").getAsJsonObject().get("regexp").getAsString();
     }
     return StringUtils.EMPTY;
+  }
+
+  public boolean shouldCleanseNoRangeWorkUnit() {
+    if (auxKeys != null && auxKeys.has(CLEANSE_NO_RANGE_WORK_UNIT)) {
+      return auxKeys.get(CLEANSE_NO_RANGE_WORK_UNIT).getAsBoolean();
+    }
+    return false;
   }
 
   /**
@@ -547,6 +556,14 @@ public class JobKeys {
 
   public void setSessionKeyField(JsonObject sessionKeyField) {
     this.sessionKeyField = sessionKeyField;
+  }
+
+  public JsonObject getAuxKeys() {
+    return auxKeys;
+  }
+
+  public void setAuxKeys(JsonObject auxKeys) {
+    this.auxKeys = auxKeys;
   }
 
   public String getTotalCountField() {

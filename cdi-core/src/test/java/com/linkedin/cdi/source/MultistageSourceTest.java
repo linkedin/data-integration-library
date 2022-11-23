@@ -685,4 +685,65 @@ public class MultistageSourceTest {
     Assert.assertEquals(actualWorkUnits.get(0).getLowWatermark(), expectedWorkUnit.getLowWatermark());
     Assert.assertEquals(actualWorkUnits.get(0).getExpectedHighWatermark(), expectedWorkUnit.getExpectedHighWatermark());
   }
+
+  @Test
+  public void testRemoveNoRangeWorkUnitEnabled() {
+    SourceState state = new SourceState();
+    state.setProp("ms.aux.keys", "{\"cleanseNoRangeWorkUnit\": true}");
+    MultistageSource<?, ?> source = new MultistageSource<>();
+    source.setSourceState(state);
+    source.jobKeys.initialize(state);
+
+    // watermark definition: define from and to date watermark
+    String jsonDef = "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"2021-06-18\", \"to\": \"2021-06-19\"}}]";
+    Gson gson = new Gson();
+    JsonArray defArray = gson.fromJson(jsonDef, JsonArray.class);
+    WatermarkDefinition watermarkDefinition = new WatermarkDefinition(defArray.get(0).getAsJsonObject(),
+        false, WorkUnitPartitionTypes.DAILY);
+    List<WatermarkDefinition> definitions = ImmutableList.of(watermarkDefinition);
+
+    // previous highwatermarks: simulate state-store entry
+    Map<String, Long> previousHighWatermarks = Mockito.mock(HashMap.class);
+    when(previousHighWatermarks.containsKey(any())).thenReturn(true);
+    when(previousHighWatermarks.get(any())).thenReturn(
+        DTF_PST_TIMEZONE.parseDateTime("2021-06-19T00:00:00").getMillis());
+
+    List<WorkUnit> actualWorkUnits = source.generateWorkUnits(definitions, previousHighWatermarks);
+    // expected result should not contain any no range work units
+    Assert.assertEquals(actualWorkUnits.size(), 0);
+  }
+
+  @Test
+  public void testRemoveNoRangeWorkUnitDisabled() {
+    SourceState state = new SourceState();
+    state.setProp("ms.aux.keys", "{\"cleanseNoRangeWorkUnit\": false}");
+    MultistageSource<?, ?> source = new MultistageSource<>();
+    source.setSourceState(state);
+    source.jobKeys.initialize(state);
+
+    // watermark definition: define from and to date watermark
+    String jsonDef = "[{\"name\": \"system\",\"type\": \"datetime\", \"range\": {\"from\": \"2021-06-18\", \"to\": \"2021-06-19\"}}]";
+    Gson gson = new Gson();
+    JsonArray defArray = gson.fromJson(jsonDef, JsonArray.class);
+    WatermarkDefinition watermarkDefinition = new WatermarkDefinition(defArray.get(0).getAsJsonObject(),
+        false, WorkUnitPartitionTypes.DAILY);
+    List<WatermarkDefinition> definitions = ImmutableList.of(watermarkDefinition);
+
+    // previous highwatermarks: simulate state-store entry
+    Map<String, Long> previousHighWatermarks = Mockito.mock(HashMap.class);
+    when(previousHighWatermarks.containsKey(any())).thenReturn(true);
+    when(previousHighWatermarks.get(any())).thenReturn(
+        DTF_PST_TIMEZONE.parseDateTime("2021-06-19T00:00:00").getMillis());
+
+    List<WorkUnit> actualWorkUnits = source.generateWorkUnits(definitions, previousHighWatermarks);
+    // expected result contains no range work units
+    WorkUnit expectedWorkUnit = WorkUnit.create(null,
+        new WatermarkInterval(
+            new LongWatermark(DTF_PST_TIMEZONE.parseDateTime("2021-06-19T00:00:00").getMillis()),
+            new LongWatermark(DTF_PST_TIMEZONE.parseDateTime("2021-06-19T00:00:00").getMillis())));
+
+    Assert.assertEquals(actualWorkUnits.size(), 1);
+    Assert.assertEquals(actualWorkUnits.get(0).getLowWatermark(), expectedWorkUnit.getLowWatermark());
+    Assert.assertEquals(actualWorkUnits.get(0).getExpectedHighWatermark(), expectedWorkUnit.getExpectedHighWatermark());
+  }
 }
