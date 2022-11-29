@@ -356,7 +356,7 @@ public class JsonExtractorTest {
         "dateTimeString",
         ImmutableMap.of("type", "string", "source", "{{dateTimeString}}"),
         "someInteger",
-        ImmutableMap.of("type", "integer", "source", "{{someInteger}}"),
+        ImmutableMap.of("type", "int", "source", "{{someInteger}}"),
         "someEpoc",
         ImmutableMap.of("type", "epoc", "source", "{{someEpoc}}"),
         "someNumber",

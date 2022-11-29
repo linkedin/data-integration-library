@@ -76,7 +76,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   protected final static String PXD = "P\\d+D";
   protected final static String CONTENT_TYPE_KEY = "Content-Type";
   protected final static List<String> SUPPORTED_DERIVED_FIELD_TYPES =
-      Arrays.asList(KEY_WORD_EPOC, KEY_WORD_STRING, KEY_WORD_REGEXP, KEY_WORD_BOOLEAN, KEY_WORD_INTEGER, KEY_WORD_NUMBER);
+      Arrays.asList(KEY_WORD_EPOC, KEY_WORD_STRING, KEY_WORD_REGEXP, KEY_WORD_BOOLEAN, KEY_WORD_INT, KEY_WORD_NUMBER);
   protected static final String COMMA_STR = ",";
   protected WorkUnitStatus workUnitStatus = WorkUnitStatus.builder().build();
   protected WorkUnitState state = null;
@@ -482,7 +482,7 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
           dataType.addProperty(KEY_WORD_TYPE, "long");
           break;
         case KEY_WORD_STRING:
-        case KEY_WORD_INTEGER:
+        case KEY_WORD_INT:
         case KEY_WORD_NUMBER:
         case KEY_WORD_BOOLEAN:
           dataType.addProperty(KEY_WORD_TYPE, entry.getValue().get(KEY_WORD_TYPE));

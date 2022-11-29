@@ -34,7 +34,7 @@ DIL supports 6 types of derived fields:
 - `epoc`: it provides a time value field in the form of epoch (millisecond level). 
 - `regexp`: it provides a string value field by extracting the value from another field using a Java REGEXP pattern
 - `string`: it provides a string value field by taking from another field, which can be a nested field, without transformation
-- `integer`: it provides a integer value field by taking from another integer field, which can be a nested field, without transformation
+- `int`: it provides a integer value field by taking from another integer field, which can be a nested field, without transformation
 - `number`: it provides a number value field by taking from another number field, which can be a nested field, without transformation
 - `boolean`: it provides a boolean value field by taking from another boolean field, which can be a nested field, without transformation
 
