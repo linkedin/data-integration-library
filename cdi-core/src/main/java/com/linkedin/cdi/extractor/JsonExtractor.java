@@ -326,7 +326,7 @@ public class JsonExtractor extends MultistageExtractor<JsonArray, JsonObject> {
         case KEY_WORD_BOOLEAN:
           row.addProperty(name, Boolean.parseBoolean(strValue));
           break;
-        case KEY_WORD_INTEGER:
+        case KEY_WORD_INT:
           row.addProperty(name, Integer.parseInt(strValue));
           break;
         case KEY_WORD_NUMBER:
