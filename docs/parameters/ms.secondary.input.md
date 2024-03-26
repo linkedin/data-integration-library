@@ -89,8 +89,8 @@ is defined in `ms.watermark`. In execution, there will be 3 work units generated
 
 The `format` of payload defines in which format the payload should be read as. This field is optional and by default
 the input will be read as a Json array. However, if `"format":"binary"` is specified, then DIL will simply store the payload path string
-in `payloadsBinaryPath` field of extractor keys to be used later. Currently the binary format is only used in S3 upload use case
-where an input stream will be opened on the given path and then passed as the input to the `putObject` method for uploading to S3.
+in `payloadsBinaryPath` field of extractor keys to be used later. Currently, the binary format is only used in S3 upload use case
+where an input stream will be opened on the given path and then passed as the input to the `putObject` method for uploading to S3. In this upload key, the s3 key will be the last part of the path (file name), or can be configured by specifying the `s3key` field in the secondary input.
 
 The variable can only be a [job-level variables](../concepts/variables.md#job-level-variables) or a 
 [work-unit-level static variable](../concepts/variables.md#work-unit-level-static-variables).
@@ -120,5 +120,9 @@ in back fill.
 In the following, we egress the normalized records from a prior job (`${preprocess.table.name}`)
 
 - `ms.secondary.input=[{"path": "${job.dir}/${extract.namespace}/${preprocess.table.name}", "fields": ["conversions"], "category": "payload"}]`
+
+In the following, we specify the s3 key to upload using `s3key` parameter
+
+- `ms.secondary.input=[{"path": "${job.dir}/${extract.namespace}/${preprocess.table.name}", "fields": ["source", "s3key"], "category": "activation"}]`
 
 [back to summary](summary.md#mssecondaryinput)
