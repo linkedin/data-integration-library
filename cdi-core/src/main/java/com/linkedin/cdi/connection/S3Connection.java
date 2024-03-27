@@ -52,7 +52,7 @@ import static software.amazon.awssdk.http.SdkHttpConfigurationOption.GLOBAL_HTTP
  */
 public class S3Connection extends MultistageConnection {
   private static final Logger LOG = LoggerFactory.getLogger(S3Connection.class);
-  private static final String UPLOAD_S3_KEY = "upload.s3.key";
+  private static final String UPLOAD_S3_KEY = "uploadS3Key";
   final private S3Keys s3SourceV2Keys;
   private S3Client s3Client = null;
 
