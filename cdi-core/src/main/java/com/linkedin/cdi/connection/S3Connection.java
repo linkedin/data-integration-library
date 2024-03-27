@@ -5,7 +5,6 @@
 package com.linkedin.cdi.connection;
 
 import com.google.common.collect.Lists;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.linkedin.cdi.exception.RetriableAuthenticationException;
 import com.linkedin.cdi.factory.ConnectionClientFactory;
@@ -39,7 +38,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.linkedin.cdi.configuration.PropertyCollection.MSTAGE_CONNECTION_CLIENT_FACTORY;
@@ -54,7 +52,7 @@ import static software.amazon.awssdk.http.SdkHttpConfigurationOption.GLOBAL_HTTP
  */
 public class S3Connection extends MultistageConnection {
   private static final Logger LOG = LoggerFactory.getLogger(S3Connection.class);
-  private static final String UPLOAD_S3_KEY = "s3key";
+  private static final String UPLOAD_S3_KEY = "upload.s3.key";
   final private S3Keys s3SourceV2Keys;
   private S3Client s3Client = null;
 
@@ -131,16 +129,13 @@ public class S3Connection extends MultistageConnection {
   }
 
   /**
-   * Get s3 key either from activation parameters named `s3key` or from the source path itself
+   * Get s3 key either from activation parameters named `UPLOAD_S3_KEY` or from the source path itself
    */
   @NotNull
   private String getS3Key(Path path) {
     JsonObject activationParameters = getExtractorKeys().getActivationParameters();
-    for (Map.Entry<String, JsonElement> entry : activationParameters.entrySet()) {
-      String key = entry.getKey();
-      if (key.equals(UPLOAD_S3_KEY)) {
-        return entry.getValue().getAsString();
-      }
+    if(activationParameters.has(UPLOAD_S3_KEY)){
+      return activationParameters.get(UPLOAD_S3_KEY).getAsString();
     }
     return path.getName();
   }
