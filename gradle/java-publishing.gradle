@@ -90,7 +90,7 @@ artifactory {
   contextUrl = 'https://linkedin.jfrog.io/artifactory'
   publish {
     repository {
-      repoKey = 'release'
+      repoKey = 'dil'
       username = System.getenv('ARTIFACTORY_USER')
       password = System.getenv('ARTIFACTORY_KEY')
     }
