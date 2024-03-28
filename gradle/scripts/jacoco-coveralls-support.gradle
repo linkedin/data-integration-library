@@ -8,7 +8,7 @@
 
 apply plugin: 'jacoco'
 
-ext.jacocoVersion = '0.8.1'
+ext.jacocoVersion = '0.8.6'
 
 jacoco {
   toolVersion = jacocoVersion
@@ -29,12 +29,6 @@ subprojects {
       html.enabled = true
       xml.enabled = true
       csv.enabled = false
-    }
-
-    afterEvaluate {
-      classDirectories = files(classDirectories.files.collect {
-        fileTree(dir: it, exclude: 'helix-*.jar')
-      })
     }
   }
 }

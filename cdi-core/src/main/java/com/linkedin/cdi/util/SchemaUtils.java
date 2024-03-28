@@ -35,9 +35,9 @@ public class SchemaUtils {
    * @return true if first N columns are all existing in source and false other wise
    *
    *
-   * Example 1: definedColumns: [A, c], sourceColumns: [a, B, C] ==> true, B in source will be ignored in projection
-   * Example 2: definedColumns: [A, e], sourceColumns: [a, B, C] ==> false
-   * Example 3: definedColumns: [A, B, C], sourceColumns: [A, B] ==> true, C is assumed to be a derived field
+   * Example 1: definedColumns: [A, c], sourceColumns: [a, B, C] ==&gt; true, B in source will be ignored in projection
+   * Example 2: definedColumns: [A, e], sourceColumns: [a, B, C] ==&gt; false
+   * Example 3: definedColumns: [A, B, C], sourceColumns: [A, B] ==&gt; true, C is assumed to be a derived field
    *
    */
   public static boolean isValidSchemaDefinition(

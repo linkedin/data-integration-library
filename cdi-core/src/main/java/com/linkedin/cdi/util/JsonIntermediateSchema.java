@@ -19,7 +19,7 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
 /**
  * Recursively defined a Json Intermediate schema
  *
- * JsonIntermediateSchema := Map<columnName, JisColumn>
+ * JsonIntermediateSchema := Map&lt;columnName, JisColumn&gt;
  *
  * JisColumn :=  (columnName, nullability, JisDataType)
  *
@@ -31,7 +31,7 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
  *
  * EnumType := (JsonElementType, symbolsArray)
  *
- * UnionType := (JsonElementType, List<JisDataType>)
+ * UnionType := (JsonElementType, List&lt;JisDataType&gt;)
  *
  */
 

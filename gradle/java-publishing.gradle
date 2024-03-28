@@ -93,7 +93,6 @@ artifactory {
       repoKey = 'dil'
       username = System.getenv('ARTIFACTORY_USER')
       password = System.getenv('ARTIFACTORY_KEY')
-      maven = true
     }
 
     defaults {
@@ -106,15 +105,6 @@ artifactory {
           publications('jar', 'dataTemplate')
         }
       }
-    }
-  }
-
-  resolve {
-    repository {
-      repoKey = 'release'
-      username = System.getenv('ARTIFACTORY_USER')
-      password = System.getenv('ARTIFACTORY_KEY')
-      maven = true
     }
   }
 }

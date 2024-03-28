@@ -14,42 +14,35 @@ import com.linkedin.cdi.keys.S3Keys;
 import com.linkedin.cdi.util.JsonUtils;
 import com.linkedin.cdi.util.SecretManager;
 import com.linkedin.cdi.util.WorkUnitStatus;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.gobblin.configuration.State;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.Path;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.*;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.utils.AttributeMap;
 
-import static com.linkedin.cdi.configuration.PropertyCollection.*;
-import static software.amazon.awssdk.http.SdkHttpConfigurationOption.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.linkedin.cdi.configuration.PropertyCollection.MSTAGE_CONNECTION_CLIENT_FACTORY;
+import static software.amazon.awssdk.http.SdkHttpConfigurationOption.CONNECTION_TIMEOUT;
+import static software.amazon.awssdk.http.SdkHttpConfigurationOption.GLOBAL_HTTP_DEFAULTS;
 
 /**
  * S3Connection creates transmission channel with AWS S3 data provider or AWS S3 data receiver,
@@ -59,6 +52,7 @@ import static software.amazon.awssdk.http.SdkHttpConfigurationOption.*;
  */
 public class S3Connection extends MultistageConnection {
   private static final Logger LOG = LoggerFactory.getLogger(S3Connection.class);
+  private static final String UPLOAD_S3_KEY = "uploadS3Key";
   final private S3Keys s3SourceV2Keys;
   private S3Client s3Client = null;
 
@@ -84,12 +78,16 @@ public class S3Connection extends MultistageConnection {
   public WorkUnitStatus execute(WorkUnitStatus status) {
     s3Client = getS3HttpClient(getState());
 
-    String finalPrefix = getWorkUnitSpecificString(s3SourceV2Keys.getPrefix(), getExtractorKeys().getDynamicParameters());
+    JsonObject dynamicParameters = getExtractorKeys().getDynamicParameters();
+    String finalPrefix = getWorkUnitSpecificString(s3SourceV2Keys.getPrefix(), dynamicParameters);
     LOG.debug("Final Prefix to get files list: {}", finalPrefix);
-    boolean shouldUpload = StringUtils.isNotEmpty(getExtractorKeys().getPayloadsBinaryPath());
-      // upload to S3 if payload is empty, otherwise download from S3
+    String pathStr = getExtractorKeys().getPayloadsBinaryPath();
+    boolean shouldUpload = StringUtils.isNotEmpty(pathStr);
+    // upload to S3 if payload is empty, otherwise download from S3
     if (shouldUpload) {
-      ByteArrayInputStream byteArrayInputStream = handleUpload(finalPrefix);
+      Path path = new Path(pathStr);
+      String fileName = finalPrefix + "/" + getS3Key(path);
+      ByteArrayInputStream byteArrayInputStream = handleUpload(path, fileName);
       if (byteArrayInputStream != null) {
         status.setBuffer(byteArrayInputStream);
       }
@@ -97,8 +95,8 @@ public class S3Connection extends MultistageConnection {
     }
     try {
       List<String> files = getFilesList(finalPrefix).stream()
-          .filter(objectKey -> objectKey.matches(s3SourceV2Keys.getFilesPattern()))
-          .collect(Collectors.toList());
+              .filter(objectKey -> objectKey.matches(s3SourceV2Keys.getFilesPattern()))
+              .collect(Collectors.toList());
 
       LOG.debug("Number of files identified: {}", files.size());
 
@@ -106,21 +104,21 @@ public class S3Connection extends MultistageConnection {
         status.setBuffer(wrap(files));
       } else {
         // Multiple files are returned, then only process the exact match
-        String fileToDownload = files.size() == 0
-            ? StringUtils.EMPTY : files.size() == 1
-            ? files.get(0) : finalPrefix;
+        String fileToDownload = files.isEmpty()
+                ? StringUtils.EMPTY : files.size() == 1
+                ? files.get(0) : finalPrefix;
 
         if (StringUtils.isNotBlank(fileToDownload)) {
           LOG.debug("Downloading file: {}", fileToDownload);
           GetObjectRequest getObjectRequest =
-              GetObjectRequest.builder().bucket(s3SourceV2Keys.getBucket()).key(fileToDownload).build();
+                  GetObjectRequest.builder().bucket(s3SourceV2Keys.getBucket()).key(fileToDownload).build();
           ResponseInputStream<GetObjectResponse> response =
-              s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
+                  s3Client.getObject(getObjectRequest, ResponseTransformer.toInputStream());
           status.setBuffer(response);
         } else {
           LOG.warn("Invalid set of parameters. "
-              + "To list down files from a bucket, pattern parameter is needed,"
-              + ", and to get object from s3 source target file name is needed.");
+                  + "To list down files from a bucket, pattern parameter is needed,"
+                  + ", and to get object from s3 source target file name is needed.");
         }
       }
     } catch (Exception e) {
@@ -130,32 +128,41 @@ public class S3Connection extends MultistageConnection {
     return status;
   }
 
-  private ByteArrayInputStream handleUpload(String finalPrefix) {
+  /**
+   * Get s3 key either from activation parameters named `UPLOAD_S3_KEY` or from the source path itself
+   */
+  @NotNull
+  private String getS3Key(Path path) {
+    JsonObject activationParameters = getExtractorKeys().getActivationParameters();
+    if(activationParameters.has(UPLOAD_S3_KEY)){
+      return activationParameters.get(UPLOAD_S3_KEY).getAsString();
+    }
+    return path.getName();
+  }
+
+  private ByteArrayInputStream handleUpload(Path path, String fileName) {
     // the path here should be a file path instead of a directory path. Planning should be done upfront at the Source
     // level and here each connection would just read a single file
-    String pathStr = getExtractorKeys().getPayloadsBinaryPath();
-    Path path = new Path(pathStr);
-    LOG.info("reading from path: {}", getExtractorKeys().getPayloadsBinaryPath());
+    LOG.info("reading from path: {}", path);
     Configuration conf = new Configuration();
     try (
-        FSDataInputStream fsDataInputStream = path.getFileSystem(conf).open(path);
-        FSDataInputStream fsDataInputStreamForMD5 = path.getFileSystem(conf).open(path);
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(fsDataInputStream)
-        ) {
+            FSDataInputStream fsDataInputStream = path.getFileSystem(conf).open(path);
+            FSDataInputStream fsDataInputStreamForMD5 = path.getFileSystem(conf).open(path);
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(fsDataInputStream)
+    ) {
       long fileSize = path.getFileSystem(conf).getFileStatus(path).getLen();
       // HDFS uses MD5MD5CRC for checksum, and thus MD5 needs to be computed separately
       // to compare with the MD5 returned from S3
       // A more detailed explanation can be found here
       // https://cloud.google.com/architecture/hadoop/validating-data-transfers
       String md5Hex = DigestUtils.md5Hex(fsDataInputStreamForMD5);
-      String fileName = finalPrefix + "/" + path.getName();
       String bucket = s3SourceV2Keys.getBucket();
       LOG.info("writing to bucket {} and key {}", bucket, fileName);
       PutObjectRequest putObjectRequest = PutObjectRequest
-          .builder()
-          .bucket(bucket)
-          .key(fileName)
-          .build();
+              .builder()
+              .bucket(bucket)
+              .key(fileName)
+              .build();
       RequestBody requestBody = RequestBody.fromInputStream(bufferedInputStream, fileSize);
       PutObjectResponse putObjectResponse = s3Client.putObject(putObjectRequest, requestBody);
       LOG.info("retrieved put object response");
@@ -165,21 +172,20 @@ public class S3Connection extends MultistageConnection {
       boolean md5Valid = true;
       if (!eTagTruncated.equals(md5Hex)) {
         LOG.error("md5 validation failed for bucket {} and key {}:"
-            + " {} from S3 is different from {} of the original file",
-            bucket, fileName, eTag, md5Hex);
+                        + " {} from S3 is different from {} of the original file",
+                bucket, fileName, eTag, md5Hex);
         md5Valid = false;
       }
       JsonObject jsonObject =
-          JsonUtils.GSON_WITH_SUPERCLASS_EXCLUSION.toJsonTree(putObjectResponse).getAsJsonObject();
+              JsonUtils.GSON_WITH_SUPERCLASS_EXCLUSION.toJsonTree(putObjectResponse).getAsJsonObject();
       jsonObject.addProperty("md5Valid", md5Valid);
       jsonObject.addProperty("bucket", bucket);
       jsonObject.addProperty("key", fileName);
       return new ByteArrayInputStream(
-          jsonObject.toString().getBytes(StandardCharsets.UTF_8)
+              jsonObject.toString().getBytes(StandardCharsets.UTF_8)
       );
     } catch (IOException e) {
-      LOG.error("Encountered IO Exception when reading from path: {}", pathStr);
-      e.printStackTrace();
+      LOG.error("Encountered IO Exception when reading from path: " + path, e);
       return null;
     }
   }
@@ -226,16 +232,16 @@ public class S3Connection extends MultistageConnection {
 
         Integer connectionTimeout = s3SourceV2Keys.getConnectionTimeout();
         AttributeMap config = connectionTimeout == null ? GLOBAL_HTTP_DEFAULTS
-            : GLOBAL_HTTP_DEFAULTS.toBuilder()
+                : GLOBAL_HTTP_DEFAULTS.toBuilder()
                 .put(CONNECTION_TIMEOUT, Duration.ofSeconds(connectionTimeout))
                 .build();
 
         s3Client = S3Client.builder()
-            .region(this.s3SourceV2Keys.getRegion())
-            .endpointOverride(URI.create(s3SourceV2Keys.getEndpoint()))
-            .httpClient(factory.getS3Client(state, config))
-            .credentialsProvider(getCredentialsProvider(state))
-            .build();
+                .region(this.s3SourceV2Keys.getRegion())
+                .endpointOverride(URI.create(s3SourceV2Keys.getEndpoint()))
+                .httpClient(factory.getS3Client(state, config))
+                .credentialsProvider(getCredentialsProvider(state))
+                .build();
       } catch (Exception e) {
         LOG.error("Error creating S3 Client: {}", e.getMessage());
       }
@@ -245,12 +251,13 @@ public class S3Connection extends MultistageConnection {
 
   /**
    * retrieve a list of objects given a bucket name and a prefix
+   *
    * @return list of object keys
    */
   private List<String> getFilesList(String finalPrefix) {
     List<String> files = Lists.newArrayList();
     ListObjectsV2Request.Builder builder =
-        ListObjectsV2Request.builder().bucket(s3SourceV2Keys.getBucket()).maxKeys(s3SourceV2Keys.getMaxKeys());
+            ListObjectsV2Request.builder().bucket(s3SourceV2Keys.getBucket()).maxKeys(s3SourceV2Keys.getMaxKeys());
 
     if (!finalPrefix.isEmpty()) {
       builder.prefix(finalPrefix);
@@ -275,8 +282,8 @@ public class S3Connection extends MultistageConnection {
     AwsCredentialsProvider credentialsProvider = AnonymousCredentialsProvider.create();
     if (StringUtils.isNotBlank(s3SourceV2Keys.getAccessKey()) || StringUtils.isNotEmpty(s3SourceV2Keys.getSecretId())) {
       AwsCredentials credentials =
-          AwsBasicCredentials.create(SecretManager.getInstance(state).decrypt(s3SourceV2Keys.getAccessKey()),
-              SecretManager.getInstance(state).decrypt(s3SourceV2Keys.getSecretId()));
+              AwsBasicCredentials.create(SecretManager.getInstance(state).decrypt(s3SourceV2Keys.getAccessKey()),
+                      SecretManager.getInstance(state).decrypt(s3SourceV2Keys.getSecretId()));
       credentialsProvider = StaticCredentialsProvider.create(credentials);
     }
     return credentialsProvider;

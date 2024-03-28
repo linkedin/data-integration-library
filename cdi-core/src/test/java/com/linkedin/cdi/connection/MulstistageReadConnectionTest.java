@@ -15,6 +15,7 @@ import com.linkedin.cdi.util.VariableUtils;
 import com.linkedin.cdi.util.WorkUnitStatus;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
@@ -25,6 +26,7 @@ import static org.powermock.api.mockito.PowerMockito.*;
 
 @Test
 @PrepareForTest(VariableUtils.class)
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class MulstistageReadConnectionTest extends PowerMockTestCase {
   @Test
   public void testGetNext() throws RetriableAuthenticationException {

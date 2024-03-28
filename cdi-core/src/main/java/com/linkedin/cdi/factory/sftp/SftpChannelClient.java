@@ -132,7 +132,7 @@ public class SftpChannelClient implements SftpClient {
   /**
    * Execute an FTP ls command with retries
    * @param path the target path to list content
-   * @param  retries the number of times to try the ls command, must be > 0
+   * @param  retries the number of times to try the ls command, must be &gt; 0
    * @return the list of files and directories
    */
   @Override

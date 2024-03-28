@@ -16,6 +16,7 @@ import org.apache.gobblin.source.extractor.filebased.FileBasedHelperException;
 import org.apache.gobblin.source.extractor.filebased.TimestampAwareFileBasedHelper;
 import org.apache.gobblin.source.extractor.hadoop.HadoopFsHelper;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
@@ -27,6 +28,7 @@ import static org.powermock.api.mockito.PowerMockito.*;
 
 @Test
 @PrepareForTest({HadoopFsHelper.class, TimestampAwareFileBasedHelper.class})
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class HdfsReadConnectionTest extends PowerMockTestCase {
   @Test
   public void testGetFileList() throws Exception {

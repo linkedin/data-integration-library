@@ -18,6 +18,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gobblin.configuration.State;
 import org.mockito.Mockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.*;
 
 
 @PrepareForTest({JsonUtils.class})
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class JobKeysTest extends PowerMockTestCase {
   private JobKeys jobKeys;
   private Gson gson;

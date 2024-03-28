@@ -14,6 +14,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.*;
  */
 
 @PrepareForTest({Base64.class})
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class JdbcUtilsTest extends PowerMockTestCase {
 
   @Mock

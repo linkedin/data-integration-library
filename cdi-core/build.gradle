@@ -26,17 +26,7 @@ sourceSets {
 }
 
 jacoco {
-  toolVersion = '0.8.0'
-}
-
-// Exclude classes, packages from Jacoco report, which we don't need to add unit tests for.
-jacocoTestReport {
-  afterEvaluate {
-    classDirectories = files(classDirectories.files.collect {
-      fileTree(dir: it,
-              exclude: ['com/linkedin/cdi/factory'])
-    })
-  }
+  toolVersion = "0.8.6"
 }
 
 apply from: "$rootDir/gradle/java-publishing.gradle"
