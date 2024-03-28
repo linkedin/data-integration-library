@@ -99,7 +99,7 @@ public class SecondaryInputProperties extends JsonArrayProperties {
    * Read authentication and activation secondary input records and payload definitions (not records)
    *
    * @return a set of JsonArrays of data read from locations specified in SECONDARY_INPUT
-   *         property organized by category, in a Map<String, JsonArray> structure
+   *         property organized by category, in a Map&lt;String, JsonArray&gt; structure
    */
   public Map<String, JsonArray> readAllContext(State state) {
     Map<String, JsonArray> secondaryInputs = new HashMap<>();

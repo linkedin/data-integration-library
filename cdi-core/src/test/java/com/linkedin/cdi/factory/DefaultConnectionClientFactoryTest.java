@@ -9,6 +9,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.*;
 
 
 @PrepareForTest({HttpClientBuilder.class})
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class DefaultConnectionClientFactoryTest extends PowerMockTestCase {
   @Mock
   private HttpClientBuilder httpClientBuilder;

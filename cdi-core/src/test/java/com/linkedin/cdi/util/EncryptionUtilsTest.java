@@ -10,6 +10,7 @@ import org.apache.gobblin.codec.StreamCodec;
 import org.apache.gobblin.password.PasswordManager;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.Assert;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.*;
 
 
 @PrepareForTest({PasswordManager.class})
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class EncryptionUtilsTest extends PowerMockTestCase {
   private final static String PLAIN_PASSWORD = "password";
   private final static String ENC_PASSWORD = "ENC(M6nV+j0lhqZ36RgvuF5TQMyNvBtXmkPl)";

@@ -40,12 +40,12 @@ import static com.linkedin.cdi.configuration.StaticConstants.*;
  * Currently following rules are defined:
  *
  *  fail (upper bound rule): the source should be failed records
- *    Job succeeds when the row count in validation set / row count in base set < threshold
- *    Job fails when the row count in validation set / row count in base set >= threshold
+ *    Job succeeds when the row count in validation set / row count in base set &lt; threshold
+ *    Job fails when the row count in validation set / row count in base set &gt;= threshold
  *
  *  success (lower bound rule): the source should be succeeded records
- *    Job succeeds when the row count in validation set / row count in base set >= threshold
- *    Job fails when the row count in validation set / row count in base set < threshold
+ *    Job succeeds when the row count in validation set / row count in base set &gt;= threshold
+ *    Job fails when the row count in validation set / row count in base set &lt; threshold
  */
 public class InFlowValidationConverter extends Converter<Schema, Schema, GenericRecord, GenericRecord> {
   private static final Logger LOG = LoggerFactory.getLogger(InFlowValidationConverter.class);

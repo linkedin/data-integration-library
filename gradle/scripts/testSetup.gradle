@@ -4,7 +4,6 @@
 
 subprojects {
   plugins.withType(JavaPlugin) {
-    plugins.apply('findbugs')
     plugins.apply('checkstyle')
 
     test {
@@ -30,38 +29,12 @@ subprojects {
       }
     }
 
-    findbugs {
-      toolVersion = findBugsVersion
-      ignoreFailures = false
-      effort = "max"
-      sourceSets = [sourceSets.main] // Only analyze src/java/main, not src/java/test/
-      // The exclude filter file must be under "ligradle/findbugs/" for internal compatibility with ligradle FindBugs
-      excludeFilter = file(rootProject.projectDir.path + "/quality/findbugsExclude.xml")
-    }
     checkstyle {
       toolVersion = '7.6.1'
       configFile = rootProject.file('gradle/checkstyle/checkstyle.xml')
     }
-  }
 
-  tasks.withType(FindBugs) {
-    // Only one findbugs report can be enabled at a time.
-    // There are 3 kinds of reports in gobblin.
-    // 1. xml - when withFindBugsXmlReport is set
-    // 2. xml:withMessages - For Li internal builds
-    // 3. html - otherwise
-    if (project.hasProperty("withFindBugsXmlReport") && reports.find { it.name == "xml:withMessages"} == null) {
-      reports {
-        html.enabled = false
-        xml.enabled = true
-      }
-    }
-    else if (reports.find { it.name == "xml:withMessages"} == null) {
-      reports {
-        html.enabled = true
-        xml.enabled = false
-      }
-    }
+    checkstyleMain.source = ["src/main/java", "src/test/java"]
   }
 
   tasks.withType(Test) {

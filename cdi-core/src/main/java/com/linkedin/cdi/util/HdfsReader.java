@@ -75,7 +75,7 @@ public class HdfsReader {
 
   /**
    * Reads secondary input paths one by one and return the JsonArrays by category
-   * @return a Map<String, JsonArray> structure for records by category
+   * @return a Map&lt;String, JsonArray&gt; structure for records by category
    */
   public Map<String, JsonArray> readAll() {
     if (transientInputPayload == null || transientInputPayload.size() == 0) {

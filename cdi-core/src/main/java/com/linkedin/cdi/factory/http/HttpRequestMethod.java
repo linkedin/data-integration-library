@@ -266,7 +266,7 @@ public enum HttpRequestMethod {
    *    {"param1": "value1", "param2": "value2"}
    *
    * URL Encoded Example:
-   *   param1=value1&param2=value2
+   *   param1=value1%26param2=value2
    *
    * @param parameters Json structured parameters
    * @return URL encoded entity
