@@ -171,7 +171,7 @@ public class JdbcConnection extends MultistageConnection {
       try {
         stmt.setFetchSize(jdbcSourceKeys.getPaginationInitValues().get(ParameterTypes.PAGESIZE).intValue());
       } catch (SQLException e) {
-        LOG.warn("not able to set fetch size");
+        LOG.error("Not able to fetch size : {}", e.toString());
       }
     }
 
