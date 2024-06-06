@@ -185,7 +185,8 @@ public class S3Connection extends MultistageConnection {
               jsonObject.toString().getBytes(StandardCharsets.UTF_8)
       );
     } catch (Exception e) {
-      LOG.error("Encountered IO Exception when reading from path: {}, error : {}", path, e.toString());
+      LOG.error("Encountered Exception when reading from path: {}", path);
+      LOG.error("Error ", e);
       return null;
     }
   }

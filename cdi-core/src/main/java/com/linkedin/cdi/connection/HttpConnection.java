@@ -96,7 +96,7 @@ public class HttpConnection extends MultistageConnection {
         ConnectionClientFactory factory = (ConnectionClientFactory) factoryClass.newInstance();
         httpClient = factory.getHttpClient(state);
       } catch (Exception e) {
-        LOG.error("Error creating HttpClient: {}", e.toString());
+        LOG.error("Error creating HttpClient:", e);
       }
     }
     return httpClient;

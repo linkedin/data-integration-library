@@ -58,7 +58,8 @@ public class KeyCertRetriever {
       privateKey = Base64.getEncoder().encodeToString(entry.getPrivateKey().getEncoded());
       cert = Base64.getEncoder().encodeToString(entry.getCertificate().getEncoded());
     } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | UnrecoverableEntryException e) {
-      LOG.error("Error while loading key and cert for Alias : {}", keyAlias, e);
+      LOG.error("Error while loading key and cert for Alias : {}", keyAlias);
+      LOG.error("Error", e);
       throw new RuntimeException(e);
     }
   }
