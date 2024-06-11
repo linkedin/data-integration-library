@@ -184,8 +184,9 @@ public class S3Connection extends MultistageConnection {
       return new ByteArrayInputStream(
               jsonObject.toString().getBytes(StandardCharsets.UTF_8)
       );
-    } catch (IOException e) {
-      LOG.error("Encountered IO Exception when reading from path: " + path, e);
+    } catch (Exception e) {
+      LOG.error("Encountered Exception when reading from path: {}", path);
+      LOG.error("Error ", e);
       return null;
     }
   }
@@ -243,7 +244,7 @@ public class S3Connection extends MultistageConnection {
                 .credentialsProvider(getCredentialsProvider(state))
                 .build();
       } catch (Exception e) {
-        LOG.error("Error creating S3 Client: {}", e.getMessage());
+        LOG.error("Error creating S3 Client", e);
       }
     }
     return s3Client;

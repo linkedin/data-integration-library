@@ -200,7 +200,7 @@ public class AvroExtractor extends MultistageExtractor<Schema, GenericRecord> {
             SchemaUtils.isValidSchemaDefinition(schemaColumns, fieldNames, jobKeys.getDerivedFields().size()));
       }
     } catch (Exception e) {
-      LOG.error("Source Error: {}", e.getMessage());
+      LOG.error("Source Error: ", e);
       state.setWorkingState(WorkUnitState.WorkingState.FAILED);
       return false;
     }
