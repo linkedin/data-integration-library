@@ -244,7 +244,7 @@ public class S3Connection extends MultistageConnection {
                 .credentialsProvider(getCredentialsProvider(state))
                 .build();
       } catch (Exception e) {
-        LOG.error("Error creating S3 Client: {}", e.toString());
+        LOG.error("Error creating S3 Client", e);
       }
     }
     return s3Client;
