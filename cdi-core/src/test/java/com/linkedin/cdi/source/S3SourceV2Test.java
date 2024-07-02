@@ -4,6 +4,7 @@
 
 package com.linkedin.cdi.source;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.io.UnsupportedEncodingException;
 import org.apache.gobblin.configuration.WorkUnitState;
@@ -35,5 +36,46 @@ public class S3SourceV2Test {
     Assert.assertEquals(source.getS3SourceV2Keys().getPrefix(), "crawl-data/CC-MAIN-2019-43/cc-index.paths.gz");
     Assert.assertEquals(source.getS3SourceV2Keys().getMaxKeys(), new Integer(1000));
     Assert.assertEquals(source.getS3SourceV2Keys().getConnectionTimeout(), new Integer(30));
+  }
+
+  @Test
+  public void testBucketName() {
+    S3SourceV2 s3SourceV2 = new S3SourceV2();
+    JsonObject parameteres =
+        new Gson().fromJson("{\"region\" : \"us-east-2\", \"bucket_name\" : \"collect-us-west-2.tealium.com\"}",
+            JsonObject.class);
+    String host = "collect-us-west-2.tealium.com.s3.amazonaws.com";
+    String bucketName = s3SourceV2.getBucketName(parameteres, host);
+    Assert.assertEquals(bucketName, "collect-us-west-2.tealium.com");
+  }
+
+  @Test
+  public void testBucketNameWithoutBucketParameter() {
+    S3SourceV2 s3SourceV2 = new S3SourceV2();
+    JsonObject parameteres = new Gson().fromJson("{\"region\" : \"us-east-2\"}", JsonObject.class);
+    String host = "collect-us-west-2.s3.amazonaws.com";
+    String bucketName = s3SourceV2.getBucketName(parameteres, host);
+    Assert.assertEquals(bucketName, "collect-us-west-2");
+  }
+
+  @Test
+  public void testEndpoint() {
+    S3SourceV2 s3SourceV2 = new S3SourceV2();
+    JsonObject parameteres =
+        new Gson().fromJson("{\"region\" : \"us-east-2\", \"bucket_name\" : \"colleCt-us-west-2.tealium.com\"}",
+            JsonObject.class);
+    String host = "collect-us-west-2.tealium.com.s3.amazonaws.com";
+    String endpoint = s3SourceV2.getEndpoint(parameteres, host);
+    Assert.assertEquals(endpoint, "s3.amazonaws.com");
+  }
+
+  @Test
+  public void testEndpointWithoutPeriod() {
+    S3SourceV2 s3SourceV2 = new S3SourceV2();
+    JsonObject parameteres =
+        new Gson().fromJson("{\"region\" : \"us-east-2\", \"bucket_name\" : \"collect-us-west-2\"}", JsonObject.class);
+    String host = "collect-us-west-2.s3.amazonaws.com";
+    String endpoint = s3SourceV2.getEndpoint(parameteres, host);
+    Assert.assertEquals(endpoint, "s3.amazonaws.com");
   }
 }
