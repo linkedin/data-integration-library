@@ -92,11 +92,11 @@ public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
     }
 
     // separate the endpoint, which should be a URL without bucket name, from the domain name
-    s3SourceV2Keys.setEndpoint("https://" + getEndpointFromHost(url.getHost()));
+    s3SourceV2Keys.setEndpoint("https://" + getEndpoint(parameters, url.getHost()));
     s3SourceV2Keys.setPrefix(url.getPath().substring(1));
 
     // separate the bucket name from URI domain name
-    s3SourceV2Keys.setBucket(url.getHost().split("\\.")[0]);
+    s3SourceV2Keys.setBucket(getBucketName(parameters, url.getHost()));
 
     s3SourceV2Keys.setFilesPattern(MSTAGE_SOURCE_FILES_PATTERN.get(state));
     s3SourceV2Keys.setMaxKeys(MSTAGE_S3_LIST_MAX_KEYS.get(state));
