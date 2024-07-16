@@ -154,7 +154,8 @@ public class S3SourceV2 extends MultistageSource<Schema, GenericRecord> {
    *
    * @param parameters JsonObject containing ms.source.s3.parameters
    * @param host hostname with bucket name in the beginning
-   * @return the endpoint name without the bucket name
+   * @return the endpoint name if bucket name is present in the parameters then removes the bucket name from host and
+   * calls the getEndpointFromHost method to get the endpoint.
    */
   @VisibleForTesting
   protected String getEndpoint(JsonObject parameters, String host) {

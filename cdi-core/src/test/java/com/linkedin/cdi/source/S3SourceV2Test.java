@@ -72,10 +72,10 @@ public class S3SourceV2Test {
   @Test
   public void testEndpointWithoutPeriod() {
     S3SourceV2 s3SourceV2 = new S3SourceV2();
-    JsonObject parameteres =
+    JsonObject parameters =
         new Gson().fromJson("{\"region\" : \"us-east-2\", \"bucket_name\" : \"collect-us-west-2\"}", JsonObject.class);
     String host = "collect-us-west-2.s3.amazonaws.com";
-    String endpoint = s3SourceV2.getEndpoint(parameteres, host);
+    String endpoint = s3SourceV2.getEndpoint(parameters, host);
     Assert.assertEquals(endpoint, "s3.amazonaws.com");
   }
 }
