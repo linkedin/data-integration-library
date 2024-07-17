@@ -23,6 +23,7 @@ It can have the following attributes:
 - **write_timeout_seconds**: integer, write time out in seconds
 - **connection_timeout_seconds**: Sets the socket to timeout after failing to establish a connection with the server after milliseconds.
 - **connection_max_idle_millis**:  Sets the socket to timeout after timeout milliseconds of inactivity on the socket.
+- **bucket_name**:  Sets the bucket name, optional if the bucket name doesn't contain any special characters.
    
 ### Example
 
