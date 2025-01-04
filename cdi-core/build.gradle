@@ -57,6 +57,8 @@ dependencies {
     force = true
   }
 
+  implementation 'com.github.ben-manes.caffeine:caffeine:2.9.3'
+
   runtime externalDependency.'gobblin-azkaban'
   runtime externalDependency.'gobblin-kafka-08'
   runtime externalDependency.'gobblin-kafka-common'
