@@ -44,6 +44,7 @@ public enum JsonElementTypes {
   INTEGER("integer", "int"),
   INT64("int64", "long"),
   LONG("long"),
+  MAP("map", "map", false),
   NUMBER("number", "double"),
   OBJECT("object", "record", false),
   PRIMITIVE("primitive"),
