@@ -211,7 +211,7 @@ public class HdfsReader {
       Schema.Type fieldType = record.getSchema().getField(field).schema().getType();
       if (valueObject == null || fieldType == Schema.Type.NULL) {
         jsonObject.add(field, JsonNull.INSTANCE);
-      } else if (fieldType == Schema.Type.STRING) {
+      } else if (fieldType == Schema.Type.STRING || fieldType == Schema.Type.UNION) {
         jsonObject.addProperty(field, EncryptionUtils.decryptGobblin(valueObject.toString(), state));
       } else if (fieldType == Schema.Type.ARRAY) {
         jsonObject.add(field, gson.fromJson(valueObject.toString(), JsonArray.class));
