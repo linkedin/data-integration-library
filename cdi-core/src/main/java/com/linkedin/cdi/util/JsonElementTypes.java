@@ -52,7 +52,6 @@ public enum JsonElementTypes {
   STRING("string"),
   TIME("time"),
   TIMESTAMP("timestamp"),
-  MAP("map", "map", false),
   UNION("union", "union", false),
   UNKNOWN("unknown"),
   NULL(true, "null", "null"),
