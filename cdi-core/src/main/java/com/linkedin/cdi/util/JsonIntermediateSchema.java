@@ -231,6 +231,14 @@ public class JsonIntermediateSchema {
           // an Enum has a list of symbols
           this.setSymbols(dataTypeDefinition.get(KEY_WORD_SYMBOLS).getAsJsonArray());
           break;
+        case MAP:
+          JsonObject valuesObject = dataTypeDefinition.get(KEY_WORD_VALUES).getAsJsonObject();
+          if(valuesObject.isJsonPrimitive()) {
+            this.setItemType(new JisDataType(valuesObject.getAsString()));
+          } else {
+            this.setItemType(new JisDataType(valuesObject.getAsJsonObject().get(KEY_WORD_DATA_TYPE).getAsJsonObject()));
+          }
+          break;
         case UNION:
           // a Union has 2 or more different types
           // TODO
