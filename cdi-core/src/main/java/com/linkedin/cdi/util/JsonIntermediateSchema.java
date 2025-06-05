@@ -232,11 +232,11 @@ public class JsonIntermediateSchema {
           this.setSymbols(dataTypeDefinition.get(KEY_WORD_SYMBOLS).getAsJsonArray());
           break;
         case MAP:
-          JsonObject valuesObject = dataTypeDefinition.get(KEY_WORD_VALUES).getAsJsonObject();
-          if(valuesObject.isJsonPrimitive()) {
-            this.setItemType(new JisDataType(valuesObject.getAsString()));
+          JsonElement valuesElement = dataTypeDefinition.get(KEY_WORD_VALUES);
+          if(valuesElement.isJsonPrimitive()) {
+            this.setItemType(new JisDataType(valuesElement.getAsString()));
           } else {
-            this.setItemType(new JisDataType(valuesObject.getAsJsonObject().get(KEY_WORD_DATA_TYPE).getAsJsonObject()));
+            this.setItemType(new JisDataType(valuesElement.getAsJsonObject().get(KEY_WORD_DATA_TYPE).getAsJsonObject()));
           }
           break;
         case UNION:
