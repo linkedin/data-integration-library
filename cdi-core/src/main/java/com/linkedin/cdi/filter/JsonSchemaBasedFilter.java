@@ -45,6 +45,12 @@ public class JsonSchemaBasedFilter extends MultistageSchemaBasedFilter<JsonObjec
       return filter(dataType.getChildRecord(), input.getAsJsonObject());
     } else if (dataType.getType() == JsonElementTypes.ARRAY) {
       return filter(dataType.getItemType(), input.getAsJsonArray());
+    } else if (dataType.getType() == JsonElementTypes.MAP) {
+      JsonObject output = new JsonObject();
+      for (Map.Entry<String, JsonElement> entry: input.getAsJsonObject().entrySet()) {
+        output.add(entry.getKey(), filter(dataType.getItemType().getChildRecord(), entry.getValue().getAsJsonObject()));
+      }
+      return output;
     }
     return null;
   }
