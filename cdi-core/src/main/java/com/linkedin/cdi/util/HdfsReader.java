@@ -10,7 +10,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -219,7 +218,7 @@ public class HdfsReader {
         String decrypted = EncryptionUtils.decryptGobblin(valueObject.toString(), state);
         if (inlineJsonStrings && looksLikeJson(decrypted)) {
           try {
-            jsonObject.add(field, new JsonParser().parse(decrypted));
+            jsonObject.add(field, gson.fromJson(decrypted, JsonElement.class));
           } catch (JsonSyntaxException e) {
             jsonObject.addProperty(field, decrypted);
           }
