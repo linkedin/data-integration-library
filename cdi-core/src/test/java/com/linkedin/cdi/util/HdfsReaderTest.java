@@ -119,10 +119,33 @@ public class HdfsReaderTest {
     Assert.assertEquals(result.get(FIELD).getAsString(), "");
   }
 
+  @Test
+  public void testNullableStringField_whenFlagOn_andValueIsJsonArray_inlinesAsJsonArray() throws Exception {
+    state.setProp(MSTAGE_HDFS_READER_PARSE_JSON_STRINGS.getConfig(), "true");
+    GenericRecord record = recordWithNullableStringField(FIELD, "[{\"@context\":\"schema.org\"}]");
+
+    JsonObject result = Whitebox.invokeMethod(reader, "selectFieldsFromGenericRecord", record, FIELDS);
+
+    Assert.assertTrue(result.get(FIELD).isJsonArray());
+    Assert.assertEquals(
+        result.get(FIELD).getAsJsonArray().get(0).getAsJsonObject().get("@context").getAsString(),
+        "schema.org");
+  }
+
   private GenericRecord recordWithStringField(String key, String val) {
     Schema schema = SchemaBuilder.record("Test").namespace("com.linkedin.test")
         .doc("Test record").fields()
         .name(key).doc("test").type().stringType()
+        .noDefault().endRecord();
+    GenericRecord record = new GenericData.Record(schema);
+    record.put(key, val);
+    return record;
+  }
+
+  private GenericRecord recordWithNullableStringField(String key, String val) {
+    Schema schema = SchemaBuilder.record("Test").namespace("com.linkedin.test")
+        .doc("Test record").fields()
+        .name(key).doc("test").type().nullable().stringType()
         .noDefault().endRecord();
     GenericRecord record = new GenericData.Record(schema);
     record.put(key, val);
