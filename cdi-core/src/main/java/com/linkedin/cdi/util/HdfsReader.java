@@ -219,7 +219,7 @@ public class HdfsReader {
         String decrypted = EncryptionUtils.decryptGobblin(valueObject.toString(), state);
         if (inlineJsonStrings && looksLikeJson(decrypted)) {
           try {
-            jsonObject.add(field, JsonParser.parseString(decrypted));
+            jsonObject.add(field, new JsonParser().parse(decrypted));
           } catch (JsonSyntaxException e) {
             jsonObject.addProperty(field, decrypted);
           }
