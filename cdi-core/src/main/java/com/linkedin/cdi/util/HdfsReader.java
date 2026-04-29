@@ -216,7 +216,7 @@ public class HdfsReader {
         jsonObject.add(field, JsonNull.INSTANCE);
       } else if (fieldType == Schema.Type.STRING || fieldType == Schema.Type.UNION) {
         String decrypted = EncryptionUtils.decryptGobblin(valueObject.toString(), state);
-        if (inlineJsonStrings && looksLikeJson(decrypted)) {
+        if (inlineJsonStrings && isValidJson(decrypted)) {
           try {
             jsonObject.add(field, gson.fromJson(decrypted, JsonElement.class));
           } catch (JsonSyntaxException e) {
@@ -242,14 +242,14 @@ public class HdfsReader {
     return jsonObject;
   }
 
-  private static boolean looksLikeJson(String s) {
-    if (s == null) {
+  private static boolean isValidJson(String value) {
+    if (value == null) {
       return false;
     }
-    String t = s.trim();
-    return t.length() >= 2
-        && ((t.charAt(0) == '{' && t.charAt(t.length() - 1) == '}')
-        || (t.charAt(0) == '[' && t.charAt(t.length() - 1) == ']'));
+    String trimmed = value.trim();
+    return trimmed.length() >= 2
+        && ((trimmed.charAt(0) == '{' && trimmed.charAt(trimmed.length() - 1) == '}')
+        || (trimmed.charAt(0) == '[' && trimmed.charAt(trimmed.length() - 1) == ']'));
   }
 
   /**
