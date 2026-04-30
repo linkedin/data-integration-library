@@ -10,6 +10,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,6 +30,7 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.linkedin.cdi.configuration.PropertyCollection.*;
 import static com.linkedin.cdi.configuration.StaticConstants.*;
 
 
@@ -206,13 +208,23 @@ public class HdfsReader {
   @VisibleForTesting
   private JsonObject selectFieldsFromGenericRecord(GenericRecord record, List<String> fields) {
     JsonObject jsonObject = new JsonObject();
+    boolean inlineJsonStrings = MSTAGE_HDFS_READER_PARSE_JSON_STRINGS.get(state);
     for (String field: fields) {
       Object valueObject = record.get(field);
       Schema.Type fieldType = record.getSchema().getField(field).schema().getType();
       if (valueObject == null || fieldType == Schema.Type.NULL) {
         jsonObject.add(field, JsonNull.INSTANCE);
       } else if (fieldType == Schema.Type.STRING || fieldType == Schema.Type.UNION) {
-        jsonObject.addProperty(field, EncryptionUtils.decryptGobblin(valueObject.toString(), state));
+        String decrypted = EncryptionUtils.decryptGobblin(valueObject.toString(), state);
+        if (inlineJsonStrings && isValidJson(decrypted)) {
+          try {
+            jsonObject.add(field, gson.fromJson(decrypted, JsonElement.class));
+          } catch (JsonSyntaxException e) {
+            jsonObject.addProperty(field, decrypted);
+          }
+        } else {
+          jsonObject.addProperty(field, decrypted);
+        }
       } else if (fieldType == Schema.Type.ARRAY) {
         jsonObject.add(field, gson.fromJson(valueObject.toString(), JsonArray.class));
       } else if (fieldType == Schema.Type.RECORD) {
@@ -228,6 +240,16 @@ public class HdfsReader {
       }
     }
     return jsonObject;
+  }
+
+  private static boolean isValidJson(String value) {
+    if (value == null) {
+      return false;
+    }
+    String trimmed = value.trim();
+    return trimmed.length() >= 2
+        && ((trimmed.charAt(0) == '{' && trimmed.charAt(trimmed.length() - 1) == '}')
+        || (trimmed.charAt(0) == '[' && trimmed.charAt(trimmed.length() - 1) == ']'));
   }
 
   /**

@@ -102,6 +102,9 @@ public interface PropertyCollection {
     }
   };
 
+  BooleanProperties MSTAGE_HDFS_READER_PARSE_JSON_STRINGS =
+      new BooleanProperties("ms.hdfs.reader.parse.json.strings", Boolean.FALSE);
+
   // ms.http.maxConnections has default value 50 and max value 500
   // 0 is interpreted as default
   IntegerProperties MSTAGE_HTTP_CONN_MAX =
@@ -339,6 +342,7 @@ public interface PropertyCollection {
       MSTAGE_EXTRACT_PREPROCESSORS,
       MSTAGE_EXTRACT_PREPROCESSORS_PARAMETERS,
       MSTAGE_GRACE_PERIOD_DAYS,
+      MSTAGE_HDFS_READER_PARSE_JSON_STRINGS,
       MSTAGE_HTTP_CONN_MAX,
       MSTAGE_HTTP_CONN_PER_ROUTE_MAX,
       MSTAGE_HTTP_CONN_TTL_SECONDS,
