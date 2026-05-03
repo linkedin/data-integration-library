@@ -723,14 +723,14 @@ public class MultistageExtractor<S, D> implements Extractor<S, D> {
   }
 
   /**
-   * Check if session state is enabled and session fail condition is met
+   * Check if session state is enabled with a session fail condition defined, and the fail condition is met
    *
-   * @return true if session state is enabled and session fail condition is met
+   * @return true if session state is enabled with a session fail condition defined, and the fail condition is met
    * otherwise return false
    */
   protected boolean isSessionStateFailed() {
-    return jobKeys.isSessionStateEnabled() && extractorKeys.getSessionKeyValue()
-        .matches(jobKeys.getSessionStateFailCondition());
+    return jobKeys.isSessionStateEnabled() && StringUtils.isNotBlank(jobKeys.getSessionStateFailCondition())
+        && extractorKeys.getSessionKeyValue().matches(jobKeys.getSessionStateFailCondition());
   }
 
   /**
