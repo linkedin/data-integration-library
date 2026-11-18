@@ -212,7 +212,9 @@ public class WatermarkDefinition {
     DateTimeZone timeZone = DateTimeZone.forID(TZ_LOS_ANGELES);
     if (input.equals("-")) {
       dtString = "P0DT0H0M";
-    } else if (input.contains("\\.")) {
+    } else if (input.matches(REGEXP_TIME_DURATION_PATTERN) && input.contains(".")) {
+      // ISO duration with a timezone suffix, e.g. P0D.UTC. Date time strings can also
+      // contain "." (fractional seconds), so only split durations.
       timeZone = DateTimeZone.forID(input.split("\\.")[1]);
       dtString = input.split("\\.")[0];
     }

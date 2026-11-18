@@ -79,7 +79,7 @@ public class WatermarkProperties extends JsonArrayProperties {
 
           // check timezone string in the FROM value
           if (from.matches(REGEXP_TIME_DURATION_PATTERN)) {
-            if (from.contains("\\.")) {
+            if (from.contains(".")) {
               try {
                 DateTimeZone.forID(from.split("\\.")[1]);
               } catch (Exception e) {
@@ -98,7 +98,7 @@ public class WatermarkProperties extends JsonArrayProperties {
 
           // check timezone string in the TO value
           if (to.matches(REGEXP_TIME_DURATION_PATTERN)) {
-            if (to.contains("\\.")) {
+            if (to.contains(".")) {
               try {
                 DateTimeZone.forID(to.split("\\.")[1]);
               } catch (Exception e) {

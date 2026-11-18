@@ -187,6 +187,24 @@ public class WatermarkDefinitionTest {
   }
 
   @Test
+  public void testGetDateTimeWithTimezoneSuffix() {
+    definitions = new WatermarkDefinition("primary", "2020-01-01", "P0D.UTC");
+
+    DateTime dayRounded = definitions.getDateTime("P0D.UTC");
+    Assert.assertEquals(dayRounded.getZone(), DateTimeZone.UTC);
+    Assert.assertEquals(dayRounded.getMillisOfDay(), 0);
+
+    DateTime hourRounded = definitions.getDateTime("P1DT2H.America/New_York");
+    Assert.assertEquals(hourRounded.getZone(), DateTimeZone.forID("America/New_York"));
+    Assert.assertEquals(hourRounded.getMinuteOfHour(), 0);
+    Assert.assertEquals(hourRounded.getSecondOfMinute(), 0);
+
+    // a "." in fractional seconds is not a timezone separator
+    Assert.assertEquals(definitions.getDateTime("2020-01-01 10:00:30.123").toString(),
+        "2020-01-01T10:00:30.123-08:00");
+  }
+
+  @Test
   public void testGetDateTimeII() {
     definitions = new WatermarkDefinition("primary", "[{\"secondary\":\"2018\"}]");
     Assert.assertEquals(definitions.getDateTime("2020-01-01 10:00:30").toString(),
