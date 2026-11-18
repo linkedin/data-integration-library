@@ -242,6 +242,14 @@ public class MultistagePropertiesIndividualTest {
     state.setProp("ms.watermark", "[{\"name\": \"table\", \"type\": \"unit\", \"units\": \"ac_audit_log,ac_tables,accounts\"}]");
     Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
 
+    // ISO duration with a timezone suffix
+    state.setProp("ms.watermark", "[{\"name\":\"system\",\"type\":\"datetime\",\"range\":{\"from\":\"P7D.UTC\",\"to\":\"P0D.America/Los_Angeles\"}}]");
+    Assert.assertTrue(MSTAGE_WATERMARK.isValid(state));
+
+    // unknown timezone in the suffix
+    state.setProp("ms.watermark", "[{\"name\":\"system\",\"type\":\"datetime\",\"range\":{\"from\":\"2021-01-01\",\"to\":\"P0D.Not/AZone\"}}]");
+    Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
+
     // P0D0H0M - minute offset not supported yet
     state.setProp("ms.watermark", "[{\"name\":\"system\",\"type\":\"datetime\",\"range\":{\"from\":\"2021-01-01\",\"to\":\"P0D0H0M\"}}]");
     Assert.assertFalse(MSTAGE_WATERMARK.isValid(state));
